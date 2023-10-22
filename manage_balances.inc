@@ -1,6 +1,9 @@
 <?php
 
-function list_balances_of_users() {
+function list_balance_of_users() {
+    if (!isBudatollPagePermited('manage_balances')) {
+        return putPermissionNotGranted();
+    }
     $ret = 'Ez a lista az egyenlegekről már a fejlesztésből.<br>';
 
     $users = get_users([
