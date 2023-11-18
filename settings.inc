@@ -28,8 +28,7 @@ function budatoll_register_settings() {
 }
 add_action('admin_init', 'budatoll_register_settings');
 
-function my_plugin_function() {
-    $my_plugin_option = get_option('budatoll_option');
-    // Use $my_plugin_option in your plugin
+function budatoll_function() {
+   
 }
 add_action('init', 'budatoll_function');

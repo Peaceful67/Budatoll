@@ -7,7 +7,7 @@ function list_balance_of_users() {
     $ret = 'Ez a lista az egyenlegekről már a fejlesztésből.<br>';
 
     $users = get_users([
-        'role' => ROLE_COACH,
+        'role' => BUDATOLL_ROLE_COACH,
         'number' => -1,
         'fields' => 'all',
     ]);

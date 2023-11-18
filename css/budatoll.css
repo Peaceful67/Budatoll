@@ -1,0 +1,54 @@
+
+.budatoll-keret {
+    position: relative;
+    border: 2px solid #a1a1a1;
+    padding: 10px 40px;
+    border-radius: 25px;
+    margin: 10px;
+    background: lightblue;
+}
+
+.budatoll-button  {
+    margin: 5px;
+    background-color: lightgrey;
+}
+
+.budatoll-editor label {
+    display: inline-block;
+    text-align: left;
+    margin: 5px;
+    width: 180px;
+}
+.budatoll-editor input {
+    margin: 5px;
+    display: inline-block;
+    width: calc(100%-280px);
+    text-align: left;
+}
+
+.budatoll-editor {
+    display: flex;
+    line-height: 200%;
+    flex-direction: column;
+}
+.budatoll-row {
+    display: flex;
+    justify-content: left;
+}
+
+.budatoll-column {
+    flex: 1;
+    padding: 5px;
+}
+.budatoll-table thead {
+    background-color: lightgray;
+}
+
+.budatoll-editor button {
+    margin: 5px;
+}
+
+.clickable-row:hover {
+    cursor:  pointer;
+    background-color: lightblue;
+}
