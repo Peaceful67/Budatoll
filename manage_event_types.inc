@@ -3,29 +3,31 @@
 function budatoll_manage_event_types() {
     global $wpdb;
 
-    $ret = '<form id="BudatollForm" method="post">';
-    $ret .= print_r($_POST, true);
-    $edit_id = filter_input(INPUT_POST, 'budatoll_edit') ?? -1;
-    $delete_id = filter_input(INPUT_POST, 'budatoll_delete');
-    $save = filter_input(INPUT_POST, 'budatoll_save');
-    if (filter_input(INPUT_POST, 'budatoll_cancel')) {
+    $ret = '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on">';
+      $ret .= print_r($_POST, true);
+    $edit_id = getPostVariable('budatoll_edit', -1);
+    $delete_id = getPostVariable('budatoll_delete', false);
+    $save = getPostVariable('budatoll_save', false);
+    if (getPostVariable('budatoll_cancel', false)) {
         $edit_id = -1;
     }
-    $clicked_row = filter_input(INPUT_POST, 'clicked_row') ?? -1;
-    if (filter_input(INPUT_POST, 'budatoll_add')) {
+    $clicked_row = getPostVariable('budatoll_clicked_row', -1);
+    if (getPostVariable('budatoll_add', false)) {
         $edit_id = 0;
     }
+    $ret .= '<input type="hidden" name="budatoll_edit" id="budatoll_edit" value="' . $edit_id . '">';
+    $ret .= '<input type="hidden" name="budatoll_clicked_row" id="budatoll_clicked_row" value="' . $clicked_row . '">';
     if ($delete_id) {
         $wpdb->delete(BUDATOLL_EVENT_TYPE_TABLE, [BUDATOLL_EVENT_TYPE_ID => $delete_id]);
     }
     if ($save) {
         $data = [
-            BUDATOLL_EVENT_TYPE_SHORT => (filter_input(INPUT_POST, 'budatoll-short') ?? ''),
-            BUDATOLL_EVENT_TYPE_LONG => (filter_input(INPUT_POST, 'budatoll-long') ?? ''),
-            BUDATOLL_EVENT_TYPE_PRICE => (filter_input(INPUT_POST, 'budatoll-price') ?? 0),
-            BUDATOLL_EVENT_TYPE_START => (filter_input(INPUT_POST, 'budatoll-start') ?? '00:00'),
-            BUDATOLL_EVENT_TYPE_END => (filter_input(INPUT_POST, 'budatoll-end') ?? '00:00'),
-            BUDATOLL_EVENT_TYPE_MAX_PLAYERS => (filter_input(INPUT_POST, 'budatoll-max') ?? 0),
+            BUDATOLL_EVENT_TYPE_SHORT => getPostVariable('budatoll-short', ''),
+            BUDATOLL_EVENT_TYPE_LONG => getPostVariable('budatoll-long', ''),
+            BUDATOLL_EVENT_TYPE_PRICE => getPostVariable('budatoll-price', 0),
+            BUDATOLL_EVENT_TYPE_START => getPostVariable('budatoll-start', '00:00'),
+            BUDATOLL_EVENT_TYPE_END => getPostVariable('budatoll-end', '00:00'),
+            BUDATOLL_EVENT_TYPE_MAX_PLAYERS => getPostVariable('budatoll-max', 0),
         ];
 
         if ($edit_id > 0) {
@@ -42,8 +44,6 @@ function budatoll_manage_event_types() {
         $ret .= budatollEventTypeModal($clicked_row);
     }
     $ret .= budatollEventTypeList();
-    $ret .= '<input type="hidden" name="budatoll_edit" id="budatoll_edit" value="' . $edit_id . '">';
-    $ret .= '<input type="hidden" name="clicked_row" id="clicked_row" value="' . $clicked_row . '">';
     $ret .= '</form>';
     return $ret;
 }
@@ -100,8 +100,9 @@ function budatollEventTypeEdit($item_id) {
             . '<input type="number" id="budatoll-price" name="budatoll-price" value="' . $price . '"> Ft</label>';
     $ret .= '<label>Max játékos:'
             . '<input type="number" id="budatoll-max" name="budatoll-max" value="' . $max_players . '"></label></div>';
-    $ret .= '<div class="form-inline"><button name="budatoll_save" value="' . $item_id . '" title="Mentés"><span class="dashicons dashicons-saved"></span></button>';
-    $ret .= '<button name="budatoll_cancel" id="budatoll_cancel" value="-1" title="Mégse"><span class="dashicons dashicons-undo"></span></button></div>';
+    $ret .= '<div class="form-inline"><button class="button budatoll-button" name="budatoll_save"  id="budatoll_save" value="-1" title="Mentés">'
+            . '<span class="dashicons dashicons-saved"></span></button>';
+    $ret .= '<button class="button budatoll-button" name="budatoll_cancel" id="budatoll_cancel" value="-1" title="Mégse"><span class="dashicons dashicons-undo"></span></button></div>';
     $ret .= '</div></div></div>';
     return $ret;
 }
@@ -111,20 +112,21 @@ function budatollEventTypeList() {
     $ret = '<H4>Edzés típusok</H4>';
     $results = $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '`;');
     $ret .= '<table class="table table-striped table-bordered budatoll-table">';
-    $ret .= '<button class="button budatoll-button" name="budatoll_add" value="-1" title="Új hozzáadása"><span class="dashicons dashicons-plus"></span></button>';
+    $ret .= '<button class="button budatoll-button" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása"><span class="dashicons dashicons-plus"></span></button>';
     $ret .= '<thead><tr><th>Rövid név</th><th>Rövid név</th><th>Ár</th><th>Kezdet</th><th>Vég</th><th>Művelet</th></tr></thead><tbody>';
     foreach ($results as $row) {
         $id = $row->{BUDATOLL_EVENT_TYPE_ID};
-        $ret .= '<tr class="clickable-row" data-itemm="' . $id . '">';
+        $ret .= '<tr class="clickable-row" data-item="' . $id . '">';
         $ret .= '<td>' . $row->{BUDATOLL_EVENT_TYPE_SHORT} . '</td>';
         $ret .= '<td>' . $row->{BUDATOLL_EVENT_TYPE_LONG} . '</td>';
         $ret .= '<td>' . number_format($row->{BUDATOLL_EVENT_TYPE_PRICE}, 0, ',', '.') . ' Ft</td>';
         $ret .= '<td>' . substr($row->{BUDATOLL_EVENT_TYPE_START}, 0, 5) . '</td>';
         $ret .= '<td>' . substr($row->{BUDATOLL_EVENT_TYPE_END}, 0, 5) . '</td>';
         $ret .= '<td class="form-inline"><button class="button budatoll-button" name="budatoll_edit" id="budatoll_edit" value="' . $id . '" title="Szerkesztés">'
-                . '<span class="dashicons dashicons-edit"></span></button>'
+                . '<i class="fa-solid fa-pen-to-square"></i></button>'
                 . '<button class="button budatoll-button" name="budatoll_delete" id="budatoll_delete" value="' . $id . '" '
-                . 'onclick="return confirm(\'Biztosan törölni akarod a \"' . $row->{BUDATOLL_EVENT_TYPE_LONG} . '\" nevű edzést?\');" title="Törlés"><span class="dashicons dashicons-trash"></span></button></td>';
+                . 'onclick="return confirm(\'Biztosan törölni akarod a \"' . $row->{BUDATOLL_EVENT_TYPE_LONG} . '\" nevű edzést?\');" title="Törlés">'
+                        . '<i class="fa-solid fa-trash"></i></button></td>';
         $ret .= '</tr>';
     }
     $ret .= '</tbody></table>';
