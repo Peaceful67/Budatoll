@@ -1,45 +1,91 @@
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('calendar');
-    let currentDate = new Date();
-    let year = currentDate.getFullYear();
-    let month = currentDate.getMonth() + 1; // getMonth() is zero-indexed
-    let day = currentDate.getDate();
-    month = month < 10 ? '0' + month : month;
-    day = day < 10 ? '0' + day : day;
-    let today = year + '-' + month + '-' + day;
-    
-    var budatoll_calendar = new FullCalendar.Calendar(calendarEl, {
-         headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek'
-      },
-        initialDate: today,
-        editable: true,
-        selectable: true,
-        businessHours: true,
-        droppable: true,
-        dayMaxEvents: true, // allow "more" link when too many events
-        events: [
-            {
-                title: 'All Day Event',
-                start: '2023-11-01'
-            },
-            {
-                title: 'Long Event',
-                start: '2023-11-07',
-                end: '2023-11-10'
-            },
+btAddedEventIds = [];
 
-            {
-                title: 'Conference',
-                start: '2023-11-11T14:30:00',
-                end: '2023-11-11T14:30:00'
-            },
-        ]
+function isFullcalendar() {
+    var url = window.location.href;
+    var mainUrl = url.split('?')[0];
+    if (mainUrl.endsWith('/')) {
+        mainUrl = mainUrl.substring(0, mainUrl.length - 1);
+    }
+    var slug = mainUrl.substring(mainUrl.lastIndexOf('/') + 1);
+    return slug.includes('edzes-naptar');
+}
+
+function submitForm(form_id) {
+    document.getElementById(form_id).submit();
+}
+
+function btEventClick(eventInfo) {
+    alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
+}
+
+function btEventReceive(eventInfo) {
+    var droppedDate = getDateOfEventDate(eventInfo.event.start);
+    eventInfo.event.setAllDay(false);
+    $.ajax({
+        url: budatoll_ajax_object.ajax_url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'budatoll',
+            'ajax-action': 'add-event',
+            'event_type-id': eventInfo.event.id,
+            'dropped-date': droppedDate,
+        },
+        success: function (response) {
+            switch (response.result) {
+                case 'already':
+                    eventInfo.event.remove();
+                    $('#budatoll-message').html('Ilyen edzés már van ezen a napon, nem történt mentés').removeClass('budatoll-success').addClass('budatoll-error');
+                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
+                case 'success':
+                    start_time = droppedDate + 'T' + response.event.start;
+                    end_time = droppedDate + 'T' + response.event.end;
+                    event_id = response.event_id;
+                    console.log('event id: ' + event_id);
+                    eventInfo.event.setProp('id', event_id);
+                    eventInfo.event.setDates(start_time, end_time);
+                    eventInfo.event.setAllDay(false);
+                    //                           console.log(eventInfo.event);
+                    $('#budatoll-message').html('Mentés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
+                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
+                case 'error':
+                    eventInfo.event.remove();
+                    $('#budatoll-message').html('A mentés sikeretelen').removeClass('budatoll-success').addClass('budatoll-error');
+                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
+            }
+        },
+        error: function (response) {
+            eventInfo.event.remove();
+            $('#budatoll-message').html('A mentés sikeretelen').addClass('budatoll-error');
+            $('#budatoll-message').show(1000).delay(1500).hide(1000);
+        }
     });
+}
 
-    budatoll_calendar.render();
-});
+function btEventMouseEnter(eventInfo) {
+    console.log(eventInfo.event);
+}
+
+function btEventMouseLeave(eventInfo) {
+    console.log('Mouse leave: ' + eventInfo.event.title);
+
+}
+
+function btEventDrop(eventInfo) {
+//    alert('Drop event:' + eventInfo.event.id);
+    console.log('EventDrop: ' + eventInfo.event.start + ' - ' + eventInfo.event.start);
+}
+
+function getDateOfEventDate(event_date) {
+    var date = new Date(event_date);
+    var year = date.getFullYear(); // Gets the year
+    var month = (date.getMonth() + 1).toString().padStart(2, '0'); // Gets the month, zero-padded
+    var day = date.getDate().toString().padStart(2, '0'); // Gets the day of the month, zero-padded
+
+    return  year + '-' + month + '-' + day;
+}

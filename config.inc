@@ -3,18 +3,16 @@
 define("BUDATOLL_ROLE_COACH", 'coach');
 define("BUDATOLL_ROLE_PLAYER", 'player');
 
-define("BUDATOLL_ACCESS_MANAGE_BALANCES", 'budatoll_manage_balances');
-define("BUDATOLL_ACCESS_MANAGE_BOOKING", 'budatoll_manage_booking');
-define("BUDATOLL_ACCESS_VIEW_BALANCE", 'budatoll_view_balance');
-define("BUDATOLL_ACCESS_VIEW_BOOKINGS", 'budatoll_view_bookings');
+define("BUDATOLL_ACCESS_MANAGE_OPTIONS", 'budatoll-manage-options');
+define("BUDATOLL_ACCESS_MANAGE_COACH", 'budatoll-manage-coach');
+define("BUDATOLL_ACCESS_MANAGE_PLAYER", 'budatoll-manage-player');
 
-define("BUDATOLL_PAYMENT_TABLE", $wpdb->prefix . 'budatoll_payments');
+define("BUDATOLL_PAYMENT_TABLE", 'wp_budatoll_payments');
 define("BUDATOLL_PAYMENT_ID", 'id');
 define("BUDATOLL_PAYMENT_USER_ID", 'user-id');
 define("BUDATOLL_PAYMENT_AMOUNT", 'amount');
 define("BUDATOLL_PAYMENT_EVENT_ID", 'event-id');
 define("BUDATOLL_PAYMENT_TIME", 'time');
-
 
 define("BUDATOLL_EVENT_TYPE_TABLE", 'wp_budatoll_event_type');
 define("BUDATOLL_EVENT_TYPE_ID", 'id');
@@ -25,43 +23,48 @@ define("BUDATOLL_EVENT_TYPE_MAX_PLAYERS", 'max_players');
 define("BUDATOLL_EVENT_TYPE_START", 'start');
 define("BUDATOLL_EVENT_TYPE_END", 'end');
 
-define("BUDATOLL_APPLY_TABLE", $wpdb->prefix . 'budatoll_applay');
-define("BUDATOLL_APPLAY_ID", 'id');
-define("BUDATOLL_APPLAY_EVENT_ID", 'event-id');
-define("BUDATOLL_APPLAY_USER_ID", 'user-id');
+define("BUDATOLL_EVENTS_TABLE", 'wp_budatoll_events');
+define("BUDATOLL_EVENTS_ID", 'id');
+define("BUDATOLL_EVENTS_EVENT_TYPE_ID", 'type_id');
+define("BUDATOLL_EVENTS_SHORT", 'short');
+define("BUDATOLL_EVENTS_LONG", 'long');
+define("BUDATOLL_EVENTS_PRICE", 'price');
+define("BUDATOLL_EVENTS_MAX_PLAYERS", 'max_players');
+define("BUDATOLL_EVENTS_DAY", 'day');
+define("BUDATOLL_EVENTS_START", 'start');
+define("BUDATOLL_EVENTS_END", 'end');
+define("BUDATOLL_EVENTS_COMMENT", 'comment');
 
+define("BUDATOLL_LOGGER_TABLE", 'wp_budatoll_logger');
+define("BUDATOLL_LOGGER_ID", 'id');
+define("BUDATOLL_LOGGER_TYPE", 'type');
+define("BUDATOLL_LOGGER_USER", 'user');
+define("BUDATOLL_LOGGER_RELATED", 'related');
+define("BUDATOLL_LOGGER_COMMENT", 'comment');
+define("BUDATOLL_LOGGER_TIME", 'time');
 
+$budatoll_months = [
+    1 => 'Január',
+    2 => 'Február',
+    3 => 'Március',
+    4 => 'Április',
+    5 => 'Május',
+    6 => 'Június',
+    7 => 'Július',
+    8 => 'Augusztus',
+    9 => 'Szeptember',
+    10 => 'Október',
+    11 => 'November',
+    12 => 'December',
+];
 /*
- * CREATE TABLE IF NOT EXISTS `wp_budatoll_event_type` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
-  `short` varchar(50) NOT NULL,
-  `long` varchar(255) DEFAULT NULL,
-  `price` int(8) NOT NULL DEFAULT 0,
-  `max_players` int(8) NOT NULL DEFAULT 0,
-  `start` time(1) NOT NULL,
-  `end` time(1) NOT NULL,
-  UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+if (current_user_can(BUDATOLL_ACCESS_MANAGE_OPTIONS)) {
+    
+}
 
- * CREATE TABLE IF NOT EXISTS `wp_budatoll_accounts` (
-  `id` int(8) NOT NULL AUTO_INCREMENT,
-  `user_id` int(8) NOT NULL DEFAULT -1,
-  `event_id` int(8) NOT NULL DEFAULT -1,
-  `amount` int(8) NOT NULL DEFAULT 0,
-  `payment_time` timestamp(1) NOT NULL DEFAULT current_timestamp(1) ON UPDATE current_timestamp(1),
-  `comment` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-
-CREATE TABLE IF NOT EXISTS `wp_budatoll_trainings` (
-  `id` int(8) NOT NULL AUTO_INCREMENT,
-  `type_id` int(8) NOT NULL DEFAULT -1,
-  `name` varchar(255) DEFAULT NULL,
-  `max_players` int(8) NOT NULL DEFAULT 0,
-  `day` date NOT NULL,
-  `start` time(1) NOT NULL,
-  `end` time(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
- */
+if (current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
+   
+}
+if (current_user_can(BUDATOLL_ACCESS_MANAGE_PLAYER)) {
+    
+}

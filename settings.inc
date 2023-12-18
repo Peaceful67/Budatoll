@@ -1,34 +1,56 @@
 <?php
 
-function budatoll_settings_page() {
+require_once plugin_dir_path(__FILE__) . 'setting/event_types.inc';
+require_once plugin_dir_path(__FILE__) . 'setting/options.inc';
+require_once plugin_dir_path(__FILE__) . 'setting/logger.inc';
+require_once plugin_dir_path(__FILE__) . 'setting/manage_players.inc';
+
+add_action('admin_init', 'budatoll_settings_init');
+add_action('admin_menu', 'budatoll_add_settings_pages');
+
+function budatoll_add_settings_pages() {
     add_menu_page(
             'Budatoll beállítások',
             'Budatoll',
             'manage_options',
+            'options',
+            '',
+            'dashicons-buddicons-topics',
+    );
+    add_submenu_page(
             'budatoll-settings',
-            'budatoll_settings_content'
+            'Beállítások',
+            'Beállítások',
+            'manage_options',
+            'options',
+            'budatoll_setting_options',
+    );
+    add_submenu_page(
+            'options',
+            'Naplók lekérdezése',
+            'Naplók',
+            'manage_options',
+            'naplo-lista',
+            'bt_logger_list',
+    );
+    add_submenu_page(
+            'options',
+            'Edzést típusok kezelése',
+            'Edzés típusok',
+            'manage_options',
+            'edzes-tipusok',
+            'budatoll_manage_event_types',
+    );
+    add_submenu_page(
+            'options',
+            'Játékosok kezelése',
+            'Játékosok',
+            'manage_options',
+            'jatekosok',
+            'budatoll_manage_players',
     );
 }
 
-function budatoll_settings_content() {
-    echo '<div class="wrap">';
-    echo '<h2>Budatoll beállítások</h2>';
-    // Add your settings form here
-    echo '</div>';
-    echo '<form method="post" action="options.php">';
-    settings_fields('my-plugin-settings-group');
-    do_settings_sections('my-plugin-settings');
-    echo '<input type="text" name="my_plugin_option" value="' . esc_attr(get_option('my_plugin_option')) . '">';
-    submit_button();
-    echo '</form>';
+function budatoll_admin_styles() {
+    wp_enqueue_style('budatoll-admin', plugins_url('css/admin.css', __FILE__));
 }
-
-function budatoll_register_settings() {
-    register_setting('budatoll-settings-group', 'budatoll_option');
-}
-add_action('admin_init', 'budatoll_register_settings');
-
-function budatoll_function() {
-   
-}
-add_action('init', 'budatoll_function');

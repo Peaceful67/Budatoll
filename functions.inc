@@ -26,7 +26,7 @@ function putPermissionNotGranted() {
 
 function budatollNewModal($modal_name, $title, $size = 'md') {
     $ret = '<script type="text/javascript">$(function(){$("#' . $modal_name . '").modal("show");}); '
-            . 'function closeModal(){ $("#'.$modal_name.'").modal("hide");}</script>';
+            . 'function closeModal(){ $("#' . $modal_name . '").modal("hide");}</script>';
     $ret .= '<div class="modal fade" id="' . $modal_name . '" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-' . $size . '"><div class="modal-content">';
     $ret .= '<div class="modal-header">';
     $ret .= '<h4 class="modal-title">' . $title . '</h4>';
@@ -42,4 +42,30 @@ function budatollNewModalFooter() {
 
 function budatollEndModal() {
     return '</div></div></div></div></div>';
+}
+
+function getPostVariable($var_name, $default = false) {
+    $ret = $_POST[$var_name] ?? $default;
+    if (is_null($ret) OR !$ret) {
+        $ret = $default;
+    }
+    return $ret;
+}
+
+function putScript($script) {
+    return '<script type="text/javascript">' . $script . '</script>';
+}
+
+function bt_send_email($user_id, $subject, $message) {
+    $user = get_userdata($user_id);
+    if (!$user) {
+        return false; // User not found
+    }
+    $user_email = sanitize_email($user->user_email);
+    if (!is_email($user_email)) {
+        return false;
+    }
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
+    return wp_mail($user_email, $subject, $message, $headers);
 }

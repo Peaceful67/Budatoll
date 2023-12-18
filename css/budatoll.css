@@ -5,11 +5,11 @@
     padding: 10px 40px;
     border-radius: 25px;
     margin: 10px;
-    background: lightblue;
+    background: lightgray;
 }
 
 .budatoll-button  {
-    margin: 5px;
+    margin: 5px !important;
     background-color: lightgrey;
 }
 
@@ -31,11 +31,14 @@
     line-height: 200%;
     flex-direction: column;
 }
-.budatoll-row {
-    display: flex;
-    justify-content: left;
-}
 
+
+.budatoll-label {
+    display: flex;
+    font-weight: bold;
+    justify-content: left;
+    width: 120px;
+}
 .budatoll-column {
     flex: 1;
     padding: 5px;
@@ -52,3 +55,83 @@
     cursor:  pointer;
     background-color: lightblue;
 }
+
+.budatoll-table-row:hover {
+    background-color: lightgray;
+}
+
+.budatoll-popup {
+    display:none;
+    position: fixed;
+    background: #FFF;
+    background-color: rgba(255,255,255,0.5);
+    padding: 0px;
+    width: auto;
+    z-index: 100;
+    margin: auto;
+}
+
+.budatoll-popup-content {
+    background: #ddd;
+    padding: 20px;
+    width: 100%;
+    margin: 0px;
+    ;
+    border: 1px solid #888;
+    border-radius: 10px;
+}
+.budatoll-popup-close {
+    color: #555;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.budatoll-popup-close:hover, .budatoll-popup-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.budatoll-row {
+    display: block;
+    margin: 10px;
+    justify-content: left;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.budatoll-message {
+    display: none;
+    color: black;
+    margin:10px;
+    align-content: center;
+    padding: 10px;
+    position: relative;
+    border: 2px solid #a1a1a1;
+    border-radius: 5px;
+}
+
+.budatoll-success {
+    background: lightgreen;
+}
+.budatoll-error {
+    background: lightpink;
+}
+
+.budatoll-dropdown {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.budatoll-dropdown option {
+    padding: 5px;
+}
+
+.form-table th {
+    width:20%;
+}
+
+
