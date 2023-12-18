@@ -43,28 +43,3 @@ define("BUDATOLL_LOGGER_RELATED", 'related');
 define("BUDATOLL_LOGGER_COMMENT", 'comment');
 define("BUDATOLL_LOGGER_TIME", 'time');
 
-$budatoll_months = [
-    1 => 'Január',
-    2 => 'Február',
-    3 => 'Március',
-    4 => 'Április',
-    5 => 'Május',
-    6 => 'Június',
-    7 => 'Július',
-    8 => 'Augusztus',
-    9 => 'Szeptember',
-    10 => 'Október',
-    11 => 'November',
-    12 => 'December',
-];
-/*
-if (current_user_can(BUDATOLL_ACCESS_MANAGE_OPTIONS)) {
-    
-}
-
-if (current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
-   
-}
-if (current_user_can(BUDATOLL_ACCESS_MANAGE_PLAYER)) {
-    
-}

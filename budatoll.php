@@ -10,7 +10,7 @@
 if (!defined('ABSPATH')) {
     die();
 }
-
+setlocale(LC_TIME, 'hu_HU.UTF-8');
 require_once plugin_dir_path(__FILE__) . 'config.inc';
 require_once plugin_dir_path(__FILE__) . 'functions.inc';
 require_once plugin_dir_path(__FILE__) . 'manage_balances.inc';
@@ -28,6 +28,7 @@ add_shortcode('budatoll-list-event-types', 'budatoll_list_event_types');
 add_shortcode('budatoll-event-types', 'budatoll_manage_event_types');
 add_shortcode('budatoll-events-list', 'budatoll_manage_events_list');
 add_shortcode('budatoll-events-calendar', 'budatoll_manage_events_calendar');
+add_shortcode('budatoll-test-page', 'budatoll_test_page');
 
 register_activation_hook(__FILE__, 'budatoll_activated');
 register_deactivation_hook(__FILE__, 'budatoll_deactivated');
@@ -35,12 +36,16 @@ register_deactivation_hook(__FILE__, 'budatoll_deactivated');
 add_action('wp_enqueue_scripts', 'budatoll_scripts');
 add_action('admin_enqueue_scripts', 'budatoll_admin_styles');
 
+add_filter('wp_nav_menu_args', 'budatoll_menu_based_on_role');
+
 function budatoll_scripts() {
     wp_enqueue_style('budatoll-jquery-style', plugins_url('jquery-ui/jquery-ui.css', __FILE__));
     wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__));
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__));
+
     wp_enqueue_script('jquery-ui-datepicker');
     wp_enqueue_script('budatoll-fc', plugins_url('js/fullcalendar/index.global.js', __FILE__), array('jquery'), null, false);
+    wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('js/fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'), null, false);
     wp_enqueue_script('budatoll-header-script', plugins_url('js/budatoll-header-script.js', __FILE__), array('jquery'), null, false);
     wp_enqueue_script('budatoll-jquery-ui-script', plugins_url('jquery-ui/jquery-ui.js', __FILE__), array('jquery'), null, false);
     wp_enqueue_script('budatoll-end-script', plugins_url('js/budatoll-end-script.js', __FILE__), array('jquery'), null, true);
@@ -93,4 +98,39 @@ function budatoll_activated() {
 function budatoll_deactivated() {
     remove_role(BUDATOLL_ROLE_COACH);
     remove_role(BUDATOLL_ROLE_PLAYER);
+}
+
+function budatoll_menu_based_on_role($args) {
+    global $bt_nav_menu;
+    $bt_nav_menu = 'Visitor';
+    if ('primary-menu' === $args['theme_location']) {
+        $user = wp_get_current_user();
+        if (in_array('administrator', (array) $user->roles) AND wp_get_nav_menu_object('Admin')) {
+            $args['menu'] = 'Admin';
+            $bt_nav_menu = 'Admin';
+        } elseif (in_array('coach', (array) $user->roles) AND wp_get_nav_menu_object('Coach')) {
+            $args['menu'] = 'Coach';
+            $bt_nav_menu = 'Coach';
+        } elseif (in_array('player', (array) $user->roles) AND wp_get_nav_menu_object('Player')) {
+            $args['menu'] = 'Player';
+            $bt_nav_menu = 'Player';
+        }
+    }
+
+    return $args;
+}
+
+$bt_nav_menu = 'Visistor';
+
+function budatoll_test_page() {
+    global $bt_nav_menu;
+    $ret = 'Teszteljük az oldalt';
+    $menus = wp_get_nav_menus();
+    foreach ($menus as $menu) {
+        $ret .= 'Menu Name: ' . $menu->name . '<br>';
+    }
+    $user = wp_get_current_user();
+    $ret .= ' Current user: ' . $user->display_name . '<br>';
+    $ret .= 'Menu:' . $bt_nav_menu;
+    return $ret;
 }

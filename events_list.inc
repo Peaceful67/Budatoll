@@ -3,7 +3,7 @@
 function budatoll_manage_events_list() {
     global $wpdb;
     $ret = '<H3>Edzések listája</H3>';
-//    $ret .= print_r($_POST, true);
+    //   $ret .= print_r($_POST, true);
     $ret .= '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on">';
     $edit_id = getPostVariable('budatoll_edit', -1);
     $delete_id = getPostVariable('budatoll_delete', false);
@@ -85,24 +85,45 @@ function budatollEventEdit($item_id) {
 }
 
 function budatollEventsList() {
-    global $wpdb, $budatoll_months;
-    $month_first = date('Y-m-01');
-    $month_last = date('Y-m-t');
-    $events_from = getPostVariable('events_from', $month_first);
-    $events_to = getPostVariable('events_to', $month_last);
+    global $wpdb;
+    $events_from = getPostVariable('events_from', date('Y-m-01'));
+    $events_to = getPostVariable('events_to', date('Y-m-t'));
     $event_type_id = getPostVariable('bt_event_type', -1);
-    /*
-      putScript('$(function() {'
-      . '$("#events_from").datepicker({dateFormat: "yyyy-mm-dd" });'
-      . '$("#events_to").datepicker({dateFormat: "yyyy-mm-dd" });'
-      . '});');
-     * 
-     */
-    $ret = '<div class="et_pb_row">';
-    $ret .= '<div class="et_pb_column et_pb_column_1_0">';
+    $event_type_year = date("Y", strtotime($events_from));
+    $event_type_month = date("m", strtotime($events_from));
+    putScript('$(function() {'
+            . '$("#events_from").datepicker({dateFormat: "yyyy-mm-dd" });'
+            . '$("#events_to").datepicker({dateFormat: "yyyy-mm-dd" });'
+            . '});');
+
+    if (getPostVariable('month_left')) {
+        if ($event_type_month > 1) {
+            $event_type_month--;
+        } else {
+            $event_type_year--;
+            $event_type_month = 12;
+        }
+        $events_from = date(sprintf("%04d", $event_type_year) . '-' . sprintf("%02d", $event_type_month) . '-01');
+        $events_to = date('Y-m-t', strtotime($events_from));
+    }
+    if (getPostVariable('month_right')) {
+        if ($event_type_month < 12) {
+            $event_type_month++;
+        } else {
+            $event_type_year++;
+            $event_type_month = 1;
+        }
+        $events_from = date(sprintf("%04d", $event_type_year) . '-' . sprintf("%02d", $event_type_month) . '-01');
+        $events_to = date('Y-m-t', strtotime($events_from));
+    }
+    $ret .= '<input type="hidden" name="event_type_year" id="event_type_year" value="' . $event_type_year . '">';
+    $ret .= '<input type="hidden" name="event_type_month" id="event_type_month" value="' . $event_type_month . '">';
+    //   $ret .= 'Year:' . $event_type_year . ', Month: ' . $event_type_month;
+    $ret = '<table class="table" style="border:none;">';
+    $ret .= '<tr><td style="width:10%;">';
     $ret .= '<button class="button budatoll-button" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása">'
             . '<span class="dashicons dashicons-plus"></span></button>';
-    $ret .= '</div><div class="et_pb_column et_pb_column_1_1">';
+    $ret .= '</td><td style="30%;">';
     $ret .= '<label for="bt_event_type">Edzés típus:</label>';
     $ret .= '<select class="budatoll-dropdown" id="bt_event_type" name="bt_event_type" onChange="submit();" >';
     $ret .= '<option value="-1" ' . ($event_type_id == -1 ? 'selected' : '') . '>Összes</option>';
@@ -111,14 +132,18 @@ function budatollEventsList() {
         $ret .= '<option value="' . $et_id . '" ' . ($event_type_id == $et_id ? 'selected' : '') . '>' . $event_type->{BUDATOLL_EVENT_TYPE_SHORT} . '</option>';
     }
     $ret .= '</select>';
-    $ret .= '</div><div class="et_pb_column et_pb_column_1_2">';
-
+    $ret .= '</td><td style="30%;">';
     $ret .= '<label for="events_from">Időszak:</label>'
             . '<input type="date" id="events_from" name="events_from" value="' . $events_from . '" onchange="submit();"> - '
             . '<input type="date" id="events_to" name="events_to" value="' . $events_to . '" onchange="submit();">';
-    $ret .= '</div><div class="et_pb_column et_pb_column_1_3">';
-    $ret .= '</div>';
-    $ret .= '</div>';
+    $ret .= '</td><td style="30%;">';
+    $ret .= '<button class="button budatoll-button" name="month_left" id="month_left" title="Előző hónap" value="-1">'
+            . '<span class="dashicons dashicons-arrow-left"></span></button>';
+    $ret .= $event_type_year . ' ' . strftime("%B", strtotime($events_from));
+    $ret .= '<button class="button budatoll-button" name="month_right" id="month_right" title="Következő hónap" value="-1">'
+            . '<span class="dashicons dashicons-arrow-right"></span></button>';
+    $ret .= '</td></tr>';
+    $ret .= '</table>';
     $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '` BETWEEN "' . $events_from . '" AND "' . $events_to . '" '
             . ($event_type_id >= 0 ? (' AND `' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=' . $event_type_id) : '')
             . ' ORDER BY `' . BUDATOLL_EVENTS_DAY . '`,`' . BUDATOLL_EVENTS_START . '` ;';
@@ -131,12 +156,13 @@ function budatollEventsList() {
         $id = $row->{BUDATOLL_EVENTS_ID};
         $short = $row->{BUDATOLL_EVENTS_SHORT} ?? '';
         $day = $row->{BUDATOLL_EVENTS_DAY} ?? '';
+        $day_of_week = strftime('%A', strtotime($day));
         $start = substr(($row->{BUDATOLL_EVENTS_START} ?? '00:00'), 0, 5);
         $end = substr(($row->{BUDATOLL_EVENTS_END} ?? '00:00'), 0, 5);
         $max_players = $row->{BUDATOLL_EVENTS_MAX_PLAYERS} ?? 0;
         $ret .= '<tr class="budatoll-table-row" id="budatoll-popup_' . $id . '" data-item="' . $id . '">';
         $ret .= '<td>' . $short . '</td>';
-        $ret .= '<td>' . $day . '</td>';
+        $ret .= '<td>' . $day . ' (' . $day_of_week . ')</td>';
         $ret .= '<td>' . $start . ' Ft</td>';
         $ret .= '<td>' . $end . '</td>';
         $ret .= '<td>' . $max_players . '</td>';

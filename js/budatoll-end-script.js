@@ -6,7 +6,7 @@ $(".clickable-row").click(function () {
 });
 
 $(document).ready(function () {
-  
+
     if (isFullcalendar()) {
         var eventListEl = document.getElementById('event-types-list');
         new FullCalendar.Draggable(eventListEl, {
@@ -65,6 +65,7 @@ $(document).ready(function () {
                 right: 'dayGridMonth,timeGridWeek'
 
             },
+            locale: 'hu',
             firstDay: 1,
             editable: true,
             droppable: true,
