@@ -4,6 +4,7 @@ define("BUDATOLL_PLAYERS_FIELD_EVENTS", 'players_events_assignment');
 define("BUDATOLL_USER_META_LEASED", 'leased');
 define("BUDATOLL_USER_META_EVENTS", 'events');
 define("BUDATOLL_USER_META_PHONE", 'phone');
+define("BUDATOLL_USER_META_ACTIVE", 'active');
 
 function budatoll_manage_players() {
     if (!current_user_can('manage_options')) {
@@ -45,7 +46,8 @@ function budatoll_manage_players_edit($user_id) {
     $ret = '';
     if ($user_id < 0) {  // Új játékos veszünk fel
         $phone = '';
-        $leased = 0;
+        $leased = 1;
+        $active = 1;
         $events = [];
         $user_login = '';
         $display_name = '';
@@ -54,6 +56,7 @@ function budatoll_manage_players_edit($user_id) {
         $user = get_userdata($user_id);
         $phone = get_user_meta($user_id, BUDATOLL_USER_META_PHONE, true);
         $leased = get_user_meta($user_id, BUDATOLL_USER_META_LEASED, true);
+        $active = get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, true);
         $events = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS, false);
         if (!$events OR $events == '') {
             $events = [];
@@ -74,6 +77,9 @@ function budatoll_manage_players_edit($user_id) {
             . '<td><input type="email" id="budatoll-user-email" name="budatoll-user-email" value="' . $user_email . '"/></td></tr>';
     $ret .= '<tr><th scope="row"><label for="budatoll-tel">Telefon:</th>'
             . '<td><input type="tel" id="budatoll-tel" name="budatoll-tel" value="' . $phone . '"/></td></tr>';
+    $ret .= '<tr><th scope="row"><label for="budatoll-active">Aktív:</label></th>'
+            . '<td><input type="checkbox" id="budatoll-active" name="budatoll-active" value="1"'
+            . ($active == '1' ? 'checked' : '') . '></td></tr>';
     $ret .= '<tr><th scope="row"><label for="budatoll-leased">Bérletes:</label></th>'
             . '<td><input type="checkbox" id="budatoll-leased" name="budatoll-leased" value="1"'
             . ($leased == '1' ? 'checked' : '') . '></td></tr>';
@@ -127,6 +133,12 @@ function budatoll_manage_players_save($user_id) {
             logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, ($leased == 1 ? 'Bérletes lett' : 'Már nem bérletes'));
         }
     }
+    $active = getPostVariable('budatoll-active', '0');
+    if ($active != get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, true)) {
+        if (update_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, $active)) {
+            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, ($active == 1 ? 'Aktív lett' : 'Inaktív lett'));
+        }
+    }
     $phone = getPostVariable('budatoll-tel');
     if ($phone != get_user_meta($user_id, BUDATOLL_USER_META_PHONE, true)) {
         if (update_user_meta($user_id, BUDATOLL_USER_META_PHONE, $phone)) {
@@ -164,6 +176,7 @@ function budatoll_manage_players_list() {
         'role' => BUDATOLL_ROLE_PLAYER,
         'number' => -1,
         'fields' => 'all',
+        'orderby' => 'display_name',
     ]);
     $ret .= '<div class="wrap">';
     $ret .= '<table class="wp-list-table widefat fixed striped">';
@@ -173,13 +186,15 @@ function budatoll_manage_players_list() {
             . '<th scope="col" id="column3" class="manage-column column-column3" >Email cím</th>'
             . '<th scope="col" id="column4" class="manage-column column-column4" >Telefonszám</th>'
             . '<th scope="col" id="column5" class="manage-column column-column5" >Választható edzések</th>'
-            . '<th scope="col" id="column6" class="manage-column column-column6" style="width:50px;">Bérletes</th>'
-            . '<th scope="col" id="column6" class="manage-column column-column7" style="width:100px;">Művelet</th>'
+            . '<th scope="col" id="column6" class="manage-column column-column6" style="width:50px;">Aktív</th>'
+            . '<th scope="col" id="column7" class="manage-column column-column6" style="width:50px;">Bérletes</th>'
+            . '<th scope="col" id="column8" class="manage-column column-column7" style="width:100px;">Művelet</th>'
             . '</tr></thead><tbody>';
     foreach ($users as $user) {
         $user_id = $user->ID;
         $phone = get_user_meta($user_id, BUDATOLL_USER_META_PHONE, true);
         $leased = get_user_meta($user_id, BUDATOLL_USER_META_LEASED, true);
+        $active = get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, true);
         $events_arr = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS, false);
         if (empty($events_arr)) {
             $events = 'Inaktív';
@@ -197,8 +212,9 @@ function budatoll_manage_players_list() {
         $ret .= '<td class="column-column3">' . $user->user_email . '</td>';
         $ret .= '<td class="column-column4">' . $phone . '</td>';
         $ret .= '<td class="column-column5">' . $events . '</td>';
-        $ret .= '<td class="column-column6"><span class="dashicons dashicons-' . ($leased == '1' ? 'yes' : 'no' ) . '"></span></td>';
-        $ret .= '<td class="column-column7"><button class="button button-link button-small" name="budatoll_player" id="budatoll_player" value="'
+        $ret .= '<td class="column-column6"><span class="dashicons dashicons-' . ($active == '1' ? 'yes' : 'no' ) . '"></span></td>';
+        $ret .= '<td class="column-column7"><span class="dashicons dashicons-' . ($leased == '1' ? 'yes' : 'no' ) . '"></span></td>';
+        $ret .= '<td class="column-column8"><button class="button button-link button-small" name="budatoll_player" id="budatoll_player" value="'
                 . $user_id . '" title="Szerkesztés">'
                 . '<span class="dashicons dashicons-edit"></span></button></td>';
         $ret .= '</tr>';
@@ -208,10 +224,30 @@ function budatoll_manage_players_list() {
 }
 
 function isUserActivePlayer($user_id) {
-    $events = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS);
-    if (!$events || emtpy($events)) {
-        return false;
-    } else {
-        return true;
+    return 1 == get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE);
+}
+
+function put_select_player($var_name, $player_id = 0, $submitOnChange = true, $unselected_txt = 'Összes') {
+
+    $ret = '<select class="budatoll-dropdown" id="select_' . $var_name . '" name="select_' . $var_name . '" ' . ($submitOnChange ? 'onChange="submit();" ' : '') . '>';
+    $ret .= '<option value="-1" ' . (($player_id == -1) ? 'selected' : '') . '>' . $unselected_txt . '</option>';
+    foreach (get_active_players() as $player) {
+        $pl_id = $player->ID;
+        $ret .= '<option value="' . $pl_id . '" ' . (($player_id == $pl_id) ? 'selected' : '') . '>' . $player->display_name . '</option>';
     }
+    $ret .= '</select>';
+    return $ret;
+}
+
+function get_active_players() {
+    $active_players = new WP_User_Query([
+        'role' => BUDATOLL_ROLE_PLAYER,
+        'number' => -1,
+        'fields' => 'all',
+        'orderby' => 'display_name',
+        'count_total' => false,
+        'meta_key' => BUDATOLL_USER_META_ACTIVE,
+        'meta_value' => 1,
+    ]);
+    return $active_players->get_results();
 }

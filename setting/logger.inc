@@ -4,12 +4,14 @@ define("BUDATOLL_LOGGER_TYPE_EVENT_TYPE", 1);
 define("BUDATOLL_LOGGER_TYPE_EVENTS", 2);
 define("BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS", 3);
 define("BUDATOLL_LOGGER_TYPE_USER_DATA", 4);
+define("BUDATOLL_LOGGER_TYPE_PAYMENT", 5);
 
 $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'Edzés típus',
     BUDATOLL_LOGGER_TYPE_EVENTS => 'Edzések',
     BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'Beállítások',
     BUDATOLL_LOGGER_TYPE_USER_DATA => 'Játékosok',
+    BUDATOLL_LOGGER_TYPE_PAYMENT => 'Befizetések',
 ];
 
 function bt_logger_list() {
@@ -17,7 +19,7 @@ function bt_logger_list() {
     $bt_logger_related = getPostVariable('bt_logger_related', -1);
     $bt_logger_cat = getPostVariable('bt_logger_cat', -1);
     $bt_logger_to_date = getPostVariable('bt_logger_to_date', date('Y-m-d'));
-    $bt_logger_from_date = getPostVariable('bt_logger_from_date', date('Y-m-d', strtotime($bt_logger_to_date . '-1 month')));
+    $bt_logger_from_date = getPostVariable('bt_logger_from_date', date('Y-m-d', strtotime($bt_logger_to_date . ' -1 month')));
     bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
     bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
 }
@@ -91,6 +93,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
         }
         $related = '---';
         switch ($row->{BUDATOLL_LOGGER_TYPE}) {
+            case BUDATOLL_LOGGER_TYPE_PAYMENT:
             case BUDATOLL_LOGGER_TYPE_USER_DATA:
                 $related = (get_userdata($related_id))->display_name;
                 break;

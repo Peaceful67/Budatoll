@@ -46,6 +46,7 @@ $(document).ready(function () {
                                         'title': event.short,
                                         'start': event.day + 'T' + event.start,
                                         'end': event.day + 'T' + event.end,
+
                                     });
                                 }
                             });
@@ -65,6 +66,7 @@ $(document).ready(function () {
                 right: 'dayGridMonth,timeGridWeek'
 
             },
+            initialView: 'dayGridMonth',
             locale: 'hu',
             firstDay: 1,
             editable: true,

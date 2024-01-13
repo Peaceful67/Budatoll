@@ -11,6 +11,8 @@
 .budatoll-button  {
     margin: 5px !important;
     background-color: lightgrey;
+    line-height: inherit;
+    vertical-align: middle;
 }
 
 .budatoll-editor label {
@@ -134,4 +136,16 @@
     width:20%;
 }
 
+.budatoll-table th {
+    width:10%;
+}
 
+.budatoll-no-border {
+    border: none !important;
+    th {
+        border: none !important;
+    }
+    td {
+        border: none !important;
+    }
+}
