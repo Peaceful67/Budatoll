@@ -29,6 +29,10 @@ function getPostVariable($var_name, $default = false) {
     return $ret;
 }
 
+function putHiddenValue($var_name, $value) {
+    return '<input type="hidden" name="' . $var_name . '" id="' . $var_name . '" value="' . $value . '">';
+}
+
 function putScript($script) {
     return '<script type="text/javascript">' . $script . '</script>';
 }
@@ -125,8 +129,18 @@ function budatoll_activated() {
             . BUDATOLL_ACCOUNT_EVENT_PLAYER_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_ACCOUNT_PLAYER_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_ACCOUNT_COMMENT . '` varchar(255) DEFAULT NULL, `'
-            . BUDATOLL_ACCOUNT_TIME . '` timestamp NOT NULL, '
+            . BUDATOLL_ACCOUNT_TIME . '` timestamp(1) NOT NULL, '
             . 'UNIQUE KEY `' . BUDATOLL_ACCOUNT_ID . '` (`' . BUDATOLL_ACCOUNT_ID . '`)) '
+            . $wpdb->get_charset_collate() . ';';
+    dbDelta($sql);
+    $sql = 'CREATE TABLE IF NOT EXISTS `' . BUDATOLL_TRAINING_TABLE . '` (`'
+            . BUDATOLL_TRAINING_ID . '` int(9) NOT NULL AUTO_INCREMENT,`'
+            . BUDATOLL_TRAINING_PLAYER_ID . '` int(8) NOT NULL DEFAULT -1,`'
+            . BUDATOLL_TRAINING_EVENT_ID . '` int(8) NOT NULL DEFAULT -1,`'
+            . BUDATOLL_TRAINING_DONE . '` int(1) NOT NULL DEFAULT 0,`'
+            . BUDATOLL_TRAINING_COMMENT . '` varchar(255) DEFAULT NULL, `'
+            . BUDATOLL_TRAINING_CREATED . '` timestamp(1) NOT NULL, '
+            . 'UNIQUE KEY `' . BUDATOLL_TRAINING_ID . '` (`' . BUDATOLL_TRAINING_ID . '`)) '
             . $wpdb->get_charset_collate() . ';';
     dbDelta($sql);
 }

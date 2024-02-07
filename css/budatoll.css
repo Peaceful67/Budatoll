@@ -4,36 +4,73 @@
     border: 2px solid #a1a1a1;
     padding: 10px 40px;
     border-radius: 25px;
-    margin: 10px;
     background: lightgray;
 }
 
-.budatoll-button  {
-    margin: 5px !important;
-    background-color: lightgrey;
-    line-height: inherit;
-    vertical-align: middle;
-}
 
-.budatoll-editor label {
-    display: inline-block;
-    text-align: left;
-    margin: 5px;
-    width: 180px;
-}
-.budatoll-editor input {
-    margin: 5px;
-    display: inline-block;
-    width: calc(100%-280px);
-    text-align: left;
-}
-
-.budatoll-editor {
-    display: flex;
-    line-height: 200%;
+.budatoll-editor-group {
+    display:flex;
     flex-direction: column;
 }
 
+
+.budatoll-editor {
+    margin: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    line-height: 200%;
+}
+.budatoll-editor-group label {
+    margin-bottom: 5px;
+}
+
+.budatoll-editor-group input, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.budatoll-search {
+    margin: 10px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+     background: lightsteelblue;
+}
+
+.budatoll-search-group {
+    display: flex;
+    flex-direction: row;
+}
+.budatoll-search-group input, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.budatoll-search-group label {
+    margin-bottom: 5px;
+    vertical-align: central;
+}
+.budatoll-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    transition: ease-in-out 0.5s;
+    width: 25px;
+    height: 25px;
+    margin:10px;
+}
+
+.budatoll-button:hover {
+    background-color: #0056b3;
+}
 
 .budatoll-label {
     display: flex;
@@ -49,14 +86,7 @@
     background-color: lightgray;
 }
 
-.budatoll-editor button {
-    margin: 5px;
-}
 
-.clickable-row:hover {
-    cursor:  pointer;
-    background-color: lightblue;
-}
 
 .budatoll-table-row:hover {
     background-color: lightgray;

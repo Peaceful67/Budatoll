@@ -2,43 +2,42 @@
 
 function budatoll_manage_events_list() {
     global $wpdb;
-    $ret = '<H3>Edzések listája</H3>';
-    //   $ret .= print_r($_POST, true);
-    $ret .= '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on">';
+    $ret = '<H3>Alkalmak listája</H3>';
+    $ret .= '<form id="BudatollForm" method="post"  enctype="multipart/form-data" autocomplete="on">';
     $edit_id = getPostVariable('budatoll_edit', -1);
+    $ret .= putHiddenValue('budatoll_edit', $edit_id);
     $delete_id = getPostVariable('budatoll_delete', false);
     $save = getPostVariable('budatoll_save', false);
     if (getPostVariable('budatoll_cancel', false)) {
         $edit_id = -1;
     }
-    $clicked_row = getPostVariable('budatoll_clicked_row', -1);
     if (getPostVariable('budatoll_add', false)) {
         $edit_id = 0;
     }
-    $ret .= '<input type="hidden" name="budatoll_edit" id="budatoll_edit" value="' . $edit_id . '">';
-    $ret .= '<input type="hidden" name="budatoll_clicked_row" id="budatoll_clicked_row" value="' . $clicked_row . '">';
     if ($delete_id) {
-        $wpdb->delete(BUDATOLL_EVENT_TYPE_TABLE, [BUDATOLL_EVENT_TYPE_ID => $delete_id]);
+        $wpdb->delete(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_ID => $delete_id]);
     }
     if ($save) {
         $data = [
-            BUDATOLL_EVENT_TYPE_SHORT => getPostVariable('budatoll-short', ''),
-            BUDATOLL_EVENT_TYPE_LONG => getPostVariable('budatoll-long', ''),
-            BUDATOLL_EVENT_TYPE_PRICE => getPostVariable('budatoll-price', 0),
-            BUDATOLL_EVENT_TYPE_START => getPostVariable('budatoll-start', '00:00'),
-            BUDATOLL_EVENT_TYPE_END => getPostVariable('budatoll-end', '00:00'),
-            BUDATOLL_EVENT_TYPE_MAX_PLAYERS => getPostVariable('budatoll-max', 0),
+            BUDATOLL_EVENTS_SHORT => getPostVariable('budatoll-short', ''),
+            BUDATOLL_EVENTS_LONG => getPostVariable('budatoll-long', ''),
+            BUDATOLL_EVENTS_PRICE => getPostVariable('budatoll-price', 0),
+            BUDATOLL_EVENTS_START => getPostVariable('budatoll-start', '00:00'),
+            BUDATOLL_EVENTS_END => getPostVariable('budatoll-end', '00:00'),
+            BUDATOLL_EVENTS_MAX_PLAYERS => getPostVariable('budatoll-max', 0),
         ];
-
         if ($edit_id > 0) {
-            $wpdb->update(BUDATOLL_EVENT_TYPE_TABLE, $data, [BUDATOLL_EVENT_TYPE_ID => $edit_id]);
+            if ($wpdb->update(BUDATOLL_EVENTS_TABLE, $data, [BUDATOLL_EVENTS_ID => $edit_id])) {
+                logger(BUDATOLL_LOGGER_TYPE_EVENTS, $edit_id, 'Alkalom módosítva: ' . print_r($data, true));
+            }
         } else {
-            $wpdb->insert(BUDATOLL_EVENT_TYPE_TABLE, $data);
+            if ($wpdb->insert(BUDATOLL_EVENTS_TABLE, $data)) {
+                logger(BUDATOLL_LOGGER_TYPE_EVENTS, $wpdb->insert_id, 'Alkalom létrehozva: ' . print_r($data, true));
+            }
         }
         $edit_id = -1;
     }
     if ($edit_id >= 0) {
-        $clicked_row = -1;
         $ret .= budatollEventEdit($edit_id);
     }
     $ret .= budatollEventsList();
@@ -48,8 +47,8 @@ function budatoll_manage_events_list() {
 }
 
 function budatollEventEdit($item_id) {
-    global $wpdb;
-    $ret = '<div class="container-fluid"><div class="shadow p-1 m-2 rounded"><div class="budatoll-keret budatoll-editor">';
+    global $wpdb; // <div class="shadow p-1 m-2 rounded">
+    $ret = '<div class="container-fluid"><div class="budatoll-keret"><div class="budatoll-editor">';
     $short = '';
     $long = '';
     $price = 0;
@@ -57,7 +56,8 @@ function budatollEventEdit($item_id) {
     $end = '00:00';
     $max_players = 0;
     if ($item_id > 0) {
-        $results = $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '` WHERE `' . BUDATOLL_EVENT_TYPE_ID . '`=' . $item_id . ';');
+        $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENT_TYPE_ID . '`=' . $item_id . ';';
+        $results = $wpdb->get_results($sql);
         $short = $results[0]->{BUDATOLL_EVENT_TYPE_SHORT} ?? '';
         $long = $results[0]->{BUDATOLL_EVENT_TYPE_LONG} ?? '';
         $start = $results[0]->{BUDATOLL_EVENT_TYPE_START} ?? '00:00';
@@ -65,22 +65,24 @@ function budatollEventEdit($item_id) {
         $price = $results[0]->{BUDATOLL_EVENT_TYPE_PRICE} ?? 0;
         $max_players = $results[0]->{BUDATOLL_EVENT_TYPE_MAX_PLAYERS} ?? 0;
     }
-    $ret .= '<div class="et_pb_row"><label class="col-6">Rövid név:'
-            . '<input  type="text" id="budatoll-short" name="budatoll-short" value="' . $short . '"></label>';
-    $ret .= '<label class="col-6">Hosszú név:'
-            . '<input type="text" id="budatoll-long" name="budatoll-long" value="' . $long . '"></label></div>';
-    $ret .= '<div class="form-inline"><label>Kezdés:'
-            . '<input  type="time" id="budatoll-start" name="budatoll-start" value="' . $start . '"></label>';
-    $ret .= '<label>Vége:'
-            . '<input  type="time" id="budatoll-end" name="budatoll-end" value="' . $end . '"></label></div>';
-    $ret .= '<div class="form-inline"><label>Ár:'
-            . '<input type="number" id="budatoll-price" name="budatoll-price" value="' . $price . '"> Ft</label>';
-    $ret .= '<label>Max játékos:'
-            . '<input type="number" id="budatoll-max" name="budatoll-max" value="' . $max_players . '"></label></div>';
-    $ret .= '<div class="form-inline"><button class="button budatoll-button" name="budatoll_save"  id="budatoll_save" value="-1" title="Mentés">'
+    $ret .= '<div class="budatoll-editor-group"><label>Rövid név:</label>'
+            . '<input  type="text" id="budatoll-short" name="budatoll-short" value="' . $short . '"></div>';
+    $ret .= '<div class="budatoll-editor-group"><label>Hosszú név:</label>'
+            . '<input type="text" id="budatoll-long" name="budatoll-long" value="' . $long . '"></div>';
+    $ret .= '<div class="budatoll-editor-group"><label>Kezdés:</label>'
+            . '<input  type="time" id="budatoll-start" name="budatoll-start" value="' . $start . '"></div>';
+    $ret .= '<div class="budatoll-editor-group"><label>Vége:</label>'
+            . '<input  type="time" id="budatoll-end" name="budatoll-end" value="' . $end . '"></div>';
+    $ret .= '<div class="budatoll-editor-group"><label>Ár:</label>'
+            . '<input type="number" id="budatoll-price" name="budatoll-price" value="' . $price . '"></div>';
+    $ret .= '<div class="budatoll-editor-group"><label>Max játékos:</label>'
+            . '<input type="number" id="budatoll-max" name="budatoll-max" value="' . $max_players . '"></div>';
+    $ret .= '</div>';
+    $ret .= '<button class="button budatoll-button" name="budatoll_save"  id="budatoll_save" value="-1" title="Mentés">'
             . '<span class="dashicons dashicons-saved"></span></button>';
-    $ret .= '<button class="button budatoll-button" name="budatoll_cancel" id="budatoll_cancel" value="-1" title="Mégse"><span class="dashicons dashicons-undo"></span></button></div>';
-    $ret .= '</div></div></div>';
+    $ret .= '<button class="button budatoll-button" name="budatoll_cancel" id="budatoll_cancel" value="-1" title="Mégse">'
+            . '<span class="dashicons dashicons-undo"></span></button></div>';
+    $ret .= '</div></div>';
     return $ret;
 }
 
@@ -119,37 +121,32 @@ function budatollEventsList() {
     $ret .= '<input type="hidden" name="event_type_year" id="event_type_year" value="' . $event_type_year . '">';
     $ret .= '<input type="hidden" name="event_type_month" id="event_type_month" value="' . $event_type_month . '">';
     //   $ret .= 'Year:' . $event_type_year . ', Month: ' . $event_type_month;
-    $ret = '<table class="table" style="border:none;">';
-    $ret .= '<tr><td style="width:10%;">';
-    $ret .= '<button class="button budatoll-button" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása">'
-            . '<span class="dashicons dashicons-plus"></span></button>';
-    $ret .= '</td><td style="30%;">';
-    $ret .= '<label for="bt_event_type">Edzés típus:</label>';
+    $ret = '<div class="budatoll-keret budatoll-search">';
+    $ret .= '<div class="budatoll-search-group"><button class="button budatoll-button" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása">'
+            . '<span class="dashicons dashicons-plus"></span></button></div>';
+    $ret .= '<div class="budatoll-search-group"><label for="bt_event_type">Edzés típus:</label>';
     $ret .= '<select class="budatoll-dropdown" id="bt_event_type" name="bt_event_type" onChange="submit();" >';
     $ret .= '<option value="-1" ' . ($event_type_id == -1 ? 'selected' : '') . '>Összes</option>';
     foreach (btGetEventTypes() as $event_type) {
         $et_id = $event_type->{BUDATOLL_EVENT_TYPE_ID};
         $ret .= '<option value="' . $et_id . '" ' . ($event_type_id == $et_id ? 'selected' : '') . '>' . $event_type->{BUDATOLL_EVENT_TYPE_SHORT} . '</option>';
     }
-    $ret .= '</select>';
-    $ret .= '</td><td style="30%;">';
-    $ret .= '<label for="events_from">Időszak:</label>'
+    $ret .= '</select></div>';
+    $ret .= '<div class="budatoll-search-group"><label for="events_from">Időszak:</label>'
             . '<input type="date" id="events_from" name="events_from" value="' . $events_from . '" onchange="submit();"> - '
-            . '<input type="date" id="events_to" name="events_to" value="' . $events_to . '" onchange="submit();">';
-    $ret .= '</td><td style="30%;">';
-    $ret .= '<button class="button budatoll-button" name="month_left" id="month_left" title="Előző hónap" value="-1">'
+            . '<input type="date" id="events_to" name="events_to" value="' . $events_to . '" onchange="submit();"></div>';
+    $ret .= '<div class="budatoll-search-group"><button class="button budatoll-button" name="month_left" id="month_left" title="Előző hónap" value="-1">'
             . '<span class="dashicons dashicons-arrow-left"></span></button>';
     $ret .= $event_type_year . ' ' . strftime("%B", strtotime($events_from));
     $ret .= '<button class="button budatoll-button" name="month_right" id="month_right" title="Következő hónap" value="-1">'
-            . '<span class="dashicons dashicons-arrow-right"></span></button>';
-    $ret .= '</td></tr>';
-    $ret .= '</table>';
+            . '<span class="dashicons dashicons-arrow-right"></span></button></div>';
+    $ret .= '</div>';
     $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '` BETWEEN "' . $events_from . '" AND "' . $events_to . '" '
             . ($event_type_id >= 0 ? (' AND `' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=' . $event_type_id) : '')
             . ' ORDER BY `' . BUDATOLL_EVENTS_DAY . '`,`' . BUDATOLL_EVENTS_START . '` ;';
 
     $results = $wpdb->get_results($sql);
-    $ret .= '<table class="table table-striped table-bordered budatoll-table">';
+    $ret .= '<table class="table table-bordered budatoll-table">';
     $ret .= '<thead><tr><th>Rövid név</th><th>Dátum</th><th>Kezdés</th><th>Befejezés</th><th>Létszám</th><th>Művelet</th></tr></thead><tbody>';
 
     foreach ($results as $row) {

@@ -5,13 +5,16 @@ define("BUDATOLL_LOGGER_TYPE_EVENTS", 2);
 define("BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS", 3);
 define("BUDATOLL_LOGGER_TYPE_USER_DATA", 4);
 define("BUDATOLL_LOGGER_TYPE_PAYMENT", 5);
+define("BUDATOLL_LOGGER_TYPE_TRAININGS", 6);
+
 
 $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'Edzés típus',
-    BUDATOLL_LOGGER_TYPE_EVENTS => 'Edzések',
-    BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'Beállítások',
-    BUDATOLL_LOGGER_TYPE_USER_DATA => 'Játékosok',
-    BUDATOLL_LOGGER_TYPE_PAYMENT => 'Befizetések',
+    BUDATOLL_LOGGER_TYPE_EVENTS => 'Alkalom',
+    BUDATOLL_LOGGER_TYPE_TRAININGS => 'Edzés',
+    BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'Beállítás',
+    BUDATOLL_LOGGER_TYPE_USER_DATA => 'Játékos',
+    BUDATOLL_LOGGER_TYPE_PAYMENT => 'Befizetés',
 ];
 
 function bt_logger_list() {
@@ -28,7 +31,7 @@ function bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $
     global $bt_logger_types;
     $all_bt_users = get_users([
         'orderby' => 'username',
-        'role' => BUDATOLL_ROLE_PLAYER,
+//        'role' => BUDATOLL_ROLE_PLAYER,
         'number' => -1,
         'fields' => 'all',]);
     echo '<div class="wrap"><h1>Naplók listázása</h1></div>';

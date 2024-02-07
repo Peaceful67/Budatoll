@@ -43,12 +43,14 @@ define("BUDATOLL_LOGGER_RELATED", 'related');
 define("BUDATOLL_LOGGER_COMMENT", 'comment');
 define("BUDATOLL_LOGGER_TIME", 'time');
 
-define("BUDATOLL_EVENT_PLAYER_TABLE", 'wp_budatoll_event_player');
-define("BUDATOLL_EVENT_PLAYER_ID", 'id');
-define("BUDATOLL_EVENT_PLAYER_PLAYER_ID", 'player_id');
-define("BUDATOLL_EVENT_PLAYER_EVENT_ID", 'event_id');
-define("BUDATOLL_EVENT_PLAYER_CREATED", 'created');
-define("BUDATOLL_EVENT_PLAYER_CONFIRMED", 'confirmed');
+define("BUDATOLL_TRAINING_TABLE", 'wp_budatoll_trainings');
+define("BUDATOLL_TRAINING_ID", 'id');
+define("BUDATOLL_TRAINING_PLAYER_ID", 'player_id');
+define("BUDATOLL_TRAINING_EVENT_ID", 'event_id');
+define("BUDATOLL_TRAINING_CREATED", 'created');
+define("BUDATOLL_TRAINING_DONE", 'done');
+define("BUDATOLL_TRAINING_COMMENT", 'comment');
+
 
 define("BUDATOLL_ACCOUNT_TABLE", 'wp_budatoll_account');
 define("BUDATOLL_ACCOUNT_ID", 'id');

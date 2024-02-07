@@ -3,7 +3,7 @@
 function budatoll_manage_events_calendar() {
     $ret = 'Időpontok naptár szerint';
     $ret = '<div id="calendar-wrap">'
-            . '<div id="calendar">'
+            . '<div id="budatoll-alkalom-calendar">'
             . '</div></div>';
     return $ret;
 }
