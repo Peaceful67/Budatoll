@@ -7,7 +7,7 @@ function list_balance_of_users() {
     $ret = 'Ez a lista az egyenlegekről már a fejlesztésből.<br>';
 
 
-    foreach (get_active_players() as $user) {
+    foreach (bt_get_active_players() as $user) {
         $ret .= 'ID: ' . $user->ID . ', user name:' . $user->user_login . '<br>';
     }
     return $ret;

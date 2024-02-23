@@ -6,7 +6,8 @@ define("BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS", 3);
 define("BUDATOLL_LOGGER_TYPE_USER_DATA", 4);
 define("BUDATOLL_LOGGER_TYPE_PAYMENT", 5);
 define("BUDATOLL_LOGGER_TYPE_TRAININGS", 6);
-
+define("BUDATOLL_LOGGER_TYPE_EMAILS", 7);
+define("BUDATOLL_LOGGER_TYPE_DEBIT", 8);
 
 $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'Edzés típus',
@@ -15,6 +16,8 @@ $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'Beállítás',
     BUDATOLL_LOGGER_TYPE_USER_DATA => 'Játékos',
     BUDATOLL_LOGGER_TYPE_PAYMENT => 'Befizetés',
+    BUDATOLL_LOGGER_TYPE_DEBIT => 'Terhelés',
+    BUDATOLL_LOGGER_TYPE_EMAILS => 'Email küldés',
 ];
 
 function bt_logger_list() {
@@ -98,6 +101,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
         switch ($row->{BUDATOLL_LOGGER_TYPE}) {
             case BUDATOLL_LOGGER_TYPE_PAYMENT:
             case BUDATOLL_LOGGER_TYPE_USER_DATA:
+            case BUDATOLL_LOGGER_TYPE_TRAININGS:
                 $related = (get_userdata($related_id))->display_name;
                 break;
         }

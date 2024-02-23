@@ -49,8 +49,9 @@ define("BUDATOLL_TRAINING_PLAYER_ID", 'player_id');
 define("BUDATOLL_TRAINING_EVENT_ID", 'event_id');
 define("BUDATOLL_TRAINING_CREATED", 'created');
 define("BUDATOLL_TRAINING_DONE", 'done');
+define("BUDATOLL_TRAINING_PAID", 'paid');
+define("BUDATOLL_TRAINING_CONFIRMED", 'confirmed');
 define("BUDATOLL_TRAINING_COMMENT", 'comment');
-
 
 define("BUDATOLL_ACCOUNT_TABLE", 'wp_budatoll_account');
 define("BUDATOLL_ACCOUNT_ID", 'id');

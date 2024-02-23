@@ -231,7 +231,7 @@ function put_select_player($var_name, $player_id = 0, $submitOnChange = true, $u
 
     $ret = '<select class="budatoll-dropdown" id="select_' . $var_name . '" name="select_' . $var_name . '" ' . ($submitOnChange ? 'onChange="submit();" ' : '') . '>';
     $ret .= '<option value="-1" ' . (($player_id == -1) ? 'selected' : '') . '>' . $unselected_txt . '</option>';
-    foreach (get_active_players() as $player) {
+    foreach (bt_get_active_players() as $player) {
         $pl_id = $player->ID;
         $ret .= '<option value="' . $pl_id . '" ' . (($player_id == $pl_id) ? 'selected' : '') . '>' . $player->display_name . '</option>';
     }
@@ -239,15 +239,41 @@ function put_select_player($var_name, $player_id = 0, $submitOnChange = true, $u
     return $ret;
 }
 
-function get_active_players() {
+function bt_get_active_players() {
+    $ret = [];
     $active_players = new WP_User_Query([
         'role' => BUDATOLL_ROLE_PLAYER,
         'number' => -1,
         'fields' => 'all',
         'orderby' => 'display_name',
-        'count_total' => false,
+        'count_total' => true,
         'meta_key' => BUDATOLL_USER_META_ACTIVE,
         'meta_value' => 1,
     ]);
-    return $active_players->get_results();
+    foreach ($active_players->get_results() as $player) {
+        $ret[] = $player->data;
+    }
+    return $ret;
+}
+
+function bt_get_user_name($user_id) {
+    $user = get_userdata($user_id);
+    if (empty($user)) {
+        return 'Nem létező felhasználó';
+    } else {
+        return $user->user_login;
+    }
+}
+function bt_get_full_name($user_id) {
+    $user = get_userdata($user_id);
+    if (empty($user)) {
+        return 'Nem létező felhasználó';
+    } else {
+        return $user->display_name;
+    }
+}
+
+function put_players_dropdownlist($user_id) {
+    $ret = '';
+    return $ret;
 }

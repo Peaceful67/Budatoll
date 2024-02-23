@@ -1,8 +1,9 @@
 <?php
 
-define("BUDATOLL_OPTION_EVENT_CANCELABLE", 'event_cancelable');
-define("BUDATOLL_OPTION_AUTO_CHARGE", 'auto_charge');
-define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ_account');
+define("BUDATOLL_OPTION_EVENT_CANCELABLE", 'event-cancelable');
+define("BUDATOLL_OPTION_AUTO_CHARGE", 'auto-charge');
+define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ-account');
+define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
 
 function budatoll_setting_options() {
 
@@ -15,6 +16,7 @@ function budatoll_setting_options() {
         ${BUDATOLL_OPTION_EVENT_CANCELABLE} = btGetCheckbox(BUDATOLL_OPTION_EVENT_CANCELABLE);
         ${BUDATOLL_OPTION_AUTO_CHARGE} = btGetCheckbox(BUDATOLL_OPTION_AUTO_CHARGE);
         ${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT} = btGetCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT);
+        ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = btGetCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
     }
     echo '<div class="wrap">';
     echo '<h2>Budatoll beállítások</h2>';
@@ -43,6 +45,13 @@ function budatoll_setting_options() {
     . (btIsCheckboxOn(${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT}) ? 'checked' : '')
     . ' value="1" onChange="page_changed=true;"> '
     . (btIsCheckboxOn(${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT}) ? ' nem lehet edzést foglalni.' : ' szabadon foglalhat edzést.') . '</td></tr>';
+
+    ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = get_option(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
+    echo '<tr><th scope="row"><label for="' . BUDATOLL_OPTION_WAITINGLIST_EMAIL . '">Email értesítés lemondáskor:</label></th>';
+    echo '<td><input type="checkbox" name="' . BUDATOLL_OPTION_WAITINGLIST_EMAIL . '" id="' . BUDATOLL_OPTION_WAITINGLIST_EMAIL . '" '
+    . (btIsCheckboxOn(${BUDATOLL_OPTION_WAITINGLIST_EMAIL}) ? 'checked' : '')
+    . ' value="1" onChange="page_changed=true;"> '
+    . (btIsCheckboxOn(${BUDATOLL_OPTION_WAITINGLIST_EMAIL}) ? 'értesítést kapnak a várólistán szereplők.':' Nincs értesítés.' ) . '</td></tr>';
 
     echo '</tbody></table>';
     submit_button();

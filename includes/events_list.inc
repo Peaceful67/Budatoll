@@ -16,6 +16,7 @@ function budatoll_manage_events_list() {
     }
     if ($delete_id) {
         $wpdb->delete(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_ID => $delete_id]);
+        logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Alkalom törölve: ');
     }
     if ($save) {
         $data = [
@@ -163,13 +164,25 @@ function budatollEventsList() {
         $ret .= '<td>' . $start . ' Ft</td>';
         $ret .= '<td>' . $end . '</td>';
         $ret .= '<td>' . $max_players . '</td>';
+        $disabled = bt_is_deletable($id, [BUDATOLL_TRAINING_TABLE => BUDATOLL_TRAINING_EVENT_ID]) ? '' : ' disabled';
         $ret .= '<td class="form-inline"><button class="button budatoll-button" name="budatoll_edit" id="budatoll_edit" value="' . $id . '" title="Szerkesztés">'
                 . '<span class="dashicons dashicons-edit"></span></button>'
-                . '<button class="button budatoll-button" name="budatoll_delete" id="budatoll_delete" value="' . $id . '" '
+                . '<button class="button budatoll-button" name="budatoll_delete" id="budatoll_delete" value="' . $id . '" ' . $disabled
                 . 'onclick="return confirm(\'Biztosan törölni akarod a \"' . $row->{BUDATOLL_EVENTS_LONG} . '\" nevű edzési időpontot?\');" title="Törlés">'
                 . '<span class="dashicons dashicons-trash"></span></button>';
         $ret .= '</td></tr>';
     }
     $ret .= '</tbody></table>';
     return $ret;
+}
+
+function bt_get_event_by_id($event_id) {
+    global $wpdb;
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENT_TYPE_ID . '`=' . $event_id . ';';
+    $results = $wpdb->get_results($sql);
+    if (empty($results)) {
+        return false;
+    } else {
+        return $results[0];
+    }
 }

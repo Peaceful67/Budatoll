@@ -36,7 +36,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 20px;
-     background: lightsteelblue;
+    background: lightsteelblue;
 }
 
 .budatoll-search-group {
@@ -70,6 +70,7 @@
 
 .budatoll-button:hover {
     background-color: #0056b3;
+    cursor:pointer;
 }
 
 .budatoll-label {
@@ -95,22 +96,27 @@
 .budatoll-popup {
     display:none;
     position: fixed;
-    background: #FFF;
-    background-color: rgba(255,255,255,0.5);
-    padding: 0px;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    background: #000;
+    background-color: rgb(0,0,0);
+    background-color: rgba(155,155,155,0.5);
+    padding: 10px;
+    overflow: auto;
     width: auto;
-    z-index: 100;
-    margin: auto;
+    height: auto;
+    z-index: 1000;
+    margin: 15% auto;
+
 }
 
 .budatoll-popup-content {
-    background: #ddd;
+    background: #fefefe;
+    position: fixed;
     padding: 20px;
-    width: 100%;
-    margin: 0px;
-    ;
     border: 1px solid #888;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 .budatoll-popup-close {
     color: #555;
@@ -120,13 +126,14 @@
 }
 .budatoll-popup-close:hover, .budatoll-popup-close:focus {
     color: black;
-    text-decoration: none;
+    text-decoration: navajowhite ;
     cursor: pointer;
 }
 
 .budatoll-row {
     display: block;
     margin: 10px;
+    padding:10px;
     justify-content: left;
     white-space: nowrap;
     overflow: hidden;

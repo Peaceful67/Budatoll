@@ -89,7 +89,7 @@ budatoll_events_calendar.render();
 
 
 function btEventClick(eventInfo) {
-    alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
+ //   alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
 }
 
 function btEventReceive(eventInfo) {

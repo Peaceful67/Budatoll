@@ -20,6 +20,18 @@ function isBudatollPagePermited($page_name) {
     return false;
 }
 
+function bt_is_deletable($item_id, $related_arr){
+    global $wpdb;
+    foreach ($related_arr as $table => $field) {
+        $sql = 'SELECT * FROM `'.$table.'` WHERE `'.$field.'`='.$item_id.' LIMIT 1;';
+        $wpdb->get_results($sql);
+        if($wpdb->num_rows>0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function putPermissionNotGranted() {
     return '<div class="et-pb-promo-error">Az oldal megtekintéséhez nincs jogosultsága!</div>';
 }
@@ -138,9 +150,13 @@ function budatoll_activated() {
             . BUDATOLL_TRAINING_PLAYER_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_TRAINING_EVENT_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_TRAINING_DONE . '` int(1) NOT NULL DEFAULT 0,`'
+            . BUDATOLL_TRAINING_CONFIRMED . '` int(1) NOT NULL DEFAULT 0,`'
+            . BUDATOLL_TRAINING_PAID . '` int(1) NOT NULL DEFAULT 0,`'
             . BUDATOLL_TRAINING_COMMENT . '` varchar(255) DEFAULT NULL, `'
             . BUDATOLL_TRAINING_CREATED . '` timestamp(1) NOT NULL, '
             . 'UNIQUE KEY `' . BUDATOLL_TRAINING_ID . '` (`' . BUDATOLL_TRAINING_ID . '`)) '
             . $wpdb->get_charset_collate() . ';';
     dbDelta($sql);
 }
+
+

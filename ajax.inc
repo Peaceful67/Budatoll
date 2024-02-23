@@ -25,6 +25,12 @@ function budatoll_ajax() {
             $end = filter_input(INPUT_POST, 'trainings-end');
             $ret = bt_get_trainings_range($start, $end);
             break;
+        case 'get-players':
+            $ret = json_encode([
+                'players' => bt_get_active_players(),
+                'result' => 'success',
+            ]);
+            break;
         default :
             $ret = json_encode([
                 'action' => $action,
@@ -70,9 +76,11 @@ function bt_get_trainings_range($from, $to) {
         foreach ($events as $event) {
             $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
                     . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event->{BUDATOLL_EVENTS_ID} . ' ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
-            $training = $wpdb->get_results($sql);
-            $training->player_name = 'Hahoooo'; //bt_get_user_name($training->player_id);
-            $event->trainings_of_event = $training;
+            $trainings = $wpdb->get_results($sql);
+            foreach ($trainings as $training) {
+                $training->player_name = bt_get_full_name($training->player_id);
+            }
+            $event->trainings_of_event = $trainings;
             $ret['events'][] = $event;
         }
     }

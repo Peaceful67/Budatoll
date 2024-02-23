@@ -1,7 +1,45 @@
+var btAddedTrainingIds = [];
+
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
+    datesSet: function (eventInfo) {
+        var active_start = getDateOfEventDate(eventInfo.start);
+        var active_end = getDateOfEventDate(eventInfo.end);
+        $.ajax({
+            url: budatoll_ajax_object.ajax_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'budatoll',
+                'ajax-action': 'get-trainings-range',
+                'trainings-start': active_start,
+                'trainings-end': active_end
+            },
+            success: function (response) {
+                if (response.result === 'success') {
+                    response.events.forEach(function (event) {
+                        if (!btAddedTrainingIds.hasOwnProperty(event.id)) {
+                            btAddedTrainingIds[event.id] = event;
+                            budatoll_trainings_calendar.addEvent({
+                                'id': event.id,
+                                'title': event.short,
+                                'start': event.day + 'T' + event.start,
+                                'end': event.day + 'T' + event.end
 
-    
+                            });
+                        }
+                    });
+                } else {
+                    console.log('Wrong action: ' + response.action);
+                    console.log('SQL: ' + response.sql);
+                }
+            },
+            error: function (response) {
+                console.log('AJAX not succed');
+                console.log(response);
+            }
+        });
+    },
 
     headerToolbar: {
         left: 'prev,next today',
@@ -9,99 +47,110 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         right: 'dayGridMonth,timeGridWeek'
 
     },
-    initialView: 'dayGridMonth',
+    initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     locale: 'hu',
     firstDay: 1,
-    editable: true,
+    editable: false,
     weekends: false,
-    droppable: true,
+    droppable: false,
+    expandRows: true,
     forceEventDuration: true,
     defaultAllDay: false,
     dayMaxEvents: true, // allow "more" link when too many events
+    showNonCurrentDates: false,
     eventClick: function (eventInfo) {
         btEventClick(eventInfo);
     },
-    eventReceive: function (eventInfo) {
-        btEventReceive(eventInfo);
-    },
+
     eventMouseEnter: function (eventInfo) {
-        btEventMouseEnter(eventInfo);
+        btTrainingMouseEnter(eventInfo);
     },
     eventMouseLeave: function (eventInfo) {
-        btEventMouseLeave(eventInfo);
+        btTrainingMouseLeave(eventInfo);
     },
-    eventDrop: function (eventInfo) {
-        btEventDrop(eventInfo);
-    },
-
 });
 budatoll_trainings_calendar.render();
 
 
 
 function btEventClick(eventInfo) {
-    alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
-}
-
-function btEventReceive(eventInfo) {
-    var droppedDate = getDateOfEventDate(eventInfo.event.start);
-    eventInfo.event.setAllDay(false);
-    $.ajax({
-        url: budatoll_ajax_object.ajax_url,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            action: 'budatoll',
-            'ajax-action': 'add-event',
-            'event_type-id': eventInfo.event.id,
-            'dropped-date': droppedDate,
-        },
-        success: function (response) {
-            switch (response.result) {
-                case 'already':
-                    eventInfo.event.remove();
-                    $('#budatoll-message').html('Ilyen edzés már van ezen a napon, nem történt mentés').removeClass('budatoll-success').addClass('budatoll-error');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
-                case 'success':
-                    start_time = droppedDate + 'T' + response.event.start;
-                    end_time = droppedDate + 'T' + response.event.end;
-                    event_id = response.event_id;
-                    console.log('event id: ' + event_id);
-                    eventInfo.event.setProp('id', event_id);
-                    eventInfo.event.setDates(start_time, end_time);
-                    eventInfo.event.setAllDay(false);
-                    //                           console.log(eventInfo.event);
-                    $('#budatoll-message').html('Mentés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
-                case 'error':
-                    eventInfo.event.remove();
-                    $('#budatoll-message').html('A mentés sikeretelen').removeClass('budatoll-success').addClass('budatoll-error');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
-            }
-        },
-        error: function (response) {
-            eventInfo.event.remove();
-            $('#budatoll-message').html('A mentés sikeretelen').addClass('budatoll-error');
-            $('#budatoll-message').show(1000).delay(1500).hide(1000);
+    let id = eventInfo.event.id;
+    let event = btAddedTrainingIds[id];
+    let trainings = event.trainings_of_event;
+    let trainings_text = '<h4>' + event.long + '</h4>';
+    trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
+    trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
+    trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
+    trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
+    trainings_text += '<div class="budatoll-row">';
+    trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
+    budatoll_players.forEach(function (player) {
+        if (!trainings.some(obj => obj['player_id'] === player.ID)) {
+            trainings_text += '<option value="' + player.ID + '">' + player.display_name + '</option>';
         }
     });
+    trainings_text += '</select>';
+    trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Hozzáadás"><span class="dashicons dashicons-saved"></span></button>';
+    trainings_text += '</div>';
+
+    trainings.forEach(function (training) {
+        trainings_text += '<div class="budatoll-row">';
+        trainings_text += training.player_name + '<button class="button budatoll-button" name="training_delete" ';
+        trainings_text += ' value="' + training.id + '" title="Törlés" >';
+        trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
+        trainings_text += '</div>';
+    });
+    $(function () {
+        $('#close-editor-popup').click(function () {
+            $('#budatoll-trainings-editor').html('trainings_text').hide();
+        });
+    });
+
+    $("#budatoll-trainings-editor").html(trainings_text).show().css({top: 100, left: 100});
+    $("#budatoll-trainings-info").hide();
 }
 
-function btEventMouseEnter(eventInfo) {
-    console.log(eventInfo.event);
+
+function btTrainingMouseEnter(eventInfo) {
+    if ($("#budatoll-trainings-editor").is(":hidden")) {
+        let id = eventInfo.event.id;
+        let event = btAddedTrainingIds[id];
+        let trainings = event.trainings_of_event;
+        let trainings_text = '<h4>' + event.long + '</h4>';
+        trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
+        trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
+        trainings_text += 'Jelentkeztek: ';
+        let waiting_list = '';
+        if (trainings.length === 0) {
+            trainings_text += 'Még senki';
+        } else {
+            trainings.forEach(function (training) {
+                if (training.confirmed === '1') {
+                    trainings_text += training.player_name + ', ';
+                }
+            });
+        }
+        trainings.forEach(function (training) {
+            if (training.confirmed === '0') {
+                waiting_list += training.player_name + ', ';
+            }
+        });
+        if (waiting_list !== '') {
+            trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
+        }
+        training_info = $("#budatoll-trainings-info");
+        popup_width = training_info.width();
+        popup_height = training_info.height();
+        training_info.html(trainings_text).show().css({
+            top: budatoll_get_popup_y(popup_height),
+            left: budatoll_get_popup_x(popup_width),
+        });
+        $("#budatoll-trainings-editors").hide();
+    }
 }
 
-function btEventMouseLeave(eventInfo) {
-    console.log('Mouse leave: ' + eventInfo.event.title);
-
-}
-
-function btEventDrop(eventInfo) {
-//    alert('Drop event:' + eventInfo.event.id);
-    console.log('EventDrop: ' + eventInfo.event.start + ' - ' + eventInfo.event.start);
+function btTrainingMouseLeave(eventInfo) {
+    $("#budatoll-trainings-info").hide();
 }
 
 
