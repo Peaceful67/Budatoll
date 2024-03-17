@@ -102,6 +102,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
             case BUDATOLL_LOGGER_TYPE_PAYMENT:
             case BUDATOLL_LOGGER_TYPE_USER_DATA:
             case BUDATOLL_LOGGER_TYPE_TRAININGS:
+            case BUDATOLL_LOGGER_TYPE_EMAILS:
                 $related = (get_userdata($related_id))->display_name;
                 break;
         }

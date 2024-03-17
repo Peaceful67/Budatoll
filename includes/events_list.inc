@@ -15,8 +15,9 @@ function budatoll_manage_events_list() {
         $edit_id = 0;
     }
     if ($delete_id) {
-        $wpdb->delete(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_ID => $delete_id]);
-        logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Alkalom törölve: ');
+        if ($wpdb->delete(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_ID => $delete_id]) > 0) {
+            logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Alkalom törölve: ');
+        }
     }
     if ($save) {
         $data = [

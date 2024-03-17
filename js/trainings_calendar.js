@@ -67,7 +67,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     },
     eventMouseLeave: function (eventInfo) {
         btTrainingMouseLeave(eventInfo);
-    },
+    }
 });
 budatoll_trainings_calendar.render();
 
@@ -106,7 +106,7 @@ function btEventClick(eventInfo) {
         });
     });
 
-    $("#budatoll-trainings-editor").html(trainings_text).show().css({top: 100, left: 100});
+    $("#budatoll-trainings-editor").html(trainings_text).show();
     $("#budatoll-trainings-info").hide();
 }
 
@@ -145,13 +145,9 @@ function btTrainingMouseEnter(eventInfo) {
             top: budatoll_get_popup_y(popup_height),
             left: budatoll_get_popup_x(popup_width),
         });
-        $("#budatoll-trainings-editors").hide();
     }
 }
 
 function btTrainingMouseLeave(eventInfo) {
     $("#budatoll-trainings-info").hide();
 }
-
-
-

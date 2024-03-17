@@ -1,39 +1,52 @@
 <?php
 
-function isBudatollPagePermited($page_name) {
-    $page_acccess = [
-        'manage_balances' => [BUDATOLL_ACCESS_MANAGE_BALANCES],
-        'view_balance' => [BUDATOLL_ACCESS_VIEW_BALANCE],
+function budatoll_pages_restricted() {
+    /*
+      add_shortcode('list_balances', 'list_balance_of_users');
+      add_shortcode('budatoll-players', 'budatoll_manage_players');
+      add_shortcode('budatoll-list-event-types', 'budatoll_list_event_types');
+      add_shortcode('budatoll-event-types', 'budatoll_manage_event_types');
+      add_shortcode('budatoll-events-list', 'budatoll_manage_events_list');
+      add_shortcode('budatoll-events-calendar', 'budatoll_manage_events_calendar');
+      add_shortcode('budatoll-my-trainings-list', 'budatoll_my_trainings_list');
+      add_shortcode('budatoll-my-trainings-calendar', 'budatoll_my_trainings_calendar');
+      add_shortcode('budatoll-trainings-list', 'budatoll_trainings_list');
+      add_shortcode('budatoll-trainings-calendar', 'budatoll_trainings_calendar');
+      add_shortcode('budatoll-test-page', 'budatoll_test_page');
+      add_shortcode('budatoll-payment-management', 'bt_payment_management');
+     */
+    if (bt_user_has_role('administrator')) {
+        return;
+    }
+
+    $permalink = home_url(FILTER_INPUT(INPUT_SERVER, 'REQUEST_URI'));
+    $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
+        'manage_balances' => ['coach'],
+        'view_balance' => ['player'],
     ];
-    if (!isset($page_acccess[$page_name])) {
-        return false;
+    if (!isset($page_acccess[$permalink])) {
+        return;
     }
-    if (current_user_can('administrator')) {
-        return true;
-    }
-    $current_user = wp_get_current_user();
-    foreach ($page_acccess[$page_name] as $required) {
-        if ($current_user->has_cap($required)) {
-            return true;
+    if (is_user_logged_in()) {
+        foreach ($page_acccess[$permalink] as $required) {
+            if (user_has_role($required)) {
+                return;
+            }
         }
     }
-    return false;
+    wp_redirect(home_url('/nincs-jogosultsag'));
 }
 
-function bt_is_deletable($item_id, $related_arr){
+function bt_is_deletable($item_id, $related_arr) {
     global $wpdb;
     foreach ($related_arr as $table => $field) {
-        $sql = 'SELECT * FROM `'.$table.'` WHERE `'.$field.'`='.$item_id.' LIMIT 1;';
+        $sql = 'SELECT * FROM `' . $table . '` WHERE `' . $field . '`=' . $item_id . ' LIMIT 1;';
         $wpdb->get_results($sql);
-        if($wpdb->num_rows>0) {
+        if ($wpdb->num_rows > 0) {
             return false;
         }
     }
     return true;
-}
-
-function putPermissionNotGranted() {
-    return '<div class="et-pb-promo-error">Az oldal megtekintéséhez nincs jogosultsága!</div>';
 }
 
 function getPostVariable($var_name, $default = false) {
@@ -49,6 +62,16 @@ function putScript($script) {
     return '<script type="text/javascript">' . $script . '</script>';
 }
 
+function bt_welcome_message() {
+    $user = wp_get_current_user();
+    if ($user->ID == 0) {
+        $ret = 'Lépj be vagy regisztrálj játékosként!';
+    } else {
+        $ret .= 'Belépve: ' . $user->display_name;
+    }
+    return $ret;
+}
+
 function bt_send_email($user_id, $subject, $message) {
     $user = get_userdata($user_id);
     if (!$user) {
@@ -58,8 +81,13 @@ function bt_send_email($user_id, $subject, $message) {
     if (!is_email($user_email)) {
         return false;
     }
-    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        'From: from@budatoll.hu',
+        'Reply-to: no-reply@budatoll.hu',
+    ];
     $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
+    logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject);
     return wp_mail($user_email, $subject, $message, $headers);
 }
 
@@ -69,8 +97,7 @@ function budatoll_deactivated() {
 }
 
 function budatoll_menu_based_on_role($args) {
-
-    if ('primary-menu' === $args['theme_location']) {
+    if (is_user_logged_in() AND ('primary-menu' === $args['theme_location'])) {
         $user = wp_get_current_user();
         if (in_array('administrator', (array) $user->roles) AND wp_get_nav_menu_object('Admin')) {
             $args['menu'] = 'Admin';
@@ -79,6 +106,10 @@ function budatoll_menu_based_on_role($args) {
         } elseif (in_array('player', (array) $user->roles) AND wp_get_nav_menu_object('Player')) {
             $args['menu'] = 'Player';
         }
+    } elseif(wp_get_nav_menu_object('Visitor')) {
+        $args['menu'] = 'Visitor';
+    } else {
+        $args['menu'] = '';
     }
 
     return $args;
@@ -93,6 +124,11 @@ function budatoll_test_page() {
     $user = wp_get_current_user();
     $ret .= ' Current user: ' . $user->display_name . '<br>';
     return $ret;
+}
+
+function budatoll_redirect_after_login() {
+    wp_redirect(home_url());
+    exit();
 }
 
 function budatoll_activated() {
@@ -159,4 +195,11 @@ function budatoll_activated() {
     dbDelta($sql);
 }
 
-
+function bt_user_has_role($role) {
+    if (is_user_logged_in()) {
+        $user = wp_get_current_user();
+        return in_array($role, $user->roles);
+    } else {
+        return false;
+    }
+}

@@ -4,6 +4,7 @@ define("BUDATOLL_OPTION_EVENT_CANCELABLE", 'event-cancelable');
 define("BUDATOLL_OPTION_AUTO_CHARGE", 'auto-charge');
 define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ-account');
 define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
+define("BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY", 'email-user-modify');
 
 function budatoll_setting_options() {
 
@@ -17,6 +18,7 @@ function budatoll_setting_options() {
         ${BUDATOLL_OPTION_AUTO_CHARGE} = btGetCheckbox(BUDATOLL_OPTION_AUTO_CHARGE);
         ${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT} = btGetCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT);
         ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = btGetCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
+        ${BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY);
     }
     echo '<div class="wrap">';
     echo '<h2>Budatoll beállítások</h2>';
@@ -25,33 +27,11 @@ function budatoll_setting_options() {
     echo '<input type="hidden" name="page" value="options"/>';
     echo '<table class="form-table"><tbody>';
 
-    ${BUDATOLL_OPTION_EVENT_CANCELABLE} = get_option(BUDATOLL_OPTION_EVENT_CANCELABLE);
-    echo '<tr><th scope="row"><label for="' . BUDATOLL_OPTION_EVENT_CANCELABLE . '">Edzés lemondható:</label></th>';
-    echo '<td><input type="checkbox" name="' . BUDATOLL_OPTION_EVENT_CANCELABLE . '" id="' . BUDATOLL_OPTION_EVENT_CANCELABLE . '" '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_EVENT_CANCELABLE}) ? 'checked' : '')
-    . ' value="1" onChange="page_changed=true;"> '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_EVENT_CANCELABLE}) ? ' az edzés kezdetéig lemondható.' : ' csak 24 órával az edzés előtt mondtható le.') . '</td></tr>';
-
-    ${BUDATOLL_OPTION_AUTO_CHARGE} = get_option(BUDATOLL_OPTION_AUTO_CHARGE);
-    echo '<tr><th scope="row"><label for="' . BUDATOLL_OPTION_AUTO_CHARGE . '">Edzés költsége:</label></th>';
-    echo '<td><input type="checkbox" name="' . BUDATOLL_OPTION_AUTO_CHARGE . '" id="' . BUDATOLL_OPTION_AUTO_CHARGE . '" '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_AUTO_CHARGE}) ? 'checked' : '')
-    . ' value="1" onChange="page_changed=true;"> '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_AUTO_CHARGE}) ? ' automatikusan levonódik.' : ' kézzel kell lekönyvelni.') . '</td></tr>';
-
-    ${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT} = get_option(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT);
-    echo '<tr><th scope="row"><label for="' . BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT . '">Negatív egyenleg esetén:</label></th>';
-    echo '<td><input type="checkbox" name="' . BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT . '" id="' . BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT . '" '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT}) ? 'checked' : '')
-    . ' value="1" onChange="page_changed=true;"> '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT}) ? ' nem lehet edzést foglalni.' : ' szabadon foglalhat edzést.') . '</td></tr>';
-
-    ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = get_option(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
-    echo '<tr><th scope="row"><label for="' . BUDATOLL_OPTION_WAITINGLIST_EMAIL . '">Email értesítés lemondáskor:</label></th>';
-    echo '<td><input type="checkbox" name="' . BUDATOLL_OPTION_WAITINGLIST_EMAIL . '" id="' . BUDATOLL_OPTION_WAITINGLIST_EMAIL . '" '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_WAITINGLIST_EMAIL}) ? 'checked' : '')
-    . ' value="1" onChange="page_changed=true;"> '
-    . (btIsCheckboxOn(${BUDATOLL_OPTION_WAITINGLIST_EMAIL}) ? 'értesítést kapnak a várólistán szereplők.':' Nincs értesítés.' ) . '</td></tr>';
+    btPutCheckbox(BUDATOLL_OPTION_EVENT_CANCELABLE, 'Edzés lemondható', 'Az edzés kezdetéig.', 'Csak 24 órával az edzés előtt mondtható le.');
+    btPutCheckbox(BUDATOLL_OPTION_AUTO_CHARGE, 'Edzés költsége', 'Automatikusan levonódik.', 'Kézzel kell lekönyvelni.');
+    btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Nem lehet edzést foglalni.', 'Szabadon foglalhat edzést.');
+    btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
+    btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY, 'Értesítés módosításról', 'Értesítést kap a módosított játékos.', 'Nincs értesítés.');
 
     echo '</tbody></table>';
     submit_button();
@@ -81,4 +61,14 @@ function btGetCheckbox($var_name) {
         update_option($var_name, $var);
         logger(BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS, -1, 'Beállítások, ' . $var_name . ' új érték: ' . $var);
     }
+}
+
+function btPutCheckbox($var_name, $title, $msg_on, $msg_off) {
+    global $$var_name;
+    $$var_name = get_option($var_name);
+    echo '<tr><th scope="row"><label for="' . $var_name . '">' . $title . ':</label></th>';
+    echo '<td><input type="checkbox" name="' . $var_name . '" id="' . $var_name . '" '
+    . (btIsCheckboxOn($$var_name) ? 'checked' : '')
+    . ' value="1" onChange="page_changed=true;"> '
+    . (btIsCheckboxOn($$var_name) ? $msg_on : $msg_off ) . '</td></tr>';
 }

@@ -73,6 +73,15 @@
     cursor:pointer;
 }
 
+.budatoll-button-warning {
+    background-color: #d4af37;
+
+}
+.budatoll-button-warning:hover {
+    background-color: #b29a00;
+}
+
+
 .budatoll-label {
     display: flex;
     font-weight: bold;
@@ -95,7 +104,7 @@
 
 .budatoll-popup {
     display:none;
-    position: fixed;
+    position: absolute;
     left:50%;
     top:50%;
     transform: translate(-50%, -50%);
@@ -106,7 +115,7 @@
     overflow: auto;
     width: auto;
     height: auto;
-    z-index: 1000;
+    z-index: 1050;
     margin: 15% auto;
 
 }
@@ -157,6 +166,7 @@
     background: lightpink;
 }
 
+
 .budatoll-dropdown {
     padding: 5px;
     border: 1px solid #ccc;
@@ -185,4 +195,25 @@
     td {
         border: none !important;
     }
+}
+
+.budatoll-booked-event {
+    background-color: #ff686b;
+    color:white;
+    border: 1px solid darkred;
+    border-radius: 5px;
+}
+
+.budatoll-available-event {
+    background-color: #0eb439;
+    color:white;
+    border: 1px solid darkgreen;
+    border-radius: 5px;
+}
+
+.budatoll-waiting-event {
+    background-color: #e1b21c;
+    color:white;
+    border: 1px solid darkgoldenrod;
+    border-radius: 5px;
 }

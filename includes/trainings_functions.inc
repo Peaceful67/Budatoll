@@ -37,3 +37,18 @@ function bt_is_training_full($id) {
     $wpdb->get_results($sql);
     return $max_players <= $wpdb->num_rows;
 }
+
+function bt_training_confirm($id) {
+    global $wpdb;
+    $training = bt_get_training_by_id($id);
+    if (!$training) {  // Nem is jó az id, nincs ilyen
+        return false;
+    }
+    $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
+    $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET ';
+    if ($wpdb->get_results($sql)) {
+        logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés visszaigazolva.');
+        return true;
+    }
+    return false;
+}

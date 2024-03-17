@@ -1,22 +1,4 @@
 
-/*
- 
- 
- var calendar_script = document.createElement('script');
- calendar_script.type = 'text/javascript';
- switch (getCalendarType()) {
- case 'events':
- calendar_script.src = '../js/events_calendar.js';
- break;
- case 'trainings':
- calendar_script.src = '../js/trainings_calendar.js';
- break;
- case 'my-trainings':
- calendar_script.src = '../js/my_trainings_calendar.js';
- break;
- }
- document.head.appendChild(calendar_script); // Betoltjuk a megfelelo naptarat
- */
 
 function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat töltsük be
     const calendarTypes = {

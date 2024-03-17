@@ -60,3 +60,6 @@ define("BUDATOLL_ACCOUNT_EVENT_PLAYER_ID", 'event_id');
 define("BUDATOLL_ACCOUNT_AMOUNT", 'amount');
 define("BUDATOLL_ACCOUNT_TIME", 'time');
 define("BUDATOLL_ACCOUNT_COMMENT", 'comment');
+
+
+define("BUDATOLL_COMPANY_NAME", 'Budatoll egyesület');
