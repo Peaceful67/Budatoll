@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    die();
+}
 function budatoll_manage_events_list() {
     global $wpdb;
     $ret = '<H3>Alkalmak listája</H3>';

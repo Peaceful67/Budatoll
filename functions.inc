@@ -1,40 +1,36 @@
 <?php
 
-function budatoll_pages_restricted() {
-    /*
-      add_shortcode('list_balances', 'list_balance_of_users');
-      add_shortcode('budatoll-players', 'budatoll_manage_players');
-      add_shortcode('budatoll-list-event-types', 'budatoll_list_event_types');
-      add_shortcode('budatoll-event-types', 'budatoll_manage_event_types');
-      add_shortcode('budatoll-events-list', 'budatoll_manage_events_list');
-      add_shortcode('budatoll-events-calendar', 'budatoll_manage_events_calendar');
-      add_shortcode('budatoll-my-trainings-list', 'budatoll_my_trainings_list');
-      add_shortcode('budatoll-my-trainings-calendar', 'budatoll_my_trainings_calendar');
-      add_shortcode('budatoll-trainings-list', 'budatoll_trainings_list');
-      add_shortcode('budatoll-trainings-calendar', 'budatoll_trainings_calendar');
-      add_shortcode('budatoll-test-page', 'budatoll_test_page');
-      add_shortcode('budatoll-payment-management', 'bt_payment_management');
-     */
-    if (bt_user_has_role('administrator')) {
+if (!defined('ABSPATH')) {
+    die();
+}
+
+function budatoll_is_page_allowed() {
+
+    $permalink = rtrim($_SERVER['REQUEST_URI'], '/');
+    if (bt_user_has_role('administrator')) { // Ennek bármit engedünk
         return;
     }
 
-    $permalink = home_url(FILTER_INPUT(INPUT_SERVER, 'REQUEST_URI'));
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
-        'manage_balances' => ['coach'],
-        'view_balance' => ['player'],
+        'anybody' => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
+        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg'],
+        'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem',],
     ];
-    if (!isset($page_acccess[$permalink])) {
-        return;
-    }
+
     if (is_user_logged_in()) {
-        foreach ($page_acccess[$permalink] as $required) {
-            if (user_has_role($required)) {
-                return;
-            }
+        $user = wp_get_current_user();
+        $roles = $user->roles;
+    } else {
+        $roles = [];
+    }
+    $roles[] = 'anybody';
+    foreach ($roles as $role) {  // Vesszük az összes szerepet 
+        if (in_array($permalink, $page_acccess[$role])) { // Ha benne van az aktuális, örülünk
+            return;
         }
     }
-    wp_redirect(home_url('/nincs-jogosultsag'));
+    wp_redirect(site_url('/nincs-jogosultsag'));
+    exit();
 }
 
 function bt_is_deletable($item_id, $related_arr) {
@@ -67,7 +63,7 @@ function bt_welcome_message() {
     if ($user->ID == 0) {
         $ret = 'Lépj be vagy regisztrálj játékosként!';
     } else {
-        $ret .= 'Belépve: ' . $user->display_name;
+        $ret = 'Belépve: ' . $user->display_name;
     }
     return $ret;
 }
@@ -83,7 +79,7 @@ function bt_send_email($user_id, $subject, $message) {
     }
     $headers = [
         'Content-Type: text/html; charset=UTF-8',
-        'From: from@budatoll.hu',
+        'From: ' . get_option('blogname') . ' <from@budatoll.hu>',
         'Reply-to: no-reply@budatoll.hu',
     ];
     $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
@@ -94,6 +90,7 @@ function bt_send_email($user_id, $subject, $message) {
 function budatoll_deactivated() {
     remove_role(BUDATOLL_ROLE_COACH);
     remove_role(BUDATOLL_ROLE_PLAYER);
+    wp_clear_scheduled_hook('budatoll_cron_hook');
 }
 
 function budatoll_menu_based_on_role($args) {
@@ -106,7 +103,7 @@ function budatoll_menu_based_on_role($args) {
         } elseif (in_array('player', (array) $user->roles) AND wp_get_nav_menu_object('Player')) {
             $args['menu'] = 'Player';
         }
-    } elseif(wp_get_nav_menu_object('Visitor')) {
+    } elseif (wp_get_nav_menu_object('Visitor')) {
         $args['menu'] = 'Visitor';
     } else {
         $args['menu'] = '';
@@ -135,7 +132,9 @@ function budatoll_activated() {
     global $wpdb;
     add_role(BUDATOLL_ROLE_COACH, 'Edző', ['read' => true, BUDATOLL_ACCESS_MANAGE_OPTIONS => true, BUDATOLL_ACCESS_MANAGE_COACH => true]);
     add_role(BUDATOLL_ROLE_PLAYER, 'Játékos', ['read' => true, BUDATOLL_ACCESS_MANAGE_PLAYER => true]);
-
+    if (!wp_next_scheduled('budatoll_cron_hook')) {
+        wp_schedule_event(time(), 'every_five_minutes', 'budatoll_cron_hook');
+    }
     $sql = 'CREATE TABLE IF NOT EXISTS `' . BUDATOLL_EVENT_TYPE_TABLE . '` (`'
             . BUDATOLL_EVENT_TYPE_ID . '` int(9) NOT NULL AUTO_INCREMENT,`'
             . BUDATOLL_EVENT_TYPE_SHORT . '` varchar(50) NOT NULL,`'
@@ -201,5 +200,35 @@ function bt_user_has_role($role) {
         return in_array($role, $user->roles);
     } else {
         return false;
+    }
+}
+
+function bt_get_option($category, $name) {
+    $opt_arr = unserialize(get_option($category));
+    return $opt_arr[$name] ?? false;
+}
+
+function bt_set_option($category, $name, $value) {
+    $opt_arr = unserialize(get_option($category));
+    $opt_arr[$name] = $value;
+    update_option($category, serialize($opt_arr));
+}
+
+function bt_set_default_role($user_id) {
+    $user = new WP_User($user_id);
+    foreach ($user->roles as $role) {
+        $user->remove_role($role);
+    }
+    $user->add_role('player');
+}
+
+function bt_get_results($sql) {
+    global $wpdb;
+    $prep = $wpdb->prepare($sql);
+    $res = $wpdb->get_results($prep);
+    if(is_null($res) || !empty($wpdb->last_error)) {
+        return false;
+    } else {
+        return $res;
     }
 }

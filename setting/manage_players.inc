@@ -202,12 +202,8 @@ function budatoll_manage_players_save($user_id) {
 }
 
 function budatoll_manage_players_list() {
-    $users = get_users([
-        'role' => BUDATOLL_ROLE_PLAYER,
-        'number' => -1,
-        'fields' => 'all',
-        'orderby' => 'display_name',
-    ]);
+  
+    $users = bt_get_active_players();
     $ret .= '<div class="wrap">';
     $ret .= '<table class="wp-list-table widefat fixed striped">';
     $ret .= '<thead><tr>'

@@ -35,7 +35,7 @@ $(document).on('mousemove', function (event) {
 function budatoll_get_popup_x(width) {
     x = (budatoll_mouse_x > budatoll_center_x) ? budatoll_center_x - width - 50 : budatoll_center_x + 50;
     x = (budatoll_mouse_x > budatoll_center_x) ? 0 : budatoll_center_x * 2 - width;
-    x = budatoll_mouse_x;
+//    x = budatoll_mouse_x;
     return x;
 }
 

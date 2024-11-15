@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    die();
+}
 define("BUDATOLL_ROLE_COACH", 'coach');
 define("BUDATOLL_ROLE_PLAYER", 'player');
 
@@ -61,5 +63,6 @@ define("BUDATOLL_ACCOUNT_AMOUNT", 'amount');
 define("BUDATOLL_ACCOUNT_TIME", 'time');
 define("BUDATOLL_ACCOUNT_COMMENT", 'comment');
 
-
 define("BUDATOLL_COMPANY_NAME", 'Budatoll egyesület');
+
+define("BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE", 'email-negativ-balance');

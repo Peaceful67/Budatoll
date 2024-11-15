@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    die();
+}
 function bt_get_training_by_id($id) {
     global $wpdb;
     $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $id . ';';
@@ -51,4 +53,15 @@ function bt_training_confirm($id) {
         return true;
     }
     return false;
+}
+
+function bt_training_charge($id) {
+     $already_warned = get_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE);
+     $training = bt_get_training_by_id($id);
+     $player_id = $training->BUDATOLL_TRAINING_PLAYER_ID;
+    if (!isset($already_warned[$player_id])) {
+        $already_warned[] = 3;
+        update_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE, $already_warned);
+        bt_send_email($player_id, 'Negatív egyenleg', 'Az egyenleged negatív lett.');
+    }
 }

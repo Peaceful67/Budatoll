@@ -95,6 +95,7 @@ function btEventClick(eventInfo) {
     console.log(trainings);
     var is_already_booked = false;
     var is_waiting = false;
+    var num_confirmed = 0;
     let trainings_text = '<h4>' + event.long + '</h4><hr>';
     trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
     trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
@@ -106,7 +107,7 @@ function btEventClick(eventInfo) {
         trainings_text += 'Még senki';
     } else {
         trainings.forEach(function (training) {
-            if (training.player_id === btCurrentUserId) {
+            if (training.player_id == btCurrentUserId) {
                 is_already_booked = true;
                 if (training.confirmed !== '1') {
                     is_waiting = true;
@@ -114,6 +115,7 @@ function btEventClick(eventInfo) {
             }
             if (training.confirmed === '1') {
                 trainings_text += training.player_name + ', ';
+                num_confirmed++;
             } else {
                 waiting_list += training.player_name + ', ';
             }
@@ -124,8 +126,11 @@ function btEventClick(eventInfo) {
     }
     trainings_text += '<div class="budatoll-row">';
     if (is_already_booked) {
-        if (is_waiting && (event.max_players === 0 || event.max_players < trainings.length)) {
+//        console.log(event);
+//        console.log('Confirmed:' + num_confirmed);
+        if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
             trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
+            trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
         } else {
             trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
         }
@@ -179,10 +184,14 @@ function btMyTrainingMouseEnter(eventInfo) {
         training_info = $("#budatoll-trainings-info");
         popup_width = training_info.width();
         popup_height = training_info.height();
+        training_info.html(trainings_text).show();
+        /*
         training_info.html(trainings_text).show().css({
             top: budatoll_get_popup_y(popup_height),
             left: budatoll_get_popup_x(popup_width),
-        });
+        })
+         * 
+         */;
     }
 
 }

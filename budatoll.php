@@ -13,6 +13,7 @@ if (!defined('ABSPATH')) {
 setlocale(LC_TIME, 'hu_HU.UTF-8');
 require_once plugin_dir_path(__FILE__) . 'config.inc';
 require_once plugin_dir_path(__FILE__) . 'functions.inc';
+require_once plugin_dir_path(__FILE__) . 'includes/view.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/manage_payments.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/payment_accounts.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/events_list.inc';
@@ -20,6 +21,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/events_calendar.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_functions.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_calendar.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_list.inc';
+require_once plugin_dir_path(__FILE__) . 'includes/scheduler.inc';
 require_once plugin_dir_path(__FILE__) . 'ajax.inc';
 require_once plugin_dir_path(__FILE__) . 'settings.inc';
 
@@ -37,6 +39,7 @@ add_shortcode('budatoll-trainings-list', 'budatoll_trainings_list');
 add_shortcode('budatoll-trainings-calendar', 'budatoll_trainings_calendar');
 add_shortcode('budatoll-test-page', 'budatoll_test_page');
 add_shortcode('budatoll-payment-management', 'bt_payment_management');
+add_shortcode('budatoll-balance_of_user', 'bt_balance_of_user');
 add_shortcode('budatoll-welcome-message', 'bt_welcome_message');
 
 register_activation_hook(__FILE__, 'budatoll_activated');
@@ -44,10 +47,17 @@ register_deactivation_hook(__FILE__, 'budatoll_deactivated');
 
 add_action('wp_enqueue_scripts', 'budatoll_scripts');
 add_action('admin_enqueue_scripts', 'budatoll_admin_styles');
-add_action('budatoll_pages_restricted', 'budatoll_pages_restricted');
+add_action('template_redirect', 'budatoll_is_page_allowed');
 
 add_action('wp_login', 'budatoll_redirect_after_login');
 add_filter('wp_nav_menu_args', 'budatoll_menu_based_on_role');
+
+add_action('budatoll_cron_hook', 'budatoll_crontab');
+add_filter('cron_schedules', 'budatoll_cron_interval');
+
+add_action('user_register', 'bt_set_default_role');
+
+
 
 function budatoll_scripts() {
     global $post;
@@ -55,11 +65,11 @@ function budatoll_scripts() {
     wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__));
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__));
 
-//   wp_enqueue_script('jquery-ui-datepicker');
+
     wp_enqueue_script('budatoll-fc', plugins_url('js/fullcalendar/index.global.min.js', __FILE__), array('jquery'), null, false);
     wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('js/fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'), null, false);
     wp_enqueue_script('budatoll-header-script', plugins_url('js/budatoll-header-script.js', __FILE__), array('jquery'), null, false);
-//    wp_enqueue_script('magnific-popup', plugins_url('js/magnific-popup.min.js', __FILE__), array('jquery'), null, false);
+
     switch ($post->post_name) {
         case 'alkalom-naptar':
             wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), null, true);
@@ -73,6 +83,5 @@ function budatoll_scripts() {
     }
     wp_enqueue_script('budatoll-jquery-ui-script', plugins_url('jquery-ui/jquery-ui.js', __FILE__), array('jquery'), null, false);
     wp_enqueue_script('budatoll-end-script', plugins_url('js/budatoll-end-script.js', __FILE__), array('jquery'), null, true);
-
     wp_localize_script('budatoll-header-script', 'budatoll_ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
 }

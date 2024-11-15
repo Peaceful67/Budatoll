@@ -86,6 +86,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
     . '</tr></thead><tbody id="logger-list">';
     foreach ($wpdb->get_results($sql) as $row) {
         $user = get_userdata($row->{BUDATOLL_LOGGER_USER});
+        $user_name = $user->display_name ?? '---';
         $related_id = $row->{BUDATOLL_LOGGER_RELATED};
         $comment = $row->{BUDATOLL_LOGGER_COMMENT};
         $obj_pos = strpos($comment, 'a:');
@@ -97,18 +98,19 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
                 $comment = substr($comment, 0, $obj_pos) . ': ' . arr_to_string($obj_arr, true);
             }
         }
-        $related = '---';
+        $related_name = '---';
         switch ($row->{BUDATOLL_LOGGER_TYPE}) {
             case BUDATOLL_LOGGER_TYPE_PAYMENT:
             case BUDATOLL_LOGGER_TYPE_USER_DATA:
             case BUDATOLL_LOGGER_TYPE_TRAININGS:
             case BUDATOLL_LOGGER_TYPE_EMAILS:
-                $related = (get_userdata($related_id))->display_name;
+                $related = (get_userdata($related_id));
+                $related_name = $related->display_name ?? '---';
                 break;
         }
-        echo '<tr><td class="column-column1">' . $user->display_name . '</td>';
+        echo '<tr><td class="column-column1">' . $user_name . '</td>';
         echo '<td class="column-column2">' . $bt_logger_types[$row->{BUDATOLL_LOGGER_TYPE}] . '</td>';
-        echo '<td class="column-column3">' . $related . '</td>';
+        echo '<td class="column-column3">' . $related_name . '</td>';
         echo '<td class="column-column4">' . $row->{BUDATOLL_LOGGER_TIME} . '</td>';
         echo '<td class="column-column5">' . $comment . '</td></tr>';
     }

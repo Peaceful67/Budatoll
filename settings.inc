@@ -1,5 +1,8 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    die();
+}
 require_once plugin_dir_path(__FILE__) . 'setting/event_types.inc';
 require_once plugin_dir_path(__FILE__) . 'setting/options.inc';
 require_once plugin_dir_path(__FILE__) . 'setting/logger.inc';
@@ -53,4 +56,8 @@ function budatoll_add_settings_pages() {
 
 function budatoll_admin_styles() {
     wp_enqueue_style('budatoll-admin', plugins_url('css/admin.css', __FILE__));
+}
+
+function budatoll_settings_init() {
+    
 }

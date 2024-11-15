@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    die();
+}
 add_action('wp_ajax_budatoll', 'budatoll_ajax');
 add_action('wp_ajax_nopriv_budatoll', 'budatoll_ajax');
 

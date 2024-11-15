@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    die();
+}
 function budatoll_my_trainings_list() {
     return budatoll_trainings_list();
 }
@@ -87,6 +89,7 @@ function budatoll_training_add() {
 
 function budatoll_training_list($player_id = -1) {
     global $wpdb;
+    $ret = '';
     $trainings_from = getPostVariable('trainings_from', date('Y-m-01'));
     $trainings_to = getPostVariable('trainings_to', date('Y-m-t'));
     $event_type_id = getPostVariable('bt_event_type', -1);
@@ -114,7 +117,7 @@ function budatoll_training_list($player_id = -1) {
     }
     $ret .= '<input type="hidden" name="trainings_type_year" value="' . $trainings_year . '">';
     $ret .= '<input type="hidden" name="trainings_month"  value="' . $trainings_month . '">';
-    $ret = '<div class="budatoll-keret budatoll-search">';
+    $ret .= '<div class="budatoll-keret budatoll-search">';
     $ret .= '<div class="budatoll-search-group"><button class="button budatoll-button" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása">'
             . '<span class="dashicons dashicons-plus"></span></button></div>';
     $ret .= '<div class="budatoll-search-group"><label for="bt_event_type">Edzés típus:</label>';

@@ -96,7 +96,9 @@
     background-color: lightgray;
 }
 
-
+.budatoll-table  tr:nth-child(even) {
+            background-color: lightgray;
+        }
 
 .budatoll-table-row:hover {
     background-color: lightgray;
@@ -105,8 +107,8 @@
 .budatoll-popup {
     display:none;
     position: absolute;
-    left:50%;
-    top:50%;
+    left:40%;
+    top:150px;
     transform: translate(-50%, -50%);
     background: #000;
     background-color: rgb(0,0,0);
