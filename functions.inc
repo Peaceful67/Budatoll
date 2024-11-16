@@ -96,11 +96,11 @@ function budatoll_deactivated() {
 function budatoll_menu_based_on_role($args) {
     if (is_user_logged_in() AND ('primary-menu' === $args['theme_location'])) {
         $user = wp_get_current_user();
-        if (in_array('administrator', (array) $user->roles) AND wp_get_nav_menu_object('Admin')) {
+        if (in_array(BUDATOLL_ROLE_ADMIN, (array) $user->roles) AND wp_get_nav_menu_object('Admin')) {
             $args['menu'] = 'Admin';
-        } elseif (in_array('coach', (array) $user->roles) AND wp_get_nav_menu_object('Coach')) {
+        } elseif (in_array(BUDATOLL_ROLE_COACH, (array) $user->roles) AND wp_get_nav_menu_object('Coach')) {
             $args['menu'] = 'Coach';
-        } elseif (in_array('player', (array) $user->roles) AND wp_get_nav_menu_object('Player')) {
+        } elseif (in_array(BUDATOLL_ROLE_PLAYER, (array) $user->roles) AND wp_get_nav_menu_object('Player')) {
             $args['menu'] = 'Player';
         }
     } elseif (wp_get_nav_menu_object('Visitor')) {
@@ -130,8 +130,9 @@ function budatoll_redirect_after_login() {
 
 function budatoll_activated() {
     global $wpdb;
-    add_role(BUDATOLL_ROLE_COACH, 'Edző', ['read' => true, BUDATOLL_ACCESS_MANAGE_OPTIONS => true, BUDATOLL_ACCESS_MANAGE_COACH => true]);
+    add_role(BUDATOLL_ROLE_COACH, 'Edző', ['read' => true, BUDATOLL_ACCESS_MANAGE_OPTIONS => false, BUDATOLL_ACCESS_MANAGE_COACH => true]);
     add_role(BUDATOLL_ROLE_PLAYER, 'Játékos', ['read' => true, BUDATOLL_ACCESS_MANAGE_PLAYER => true]);
+
     if (!wp_next_scheduled('budatoll_cron_hook')) {
         wp_schedule_event(time(), 'every_five_minutes', 'budatoll_cron_hook');
     }
@@ -219,14 +220,14 @@ function bt_set_default_role($user_id) {
     foreach ($user->roles as $role) {
         $user->remove_role($role);
     }
-    $user->add_role('player');
+    $user->add_role(BUDATOLL_ROLE_PLAYER);
 }
 
 function bt_get_results($sql) {
     global $wpdb;
     $prep = $wpdb->prepare($sql);
     $res = $wpdb->get_results($prep);
-    if(is_null($res) || !empty($wpdb->last_error)) {
+    if (is_null($res) || !empty($wpdb->last_error)) {
         return false;
     } else {
         return $res;
