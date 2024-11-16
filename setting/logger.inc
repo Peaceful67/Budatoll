@@ -21,6 +21,10 @@ $bt_logger_types = [
 ];
 
 function bt_logger_list() {
+    if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
+        wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
+    }
+
     $bt_logger_user = getPostVariable('bt_logger_user', -1);
     $bt_logger_related = getPostVariable('bt_logger_related', -1);
     $bt_logger_cat = getPostVariable('bt_logger_cat', -1);

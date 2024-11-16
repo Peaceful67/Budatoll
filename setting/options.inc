@@ -12,7 +12,7 @@ define("BUDATOLL_OPTION_LAST_CRONTAB", 'last_crontab');
 function budatoll_setting_options() {
 
     $hidden_var_name = 'bt_save_options';
-    if (!current_user_can('manage_options')) {
+    if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
         wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
     }
 

@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
 }
 define("BUDATOLL_ROLE_COACH", 'coach');
 define("BUDATOLL_ROLE_PLAYER", 'player');
+define("BUDATOLL_ROLE_ADMIN", 'administrator');
+
 
 define("BUDATOLL_ACCESS_MANAGE_OPTIONS", 'budatoll-manage-options');
 define("BUDATOLL_ACCESS_MANAGE_COACH", 'budatoll-manage-coach');

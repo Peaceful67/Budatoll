@@ -2,6 +2,9 @@
 
 function budatoll_manage_event_types() {
     global $wpdb;
+   if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
+        wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
+    }
 
     $ret = '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on">';
     $ret .= '<input type="hidden" name="page" value="edzes-tipusok">';

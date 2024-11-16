@@ -7,7 +7,7 @@ define("BUDATOLL_USER_META_PHONE", 'phone');
 define("BUDATOLL_USER_META_ACTIVE", 'active');
 
 function budatoll_manage_players() {
-    if (!current_user_can('manage_options')) {
+    if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
         wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
     }
     //   echo 'Post: ' . print_r($_POST, true);
@@ -204,7 +204,7 @@ function budatoll_manage_players_save($user_id) {
 function budatoll_manage_players_list() {
   
     $users = bt_get_active_players();
-    $ret .= '<div class="wrap">';
+    $ret = '<div class="wrap">';
     $ret .= '<table class="wp-list-table widefat fixed striped">';
     $ret .= '<thead><tr>'
             . '<th scope="col" id="column1" class="manage-column column-column1" style="width:120px;">Felhasználónév</th>'
