@@ -98,9 +98,9 @@ function list_balance_of_all_users($list = false, $add_new = false) {
     $ret .= '<tbody>';
     foreach ($players as $player) {
         $user_id = $player->ID;
-        $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `SUM`, MAX(`' . BUDATOLL_ACCOUNT_TIME . '`) AS `LAST` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=0 '
-                . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
-        $result = bt_get_results($sql);
+        $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `SUM`, MAX(`' . BUDATOLL_ACCOUNT_TIME . '`) AS `LAST` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
+                . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d';
+        $result = bt_get_results($sql, [0, $user_id]);
         $balance = $result[0]->SUM ?? 0;
         $last_mod = $result[0]->LAST ?? '---';
         $ret .= '<tr>';

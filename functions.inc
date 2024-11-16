@@ -132,7 +132,9 @@ function budatoll_activated() {
     global $wpdb;
     add_role(BUDATOLL_ROLE_COACH, 'Edző', ['read' => true, BUDATOLL_ACCESS_MANAGE_OPTIONS => false, BUDATOLL_ACCESS_MANAGE_COACH => true]);
     add_role(BUDATOLL_ROLE_PLAYER, 'Játékos', ['read' => true, BUDATOLL_ACCESS_MANAGE_PLAYER => true]);
-
+    if (get_role(BUDATOLL_ROLE_PLAYER)) {
+        update_option('default_role', BUDATOLL_ROLE_PLAYER);
+    }
     if (!wp_next_scheduled('budatoll_cron_hook')) {
         wp_schedule_event(time(), 'every_five_minutes', 'budatoll_cron_hook');
     }
@@ -223,9 +225,13 @@ function bt_set_default_role($user_id) {
     $user->add_role(BUDATOLL_ROLE_PLAYER);
 }
 
-function bt_get_results($sql) {
+function bt_get_results($sql, $args = false) {
     global $wpdb;
-    $prep = $wpdb->prepare($sql);
+    if ($args) {
+        $prep = $wpdb->prepare($sql, $args);
+    } else {
+        $prep = $sql;
+    }
     $res = $wpdb->get_results($prep);
     if (is_null($res) || !empty($wpdb->last_error)) {
         return false;
