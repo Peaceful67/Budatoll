@@ -57,7 +57,7 @@ add_filter('cron_schedules', 'budatoll_cron_interval');
 
 add_action('user_register', 'bt_set_default_role');
 
-
+add_action('shutdown', 'budatoll_crontab');
 
 function budatoll_scripts() {
     global $post;

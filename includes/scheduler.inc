@@ -1,11 +1,14 @@
 <?php
+
+define("BUDATOLL_CRONTAB_INTERVAL", 300);
 if (!defined('ABSPATH')) {
     die();
 }
+
 function budatoll_cron_interval($schedules) {
     if (!isset($schedules['every_five_minutes'])) {
         $schedules['every_five_minutes'] = array(
-            'interval' => 300, // Interval in seconds
+            'interval' => BUDATOLL_CRONTAB_INTERVAL, // Interval in seconds
             'display' => esc_html__('Every Five Minutes'),
         );
     }
@@ -13,17 +16,15 @@ function budatoll_cron_interval($schedules) {
 }
 
 function budatoll_crontab() {
-    update_option(BUDATOLL_OPTION_LAST_CRONTAB, date('Y-m-d H:i'));
-    bt_trainings_make_done();
-    /*
-      $already_warned = get_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE);
-      if (!isset($already_warned[3])) {
-      $already_warned[] = 3;
-      update_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE, $already_warned);
-      bt_send_email(3, 'Negatív egyenleg', 'Az egyenleged negatív lett.');
-      }
-     * 
-     */
+    $now = (new DateTime('now'))->getTimestamp();
+    $last = (new DateTime(get_option(BUDATOLL_OPTION_LAST_CRONTAB)))->getTimestamp();
+
+    if (($now - $last) > BUDATOLL_CRONTAB_INTERVAL - 10) {
+        ob_start();
+        bt_trainings_make_done();
+        bt_charge_passed_trainings();
+        update_option(BUDATOLL_OPTION_LAST_CRONTAB, date('Y-m-d H:i'));
+    }
 }
 
 function bt_trainings_make_done() {

@@ -7,7 +7,7 @@ define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY", 'email-user-modify');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT", 'email-user-payment');
 
-define("BUDATOLL_OPTION_LAST_CRONTAB", 'last_crontab');
+define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
 
 function budatoll_setting_options() {
 
