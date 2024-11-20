@@ -227,6 +227,7 @@ function bt_set_default_role($user_id) {
 
 function bt_get_results($sql, $args = false) {
     global $wpdb;
+    error_log('SQL: ' . $sql . ', args: ' . print_r($args, true));
     if ($args) {
         $prep = $wpdb->prepare($sql, $args);
     } else {

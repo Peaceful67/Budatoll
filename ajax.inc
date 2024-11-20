@@ -1,4 +1,5 @@
 <?php
+
 if (!defined('ABSPATH')) {
     die();
 }
@@ -8,6 +9,7 @@ add_action('wp_ajax_nopriv_budatoll', 'budatoll_ajax');
 function budatoll_ajax() {
     header('Content-Type: application/json');
     $action = filter_input(INPUT_POST, 'ajax-action');
+    error_log('AJAX action: '.$action);
     switch ($action) {
         case 'add-event':
             $date = filter_input(INPUT_POST, 'dropped-date');
@@ -104,9 +106,8 @@ function bt_get_trainings_range_of_user($start, $end) {
 }
 
 function bt_get_events_range($from, $to) {
-    global $wpdb;
-    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_DAY . '` BETWEEN "' . $from . '" AND "' . $to . '";;';
-    $res = $wpdb->get_results($sql);
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_DAY . '` BETWEEN "%s" AND "%s";';
+    $res = bt_get_results($sql, [$from, $to]);
     $ret = [
         'result' => 'success',
         'events' => $res,
@@ -116,17 +117,15 @@ function bt_get_events_range($from, $to) {
 }
 
 function bt_get_trainings_range($from, $to) {
-    global $wpdb;
-    $sql = $wpdb->prepare('SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_DAY . '` BETWEEN %s AND %s;', $from, $to);
-    $events = $wpdb->get_results($sql);
+    $events = bt_get_results('SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_DAY . '` BETWEEN "%s" AND "%s";', [$from, $to]);
     $ret = ['result' => 'success'];
     if (empty($events)) {
         $ret['events'] = [];
     } else {
         foreach ($events as $event) {
             $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
-                    . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event->{BUDATOLL_EVENTS_ID} . ' ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
-            $trainings = $wpdb->get_results($sql);
+                    . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=%d ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
+            $trainings = bt_get_results($sql, [$event->{BUDATOLL_EVENTS_ID}]);
             foreach ($trainings as $training) {
                 $training->player_name = bt_get_full_name($training->player_id);
             }
@@ -138,12 +137,12 @@ function bt_get_trainings_range($from, $to) {
 }
 
 function bt_get_trainings_of_events($events) {
-    global $wpdb;
+
     $ret = [];
     foreach ($events as $event) {
         $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
-                . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event->{BUDATOLL_EVENTS_ID} . ' ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
-        $trainings = $wpdb->get_results($sql);
+                . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=%d ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
+        $trainings = bt_get_results($sql, [$event->{BUDATOLL_EVENTS_ID}]);
         foreach ($trainings as $training) {
             $training->player_name = bt_get_full_name($training->player_id);
         }
@@ -163,8 +162,8 @@ function btAddEvent($type_id, $date) {
     if (!$date) {
         return $ret;
     }
-    $res = $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_DAY . '`="' . $date . '" '
-            . 'AND `' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=' . $type_id . ';');
+    $res = bt_get_results('SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_DAY . '`="%s" '
+            . 'AND `' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=%d;', [$date, $type_id]);
     if ($res AND count($res) > 0) {
         $ret = json_encode(['result' => 'already']);
         return $ret;

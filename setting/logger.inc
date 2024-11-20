@@ -134,8 +134,7 @@ function logger($type, $related, $comment, $log_data = null) {
         BUDATOLL_LOGGER_COMMENT => $comment,
     ];
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data);
-    $sql = $wpdb->prepare('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
-    $wpdb->query($sql);
+    $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
 }
 
 function arr_to_string($arr) {

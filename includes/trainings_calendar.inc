@@ -2,6 +2,8 @@
 if (!defined('ABSPATH')) {
     die();
 }
+
+
 function budatoll_my_trainings_calendar() {
     $player_id = get_current_user_id();
     global $wpdb;

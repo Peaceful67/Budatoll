@@ -24,14 +24,14 @@ function bt_payment_management() {
 }
 
 function bt_list_balance_of_user($user_id) {
-    
+
     $ret = '';
     if ($user_id < 0) { // Valamiért nincs megadva játékos, bekérjük
         $ret .= bt_warning('Belső hiba. Valamiért nincs megadva játékos');
         return $ret;
     }
     $ret .= '<h4>' . bt_get_full_name($user_id) . ' egyenlegének tételei</h4>';
-    $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d' 
+    $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
             . ' ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
     $result = bt_get_results($sql, [$user_id]);
     $ret .= '<div class="wrap">';
@@ -81,7 +81,12 @@ function list_balance_of_all_users($list = false, $add_new = false) {
             global $wpdb;
             $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
             logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, 'Befizetés érkezett:' . $amount . ' Ft');
-            //           }
+            if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT)) {
+                $msg = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>'
+                        . $amount . ' Ft összegű befizetésed az egyenlegeden jóváírásra került.';
+
+                bt_send_email($user_id, 'Befizetés lekönyvelése', $msg);
+            }
         } else {
             $ret .= bt_warning('Belső hiba. Befizetés rögzítése nem történt meg!');
         }
@@ -159,7 +164,7 @@ function bt_payment_edit($user_id, $edit_id) {
 }
 
 function bt_payment_list() {
- 
+
     $payments_to = getPostVariable('payments_to', date('Y-m-d'));
     $payments_from = getPostVariable('payments_from', date('Y-m-d', strtotime($payments_to . ' -2 month')));
     $player_id = getPostVariable('select_listed_player', -1);

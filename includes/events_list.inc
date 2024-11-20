@@ -1,7 +1,9 @@
 <?php
+
 if (!defined('ABSPATH')) {
     die();
 }
+
 function budatoll_manage_events_list() {
     global $wpdb;
     $ret = '<H3>Alkalmak listája</H3>';
@@ -92,6 +94,7 @@ function budatollEventEdit($item_id) {
 
 function budatollEventsList() {
     global $wpdb;
+    $ret = '';
     $events_from = getPostVariable('events_from', date('Y-m-01'));
     $events_to = getPostVariable('events_to', date('Y-m-t'));
     $event_type_id = getPostVariable('bt_event_type', -1);
@@ -125,7 +128,7 @@ function budatollEventsList() {
     $ret .= '<input type="hidden" name="event_type_year" id="event_type_year" value="' . $event_type_year . '">';
     $ret .= '<input type="hidden" name="event_type_month" id="event_type_month" value="' . $event_type_month . '">';
     //   $ret .= 'Year:' . $event_type_year . ', Month: ' . $event_type_month;
-    $ret = '<div class="budatoll-keret budatoll-search">';
+    $ret .= '<div class="budatoll-keret budatoll-search">';
     $ret .= '<div class="budatoll-search-group"><button class="button budatoll-button" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása">'
             . '<span class="dashicons dashicons-plus"></span></button></div>';
     $ret .= '<div class="budatoll-search-group"><label for="bt_event_type">Edzés típus:</label>';
