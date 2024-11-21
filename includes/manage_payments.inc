@@ -23,6 +23,11 @@ function bt_payment_management() {
     return $ret;
 }
 
+function bt_balance_of_user() {
+    $user_id = bt_get_current_userid();
+    return bt_list_balance_of_user($user_id);
+}
+
 function bt_list_balance_of_user($user_id) {
 
     $ret = '';
@@ -48,7 +53,7 @@ function bt_list_balance_of_user($user_id) {
         $ret .= '<td>' . $item->{BUDATOLL_ACCOUNT_AMOUNT} . ' Ft</td>';
         $ret .= '<td>' . $ref . '</td>';
         $ret .= '<td>' . $item->{BUDATOLL_ACCOUNT_COMMENT} . '</td>';
-        $ret .= '<td>' . bt_edit_button($item->{BUDATOLL_ACCOUNT_ID}) . ' ' . bt_delete_button($item->{BUDATOLL_ACCOUNT_ID}) . '</td>';
+        $ret .= '<td>' . bt_edit_button($item->{BUDATOLL_ACCOUNT_ID}) . ' </td>';
         $ret .= '</tr>';
     }
     $ret .= '</tbody></table>';

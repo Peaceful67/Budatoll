@@ -68,6 +68,11 @@ function bt_welcome_message() {
     return $ret;
 }
 
+function bt_get_current_userid() {
+    $user = wp_get_current_user();
+    return ($user->ID == 0) ? false: $user->ID;
+}
+
 function bt_send_email($user_id, $subject, $message) {
     $user = get_userdata($user_id);
     if (!$user) {
@@ -227,7 +232,7 @@ function bt_set_default_role($user_id) {
 
 function bt_get_results($sql, $args = false) {
     global $wpdb;
-    error_log('SQL: ' . $sql . ', args: ' . print_r($args, true));
+ //   error_log('SQL: ' . $sql . ', args: ' . print_r($args, true));
     if ($args) {
         $prep = $wpdb->prepare($sql, $args);
     } else {
