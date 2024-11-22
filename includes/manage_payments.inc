@@ -170,8 +170,8 @@ function bt_payment_edit($user_id, $edit_id) {
 
 function bt_payment_list() {
 
-    $payments_to = getPostVariable('payments_to', date('Y-m-d'));
-    $payments_from = getPostVariable('payments_from', date('Y-m-d', strtotime($payments_to . ' -2 month')));
+    $payments_to = getPostVariable('payments_to', wp_date('Y-m-d'));
+    $payments_from = getPostVariable('payments_from', wp_date('Y-m-d', strtotime($payments_to . ' -2 month')));
     $player_id = getPostVariable('select_listed_player', -1);
     $ret = '<table class="table" style="border:none;">';
     $ret .= '<tr><td style="width:10%;">';

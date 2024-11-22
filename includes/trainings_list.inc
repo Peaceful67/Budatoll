@@ -90,11 +90,11 @@ function budatoll_training_add() {
 function budatoll_training_list($player_id = -1) {
     global $wpdb;
     $ret = '';
-    $trainings_from = getPostVariable('trainings_from', date('Y-m-01'));
-    $trainings_to = getPostVariable('trainings_to', date('Y-m-t'));
+    $trainings_from = getPostVariable('trainings_from', wp_date('Y-m-01'));
+    $trainings_to = getPostVariable('trainings_to', wp_date('Y-m-t'));
     $event_type_id = getPostVariable('bt_event_type', -1);
-    $trainings_year = date("Y", strtotime($trainings_from));
-    $trainings_month = date("m", strtotime($trainings_from));
+    $trainings_year = wp_date("Y", strtotime($trainings_from));
+    $trainings_month = wp_date("m", strtotime($trainings_from));
     if (getPostVariable('month_left')) {
         if ($trainings_month > 1) {
             $trainings_month--;
@@ -102,8 +102,8 @@ function budatoll_training_list($player_id = -1) {
             $trainings_year--;
             $trainings_month = 12;
         }
-        $trainings_from = date(sprintf("%04d", $trainings_year) . '-' . sprintf("%02d", $trainings_month) . '-01');
-        $trainings_to = date('Y-m-t', strtotime($trainings_from));
+        $trainings_from = wp_date(sprintf("%04d", $trainings_year) . '-' . sprintf("%02d", $trainings_month) . '-01');
+        $trainings_to = wp_date('Y-m-t', strtotime($trainings_from));
     }
     if (getPostVariable('month_right')) {
         if ($trainings_month < 12) {
@@ -112,8 +112,8 @@ function budatoll_training_list($player_id = -1) {
             $trainings_year++;
             $trainings_month = 1;
         }
-        $trainings_from = date(sprintf("%04d", $trainings_year) . '-' . sprintf("%02d", $trainings_month) . '-01');
-        $trainings_to = date('Y-m-t', strtotime($trainings_from));
+        $trainings_from = wp_date(sprintf("%04d", $trainings_year) . '-' . sprintf("%02d", $trainings_month) . '-01');
+        $trainings_to = wp_date('Y-m-t', strtotime($trainings_from));
     }
     $ret .= '<input type="hidden" name="trainings_type_year" value="' . $trainings_year . '">';
     $ret .= '<input type="hidden" name="trainings_month"  value="' . $trainings_month . '">';

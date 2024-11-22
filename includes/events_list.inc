@@ -95,11 +95,11 @@ function budatollEventEdit($item_id) {
 function budatollEventsList() {
     global $wpdb;
     $ret = '';
-    $events_from = getPostVariable('events_from', date('Y-m-01'));
-    $events_to = getPostVariable('events_to', date('Y-m-t'));
+    $events_from = getPostVariable('events_from', wp_date('Y-m-01'));
+    $events_to = getPostVariable('events_to', wp_date('Y-m-t'));
     $event_type_id = getPostVariable('bt_event_type', -1);
-    $event_type_year = date("Y", strtotime($events_from));
-    $event_type_month = date("m", strtotime($events_from));
+    $event_type_year = wp_date("Y", strtotime($events_from));
+    $event_type_month = wp_date("m", strtotime($events_from));
     putScript('$(function() {'
             . '$("#events_from").datepicker({dateFormat: "yyyy-mm-dd" });'
             . '$("#events_to").datepicker({dateFormat: "yyyy-mm-dd" });'
@@ -112,8 +112,8 @@ function budatollEventsList() {
             $event_type_year--;
             $event_type_month = 12;
         }
-        $events_from = date(sprintf("%04d", $event_type_year) . '-' . sprintf("%02d", $event_type_month) . '-01');
-        $events_to = date('Y-m-t', strtotime($events_from));
+        $events_from = wp_date(sprintf("%04d", $event_type_year) . '-' . sprintf("%02d", $event_type_month) . '-01');
+        $events_to = wp_date('Y-m-t', strtotime($events_from));
     }
     if (getPostVariable('month_right')) {
         if ($event_type_month < 12) {
@@ -122,8 +122,8 @@ function budatollEventsList() {
             $event_type_year++;
             $event_type_month = 1;
         }
-        $events_from = date(sprintf("%04d", $event_type_year) . '-' . sprintf("%02d", $event_type_month) . '-01');
-        $events_to = date('Y-m-t', strtotime($events_from));
+        $events_from = wp_date(sprintf("%04d", $event_type_year) . '-' . sprintf("%02d", $event_type_month) . '-01');
+        $events_to = wp_date('Y-m-t', strtotime($events_from));
     }
     $ret .= '<input type="hidden" name="event_type_year" id="event_type_year" value="' . $event_type_year . '">';
     $ret .= '<input type="hidden" name="event_type_month" id="event_type_month" value="' . $event_type_month . '">';

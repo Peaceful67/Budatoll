@@ -23,7 +23,7 @@ function budatoll_crontab() {
         ob_start();
         bt_trainings_make_done();
         bt_charge_passed_trainings();
-        update_option(BUDATOLL_OPTION_LAST_CRONTAB, date('Y-m-d H:i'));
+        update_option(BUDATOLL_OPTION_LAST_CRONTAB, wp_date('Y-m-d H:i'));
     }
 }
 

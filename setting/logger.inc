@@ -8,6 +8,7 @@ define("BUDATOLL_LOGGER_TYPE_PAYMENT", 5);
 define("BUDATOLL_LOGGER_TYPE_TRAININGS", 6);
 define("BUDATOLL_LOGGER_TYPE_EMAILS", 7);
 define("BUDATOLL_LOGGER_TYPE_DEBIT", 8);
+define("BUDATOLL_LOGGER_TYPE_LOGIN", 9);
 
 $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'Edzés típus',
@@ -18,6 +19,7 @@ $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_PAYMENT => 'Befizetés',
     BUDATOLL_LOGGER_TYPE_DEBIT => 'Terhelés',
     BUDATOLL_LOGGER_TYPE_EMAILS => 'Email küldés',
+    BUDATOLL_LOGGER_TYPE_LOGIN => 'Belépés',
 ];
 
 function bt_logger_list() {
@@ -28,8 +30,8 @@ function bt_logger_list() {
     $bt_logger_user = getPostVariable('bt_logger_user', -1);
     $bt_logger_related = getPostVariable('bt_logger_related', -1);
     $bt_logger_cat = getPostVariable('bt_logger_cat', -1);
-    $bt_logger_to_date = getPostVariable('bt_logger_to_date', date('Y-m-d'));
-    $bt_logger_from_date = getPostVariable('bt_logger_from_date', date('Y-m-d', strtotime($bt_logger_to_date . ' -1 month')));
+    $bt_logger_to_date = getPostVariable('bt_logger_to_date', wp_date('Y-m-d'));
+    $bt_logger_from_date = getPostVariable('bt_logger_from_date', wp_date('Y-m-d', strtotime($bt_logger_to_date . ' -1 month')));
     bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
     bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
 }
@@ -121,6 +123,18 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
     echo '</tbody></table>';
 }
 
+function bt_log_user_login($user_login, $user) {
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user->ID, $user_login . ' belépett');
+}
+
+function bt_log_user_logout() {
+    $user = wp_get_current_user(); // Get the current logged-in user
+
+    if ($user && $user->exists()) {
+        logger(BUDATOLL_LOGGER_TYPE_LOGIN, $current_user->ID, $user->user_login . ' kilépett');
+    }
+}
+
 function logger($type, $related, $comment, $log_data = null) {
     global $wpdb;
     $user = wp_get_current_user();
@@ -133,6 +147,7 @@ function logger($type, $related, $comment, $log_data = null) {
         BUDATOLL_LOGGER_TYPE => $type,
         BUDATOLL_LOGGER_COMMENT => $comment,
     ];
+    error_log('Logger: '.print_s($data, true));
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data);
     $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
 }

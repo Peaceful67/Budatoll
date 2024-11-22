@@ -54,10 +54,17 @@ add_filter('wp_nav_menu_args', 'budatoll_menu_based_on_role');
 
 add_action('budatoll_cron_hook', 'budatoll_crontab');
 add_filter('cron_schedules', 'budatoll_cron_interval');
+add_action('wp_login', 'bt_log_user_login', 10, 2);
+add_action('wp_logout', 'bt_log_user_logout');
 
 add_action('user_register', 'bt_set_default_role');
+function bt_enqueue_dashicons() {
+    wp_enqueue_style('dashicons');
+}
+add_action('wp_enqueue_scripts', 'bt_enqueue_dashicons');
 
-add_action('shutdown', 'budatoll_crontab');
+
+add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem működik a crontab
 
 function budatoll_scripts() {
     global $post;
