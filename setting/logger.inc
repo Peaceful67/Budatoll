@@ -131,25 +131,31 @@ function bt_log_user_logout() {
     $user = wp_get_current_user(); // Get the current logged-in user
 
     if ($user && $user->exists()) {
-        logger(BUDATOLL_LOGGER_TYPE_LOGIN, $current_user->ID, $user->user_login . ' kilépett');
+        logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user->ID, $user->user_login . ' kilépett');
+    } else {
+        error_log('Nem volt belépve senki: '.print_r($user, true));
     }
+}
+
+function bt_log_login_failed($username) {
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, -1, sanitize_text_field($username) . ' sikeretelen belépés');
 }
 
 function logger($type, $related, $comment, $log_data = null) {
     global $wpdb;
     $user = wp_get_current_user();
     if (!is_null($log_data)) {
-        $comment .= ' ' . serialize($log_data);
+        $comment .= ' ' . wp_json_encode($log_data);
     }
     $data = [
         BUDATOLL_LOGGER_USER => $user->ID,
-        BUDATOLL_LOGGER_RELATED => $related,
-        BUDATOLL_LOGGER_TYPE => $type,
+        BUDATOLL_LOGGER_RELATED => intval($related),
+        BUDATOLL_LOGGER_TYPE => intval($type),
         BUDATOLL_LOGGER_COMMENT => $comment,
     ];
-    error_log('Logger: '.print_s($data, true));
+    error_log('Logger: ' . print_r($data, true));
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data);
-    $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
+
 }
 
 function arr_to_string($arr) {

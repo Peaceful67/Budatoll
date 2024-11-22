@@ -15,17 +15,43 @@ function budatoll_cron_interval($schedules) {
     return $schedules;
 }
 
-function budatoll_crontab() {
-    $now = (new DateTime('now'))->getTimestamp();
-    $last = (new DateTime(get_option(BUDATOLL_OPTION_LAST_CRONTAB)))->getTimestamp();
 
-    if (($now - $last) > BUDATOLL_CRONTAB_INTERVAL - 10) {
+function budatoll_crontab() {
+    global $wpdb;
+
+    // Get WordPress timezone
+    $timezone = new DateTimeZone(get_option('timezone_string') ?: 'UTC');
+
+    // Get current time in WordPress timezone
+    $now = wp_date('Y-m-d H:i');
+    $datetime = new DateTime($now, $timezone);
+
+    // Get the last cron execution time or use a default value
+    $last_option = get_option(BUDATOLL_OPTION_LAST_CRONTAB, '1970-01-01 00:00:00');
+    $last_datetime = new DateTime($last_option, $timezone);
+    $last = $last_datetime->getTimestamp();
+
+    // Check if the interval has passed
+    if (($datetime->getTimestamp() - $last) > BUDATOLL_CRONTAB_INTERVAL - 10) {
+        error_log('Crontab executed at: ' . $now);
+
+        // Delete old logs
+        $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
+
+        // Update last execution time
+        update_option(BUDATOLL_OPTION_LAST_CRONTAB, $now);
+
+        // Execute tasks
         ob_start();
-        bt_trainings_make_done();
-        bt_charge_passed_trainings();
-        update_option(BUDATOLL_OPTION_LAST_CRONTAB, wp_date('Y-m-d H:i'));
+        try {
+            bt_trainings_make_done();
+            bt_charge_passed_trainings();
+        } finally {
+            ob_end_clean();
+        }
     }
 }
+
 
 function bt_trainings_make_done() {
     global $wpdb;
