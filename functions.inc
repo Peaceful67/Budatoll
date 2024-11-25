@@ -46,13 +46,26 @@ function bt_is_deletable($item_id, $related_arr) {
 }
 
 function getPostVariable($var_name, $default = false) {
-    $ret = $_POST[$var_name] ?? $default;
+    $ret = sanitize_text_field($_POST[$var_name] ?? $default);
     return $ret;
 }
 
 function putHiddenValue($var_name, $value) {
     return '<input type="hidden" name="' . $var_name . '" id="' . $var_name . '" value="' . $value . '">';
 }
+
+function bt_set_cookie($name, $value = false) {
+    if ($value) {
+        setcookie($name, sanitize_text_field($value), 0, '/');
+    } else {
+        setcookie($name, '', time() - 3600, '/');
+    }
+}
+
+function bt_get_cookie($name) {
+    return sanitize_text_field($_COOKIE[$name] ?? '');
+}
+
 
 function putScript($script) {
     return '<script type="text/javascript">' . $script . '</script>';
@@ -70,7 +83,7 @@ function bt_welcome_message() {
 
 function bt_get_current_userid() {
     $user = wp_get_current_user();
-    return ($user->ID == 0) ? false: $user->ID;
+    return ($user->ID == 0) ? false : $user->ID;
 }
 
 function bt_send_email($user_id, $subject, $message) {
@@ -232,7 +245,7 @@ function bt_set_default_role($user_id) {
 
 function bt_get_results($sql, $args = false) {
     global $wpdb;
- //   error_log('SQL: ' . $sql . ', args: ' . print_r($args, true));
+    //   error_log('SQL: ' . $sql . ', args: ' . print_r($args, true));
     if ($args) {
         $prep = $wpdb->prepare($sql, $args);
     } else {
@@ -244,4 +257,17 @@ function bt_get_results($sql, $args = false) {
     } else {
         return $res;
     }
+}
+
+function bt_currency($num) {
+    return number_format($num, 0, '.', ' ') . ' Ft';
+}
+
+function bt_redirect($url, $arr_post) {
+    $ret = '<form id="btRedirectForm" method="POST" action="' . esc_url(home_url($url)) . '">';
+    foreach ($arr_post as $key => $value) {
+        $ret .= '<input type="hidden" name="' . $key . '" value="' . $value . '">';
+    }
+    $ret .= '</form><script>  document.getElementById("btRedirectForm").submit(); </script>';
+    return $ret;
 }

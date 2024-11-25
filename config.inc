@@ -68,3 +68,6 @@ define("BUDATOLL_ACCOUNT_COMMENT", 'comment');
 define("BUDATOLL_COMPANY_NAME", 'Budatoll egyesület');
 
 define("BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE", 'email-negativ-balance');
+
+
+define ("BUDATOLL_COOKIE_BALANCE_MOD", 'bt-balance-mod');

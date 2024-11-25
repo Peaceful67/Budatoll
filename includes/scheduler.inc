@@ -15,7 +15,6 @@ function budatoll_cron_interval($schedules) {
     return $schedules;
 }
 
-
 function budatoll_crontab() {
     global $wpdb;
 
@@ -33,7 +32,7 @@ function budatoll_crontab() {
 
     // Check if the interval has passed
     if (($datetime->getTimestamp() - $last) > BUDATOLL_CRONTAB_INTERVAL - 10) {
-        error_log('Crontab executed at: ' . $now);
+ //       error_log('Crontab executed at: ' . $now);
 
         // Delete old logs
         $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
@@ -52,16 +51,16 @@ function budatoll_crontab() {
     }
 }
 
-
 function bt_trainings_make_done() {
     global $wpdb;
     $events_done = [];
     $sql = 'SELECT `' . BUDATOLL_TRAINING_TABLE . '`.*, `' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_LONG . '`, `' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_DAY . '`,  `' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_START . '` '
             . ' FROM `' . BUDATOLL_TRAINING_TABLE . '` INNER JOIN `' . BUDATOLL_EVENTS_TABLE . '` ON ('
-            . '`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_ID . '`=`' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_ID . '` AND '
+            . '`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_ID . '`=`' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_EVENT_ID . '` AND '
             . ' CURDATE()>=`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_DAY . '` AND  CURTIME()>=`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_START . '`)'
             . ' WHERE `' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_DONE . '`=0 AND `' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_CONFIRMED . '`=1;';
     $trainings = $wpdb->get_results($sql);
+//    error_log('Trainings make done: ' . $sql);
     $data = [BUDATOLL_TRAINING_DONE => 1,];
     foreach ($trainings as $training) {
         if (!in_array($training->{BUDATOLL_TRAINING_EVENT_ID}, $events_done)) {
@@ -70,8 +69,6 @@ function bt_trainings_make_done() {
                     . $training->{BUDATOLL_EVENTS_DAY} . ' / ' . $training->{BUDATOLL_EVENTS_START} . ')');
         }
         $wpdb->update(BUDATOLL_TRAINING_TABLE, $data, [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);
-        if (btIsOptionEnabled(BUDATOLL_OPTION_AUTO_CHARGE)) {
-            bt_training_charge($training->{BUDATOLL_TRAINING_ID});
-        }
+//        bt_training_charge($training->{BUDATOLL_TRAINING_ID});
     }
 }

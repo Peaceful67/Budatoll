@@ -5,10 +5,16 @@ if (!defined('ABSPATH')) {
 }
 
 function bt_payment_management() {
+
     $ret = '<form id="BudatollForm" method="post">';
-    $budatoll_mod = getPostVariable('budatoll_mod', 'all_balances');
+    $budatoll_mod = bt_get_cookie(BUDATOLL_COOKIE_BALANCE_MOD);
+    if (empty($budatoll_mod)) { // Ha még nincs megadva, alaphelyzet
+        $budatoll_mod = 'all_balances';
+        bt_set_cookie(BUDATOLL_COOKIE_BALANCE_MOD, $budatoll_mod);
+    }
     switch ($budatoll_mod) {
         default:
+            break;
         case 'all_balances':
             $ret .= list_balance_of_all_users(true, true);
             break;
@@ -24,18 +30,64 @@ function bt_payment_management() {
 }
 
 function bt_balance_of_user() {
-    $user_id = bt_get_current_userid();
+    $user_id = getPostVariable('budatoll_edit');
     return bt_list_balance_of_user($user_id);
+}
+
+function bt_my_balance() {
+    $user_id = bt_get_current_userid();
+    $ret = '';
+    if (!get_userdata($user_id)) { // Valamiért nincs megadva játékos, bekérjük
+        $ret .= bt_warning('Belső hiba. Valamiért nincs megadva játékos: ' . $user_id);
+        return $ret;
+    }
+    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `total` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
+    $sum = bt_get_results($sql);
+    $total = $sum[0]->total;
+    $ret .= '<h4 ' . ($total < 0 ? 'style="color:red;"' : '') . '>' . bt_get_full_name($user_id) . ' egyenlege. Összesen: ' . bt_currency($total) . '</h4>';
+    $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
+            . ' ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
+    $result = bt_get_results($sql, [$user_id]);
+    $ret .= '<div class="wrap">';
+    $ret .= '<table class="budatoll-table">';
+    $ret .= '<thead><tr><th>Időpont</th><th>Összeg</th><th>Hivatkozás</th><th>Megjegyzés</th></tr></thead>';
+    $ret .= '<tbody>';
+    foreach ($result as $item) {
+        if ($item->{BUDATOLL_ACCOUNT_AMOUNT} >= 0) {
+            $ref = 'Befizetés';
+        } else {
+            $ref = $item->{BUDATOLL_ACCOUNT_EVENT_PLAYER_ID};
+        }
+        $ret .= '<tr><td>' . $item->{BUDATOLL_ACCOUNT_TIME} . '</td>';
+        $ret .= '<td>' . bt_currency($item->{BUDATOLL_ACCOUNT_AMOUNT}) . '</td>';
+        $ret .= '<td>' . $ref . '</td>';
+        $ret .= '<td>' . $item->{BUDATOLL_ACCOUNT_COMMENT} . '</td>';
+        $ret .= '</tr>';
+    }
+    $ret .= '</tbody></table>';
+    $ret .= '</div>';
+    return $ret;
 }
 
 function bt_list_balance_of_user($user_id) {
 
     $ret = '';
-    if ($user_id < 0) { // Valamiért nincs megadva játékos, bekérjük
-        $ret .= bt_warning('Belső hiba. Valamiért nincs megadva játékos');
+    if (!get_userdata($user_id)) { // Valamiért nincs megadva játékos, bekérjük
+        $ret .= bt_warning('Belső hiba. Valamiért nincs megadva játékos: ' . $user_id);
         return $ret;
     }
-    $ret .= '<h4>' . bt_get_full_name($user_id) . ' egyenlegének tételei</h4>';
+    $budatoll_edit = getPostVariable('budatoll_edit');
+    if ($budatoll_edit) {
+        $account = bt_get_account($budatoll_edit);
+        $user_id = $account->{BUDATOLL_ACCOUNT_PLAYER_ID} ?? -1;
+        $ret .= putHiddenValue('budatoll_mod', 'edit_payment');
+        $ret .= bt_payment_edit($user_id, $budatoll_edit);
+        return $ret;
+    }
+    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `total` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
+    $sum = bt_get_results($sql);
+    $total = $sum[0]->total;
+    $ret .= '<h4 ' . ($total < 0 ? 'style="color:red;"' : '') . '>' . bt_get_full_name($user_id) . ' egyenlege. Összesen: ' . bt_currency($total) . '</h4>';
     $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
             . ' ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
     $result = bt_get_results($sql, [$user_id]);
@@ -50,7 +102,7 @@ function bt_list_balance_of_user($user_id) {
             $ref = $item->{BUDATOLL_ACCOUNT_EVENT_PLAYER_ID};
         }
         $ret .= '<tr><td>' . $item->{BUDATOLL_ACCOUNT_TIME} . '</td>';
-        $ret .= '<td>' . $item->{BUDATOLL_ACCOUNT_AMOUNT} . ' Ft</td>';
+        $ret .= '<td>' . bt_currency($item->{BUDATOLL_ACCOUNT_AMOUNT}) . '</td>';
         $ret .= '<td>' . $ref . '</td>';
         $ret .= '<td>' . $item->{BUDATOLL_ACCOUNT_COMMENT} . '</td>';
         $ret .= '<td>' . bt_edit_button($item->{BUDATOLL_ACCOUNT_ID}) . ' </td>';
@@ -69,6 +121,10 @@ function list_balance_of_all_users($list = false, $add_new = false) {
     if ($budatoll_add) {
         $ret .= bt_payment_edit($budatoll_add, -1);
     } elseif ($budatoll_edit) {
+        wp_redirect(add_query_arg('user_id', $budatoll_edit, home_url('/egyenleg/')));
+        exit;
+        $account = bt_get_account($budatoll_edit);
+        $user_id = $account->{BUDATOLL_ACCOUNT_PLAYER_ID} ?? -1;
         $ret .= putHiddenValue('budatoll_mod', 'balance_of_user');
         $ret .= putHiddenValue('budatoll_user_id', $budatoll_edit);
         $ret .= bt_list_balance_of_user($budatoll_edit);
@@ -85,10 +141,10 @@ function list_balance_of_all_users($list = false, $add_new = false) {
         if ($user_id > 0) {
             global $wpdb;
             $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
-            logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, 'Befizetés érkezett:' . $amount . ' Ft');
+            logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, 'Befizetés érkezett:' . bt_currency($amount));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT)) {
                 $msg = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>'
-                        . $amount . ' Ft összegű befizetésed az egyenlegeden jóváírásra került.';
+                        . bt_currency($amount) . ' összegű befizetésed az egyenlegeden jóváírásra került.';
 
                 bt_send_email($user_id, 'Befizetés lekönyvelése', $msg);
             }
@@ -102,21 +158,20 @@ function list_balance_of_all_users($list = false, $add_new = false) {
     $res = bt_get_results($sql);
     $ret .= '<h4>Egyenlegek</h4>';
     if ($res) {
-        $ret .= 'Teljes egyenleg: ' . $res[0]->total . ' Ft';
+        $ret .= 'Összesen: ' . bt_currency($res[0]->total);
     }
     $ret .= '<table class="budatoll-table">';
     $ret .= '<thead><tr><th>Felhasználónév</th><th>Egyenleg</th><th>Utolsó változás</th><th>Művelet</th></tr></thead>';
     $ret .= '<tbody>';
     foreach ($players as $player) {
         $user_id = $player->ID;
-        $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `SUM`, MAX(`' . BUDATOLL_ACCOUNT_TIME . '`) AS `LAST` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
-                . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d';
-        $result = bt_get_results($sql, [0, $user_id]);
+        $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `SUM`, MAX(`' . BUDATOLL_ACCOUNT_TIME . '`) AS `LAST` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
+        $result = bt_get_results($sql);
         $balance = $result[0]->SUM ?? 0;
         $last_mod = $result[0]->LAST ?? '---';
         $ret .= '<tr>';
         $ret .= '<td>' . $player->display_name . ' (' . $user_id . ')</td>';
-        $ret .= '<td>' . $balance . ' Ft</td>';
+        $ret .= '<td ' . ($balance < 0 ? 'style="color:red;"' : '') . '>' . bt_currency($balance) . '</td>';
         $ret .= '<td>' . $last_mod . '</td>';
         $ret .= '<td>';
         if ($list) {

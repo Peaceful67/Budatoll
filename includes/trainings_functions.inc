@@ -3,9 +3,8 @@ if (!defined('ABSPATH')) {
     die();
 }
 function bt_get_training_by_id($id) {
-    global $wpdb;
     $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $id . ';';
-    $results = $wpdb->get_results($sql);
+    $results = bt_get_results($sql);
     if (empty($results)) {
         return false;
     } else {
@@ -56,9 +55,12 @@ function bt_training_confirm($id) {
 }
 
 function bt_training_charge($id) {
+    global $wpdb;
+    error_log('Training charge: '.$id);
      $already_warned = get_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE);
      $training = bt_get_training_by_id($id);
      $player_id = $training->BUDATOLL_TRAINING_PLAYER_ID;
+  
     if (!isset($already_warned[$player_id])) {
         $already_warned[] = 3;
         update_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE, $already_warned);

@@ -40,6 +40,7 @@ add_shortcode('budatoll-trainings-calendar', 'budatoll_trainings_calendar');
 add_shortcode('budatoll-test-page', 'budatoll_test_page');
 add_shortcode('budatoll-payment-management', 'bt_payment_management');
 add_shortcode('budatoll-balance-of-user', 'bt_balance_of_user');
+add_shortcode('budatoll-my-balance', 'bt_my_balance');
 add_shortcode('budatoll-welcome-message', 'bt_welcome_message');
 
 register_activation_hook(__FILE__, 'budatoll_activated');

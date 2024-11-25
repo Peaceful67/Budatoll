@@ -133,7 +133,7 @@ function bt_log_user_logout() {
     if ($user && $user->exists()) {
         logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user->ID, $user->user_login . ' kilépett');
     } else {
-        error_log('Nem volt belépve senki: '.print_r($user, true));
+        error_log('Nem volt belépve senki: ' . print_r($user, true));
     }
 }
 
@@ -155,7 +155,6 @@ function logger($type, $related, $comment, $log_data = null) {
     ];
     error_log('Logger: ' . print_r($data, true));
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data);
-
 }
 
 function arr_to_string($arr) {
