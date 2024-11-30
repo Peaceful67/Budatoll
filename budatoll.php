@@ -59,6 +59,10 @@ add_filter('cron_schedules', 'budatoll_cron_interval');
 add_action('wp_login', 'bt_log_user_login', 5, 2);
 add_action('clear_auth_cookie', 'bt_log_user_logout');
 add_action('wp_login_failed', 'bt_log_login_failed');
+add_action('user_register', 'bt_user_register', 10, 1);
+add_action('delete_user', 'bt_user_delete', 10,1);
+add_action('init', 'bt_init');
+add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem működik a crontab
 
 add_action('user_register', 'bt_set_default_role');
 function bt_enqueue_dashicons() {
@@ -67,7 +71,6 @@ function bt_enqueue_dashicons() {
 add_action('wp_enqueue_scripts', 'bt_enqueue_dashicons');
 
 
-add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem működik a crontab
 
 function budatoll_scripts() {
     global $post;

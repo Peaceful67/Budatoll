@@ -32,8 +32,7 @@ function budatoll_crontab() {
 
     // Check if the interval has passed
     if (($datetime->getTimestamp() - $last) > BUDATOLL_CRONTAB_INTERVAL - 10) {
- //       error_log('Crontab executed at: ' . $now);
-
+        //       error_log('Crontab executed at: ' . $now);
         // Delete old logs
         $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
 
@@ -41,12 +40,16 @@ function budatoll_crontab() {
         update_option(BUDATOLL_OPTION_LAST_CRONTAB, $now);
 
         // Execute tasks
-        ob_start();
+        if (!headers_sent()) {
+            ob_start();
+        }
         try {
             bt_trainings_make_done();
             bt_charge_passed_trainings();
         } finally {
-            ob_end_clean();
+            if (ob_get_length()) {
+                ob_end_flush();
+            }
         }
     }
 }

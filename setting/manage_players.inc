@@ -164,7 +164,10 @@ function budatoll_manage_players_save($user_id) {
             }
         }
     }
-    $events_new = getPostVariable('event_types_chk', []);
+    $events_new = getPostVariable('event_types_chk', false);
+    if (!$events_new) {
+        $events_new = [];
+    }
     $events_old = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS, false);
     if (!$events_old OR $events_old == '') {
         $events_old = [];
@@ -202,7 +205,7 @@ function budatoll_manage_players_save($user_id) {
 }
 
 function budatoll_manage_players_list() {
-  
+
     $users = bt_get_active_players();
     $ret = '<div class="wrap">';
     $ret .= '<table class="wp-list-table widefat fixed striped">';
@@ -273,8 +276,8 @@ function bt_get_active_players() {
         'fields' => 'all',
         'orderby' => 'display_name',
         'count_total' => true,
-        'meta_key' => BUDATOLL_USER_META_ACTIVE,
-        'meta_value' => 1,
+            //      'meta_key' => BUDATOLL_USER_META_ACTIVE,
+            //      'meta_value' => 1,
     ]);
     foreach ($active_players->get_results() as $player) {
         $ret[] = $player->data;
@@ -303,4 +306,12 @@ function bt_get_full_name($user_id) {
 function put_players_dropdownlist($user_id) {
     $ret = '';
     return $ret;
+}
+
+function bt_user_register($user_id) {
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos létrehozva  a rendszerben. ID: '.$user_id);
+}
+
+function bt_user_delete($user_id) {
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos törölve a rendszerből. ID: '.$user_id);
 }

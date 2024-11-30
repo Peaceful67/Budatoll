@@ -46,26 +46,15 @@ function bt_is_deletable($item_id, $related_arr) {
 }
 
 function getPostVariable($var_name, $default = false) {
-    $ret = sanitize_text_field($_POST[$var_name] ?? $default);
+//    $ret = filter_input(INPUT_POST, $var_name, FILTER_NULL_ON_FAILURE);
+//    error_log('getPostVariable '.$var_name.': '.$_POST[$var_name]);
+    $ret = $_POST[$var_name] ?? $default;
     return $ret;
 }
 
 function putHiddenValue($var_name, $value) {
     return '<input type="hidden" name="' . $var_name . '" id="' . $var_name . '" value="' . $value . '">';
 }
-
-function bt_set_cookie($name, $value = false) {
-    if ($value) {
-        setcookie($name, sanitize_text_field($value), 0, '/');
-    } else {
-        setcookie($name, '', time() - 3600, '/');
-    }
-}
-
-function bt_get_cookie($name) {
-    return sanitize_text_field($_COOKIE[$name] ?? '');
-}
-
 
 function putScript($script) {
     return '<script type="text/javascript">' . $script . '</script>';
@@ -101,8 +90,8 @@ function bt_send_email($user_id, $subject, $message) {
         'Reply-to: no-reply@budatoll.hu',
     ];
     $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
-    logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject);
-    return wp_mail($user_email, $subject, $message, $headers);
+    logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject.', '.substr($message, 0, 128));
+    wp_mail($user_email, $subject, $message, $headers);
 }
 
 function budatoll_deactivated() {
@@ -270,4 +259,22 @@ function bt_redirect($url, $arr_post) {
     }
     $ret .= '</form><script>  document.getElementById("btRedirectForm").submit(); </script>';
     return $ret;
+}
+
+function bt_get_all_posts() {
+    $ret = '';
+    foreach ($_POST as $name => $value) {
+        if (is_array($value)) {
+            $ret .= print_r($value, true) . '<br>';
+        } else {
+            $ret .= $name . ' => ' . $value . '<br>';
+        }
+    }
+    return $ret;
+}
+
+function bt_init() {
+    if (!headers_sent()) {
+        ob_start();
+    }
 }

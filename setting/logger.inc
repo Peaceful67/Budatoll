@@ -153,7 +153,7 @@ function logger($type, $related, $comment, $log_data = null) {
         BUDATOLL_LOGGER_TYPE => intval($type),
         BUDATOLL_LOGGER_COMMENT => $comment,
     ];
-    error_log('Logger: ' . print_r($data, true));
+//    error_log('Logger: ' . print_r($data, true));
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data);
 }
 
@@ -164,3 +164,5 @@ function arr_to_string($arr) {
     }
     return $ret;
 }
+
+
