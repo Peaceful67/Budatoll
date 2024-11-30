@@ -112,6 +112,7 @@ function btEventClick(eventInfo) {
 
 
 function btTrainingMouseEnter(eventInfo) {
+    console.log('btTraining?ouseEnter');
     if ($("#budatoll-trainings-editor").is(":hidden")) {
         let id = eventInfo.event.id;
         let event = btAddedTrainingIds[id];
@@ -141,10 +142,13 @@ function btTrainingMouseEnter(eventInfo) {
         training_info = $("#budatoll-trainings-info");
         popup_width = training_info.width();
         popup_height = training_info.height();
-        training_info.html(trainings_text).show().css({
+        training_info.html(trainings_text).show();
+/*             training_info.html(trainings_text).show().css({
             top: budatoll_get_popup_y(popup_height),
             left: budatoll_get_popup_x(popup_width),
         });
+         * 
+ */
     }
 }
 

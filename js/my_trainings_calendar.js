@@ -5,6 +5,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (eventInfo) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
+        console.log('My trainings');
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -44,7 +45,6 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         });
     },
     eventContent: function (day) {
-
         var arrayOfDomNodes = [];
         var title = document.createElement('div');
         title.innerText = day.event.title;

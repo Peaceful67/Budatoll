@@ -6,7 +6,10 @@ if (!defined('ABSPATH')) {
 
 function budatoll_is_page_allowed() {
 
-    $permalink = rtrim($_SERVER['REQUEST_URI'], '/');
+    $permalink = strtok(rtrim($_SERVER['REQUEST_URI'], '/'), '?');
+    if (substr($permalink, -1, 1) == '/') {
+        $permalink = substr($permalink, 0, -1);
+    }
     if (bt_user_has_role('administrator')) { // Ennek bármit engedünk
         return;
     }
@@ -24,6 +27,7 @@ function budatoll_is_page_allowed() {
         $roles = [];
     }
     $roles[] = 'anybody';
+//    error_log('Roles: ' . print_r($roles, true) . ', permalink:' . $permalink);
     foreach ($roles as $role) {  // Vesszük az összes szerepet 
         if (in_array($permalink, $page_acccess[$role])) { // Ha benne van az aktuális, örülünk
             return;
@@ -90,7 +94,7 @@ function bt_send_email($user_id, $subject, $message) {
         'Reply-to: no-reply@budatoll.hu',
     ];
     $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
-    logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject.', '.substr($message, 0, 128));
+    logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
     wp_mail($user_email, $subject, $message, $headers);
 }
 

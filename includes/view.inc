@@ -1,27 +1,28 @@
 <?php
 
-function bt_add_button($id = -1) {
-    return '<button class="button budatoll-button button-small" name="budatoll_add" id="budatoll_add" value="' . $id . '" title="Új hozzáadása">'
+function bt_add_button($id = -1, $var_name = 'budatoll_add', $title = 'Új hozzásadása') {
+    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="' . $title . '">'
             . '<span class="dashicons dashicons-plus"></span></button>';
 }
 
-function bt_edit_button($id, $var_name = 'budatoll_edit') {
-    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="Szerkesztés">'
+function bt_edit_button($id, $var_name = 'budatoll_edit', $title='Szerkesztés') {
+    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="' . $title . '">'
             . '<span class="dashicons dashicons-edit"></span></button>';
 }
 
-function bt_save_button($id, $var_name = 'budatoll_save') {
-    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="Mentés">'
+function bt_save_button($id, $var_name = 'budatoll_save', $title='Mentés') {
+    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="'.$title.'">'
             . '<span class="dashicons dashicons-saved"></span></button>';
 }
 
-function bt_cancel_button($id, $var_name = 'budatoll_cancel') {
-    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="Mégsem">'
+function bt_cancel_button($id, $var_name = 'budatoll_cancel', $title='Mégsem') {
+    return '<button class="button budatoll-button button-small" name="' . $var_name . '" id="' . $var_name . '" value="' . $id . '" title="'.$title.'">'
             . '<span class="dashicons dashicons-undo"></span></button>';
 }
 
-function bt_delete_button($id) {
-    return '<button class="button budatoll-button button-small button-action" onclick="return confirm(\'Biztosan törölni akarod\');" name="budatoll_delete" id="budatoll_delete" value="' . $id . '" title="Törlés">'
+function bt_delete_button($id, $var_name='budatoll_delete', $title='') {
+    return '<button class="button budatoll-button button-small button-action" onclick="return confirm(\'Biztosan törölni akarod\');" '
+    . 'name="'.$var_name.'" id="'.$var_name.'" value="' . $id . '" title="'.$title.'">'
             . '<span class="dashicons dashicons-trash" ></span></button>';
 }
 
