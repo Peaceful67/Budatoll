@@ -64,10 +64,12 @@ function budatoll_admin_styles() {
 }
 
 function budatoll_settings_init() {
-    if (!current_user_can(BUDATOLL_ROLE_COACH) && !current_user_can(BUDATOLL_ROLE_ADMIN)) {
-        wp_redirect(home_url());
-        exit;
+    if (!defined('DOING_AJAX') || !DOING_AJAX) {
+        if (!current_user_can(BUDATOLL_ROLE_COACH) && !current_user_can(BUDATOLL_ROLE_ADMIN)) {
+            wp_redirect(home_url());
+            exit;
 //        wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
+        }
     }
 }
 

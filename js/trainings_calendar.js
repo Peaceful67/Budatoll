@@ -35,7 +35,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                 }
             },
             error: function (response) {
-                console.log('AJAX not succed');
+                console.log('training AJAX not succed');
                 console.log(response);
             }
         });
@@ -112,7 +112,7 @@ function btEventClick(eventInfo) {
 
 
 function btTrainingMouseEnter(eventInfo) {
-    console.log('btTraining?ouseEnter');
+
     if ($("#budatoll-trainings-editor").is(":hidden")) {
         let id = eventInfo.event.id;
         let event = btAddedTrainingIds[id];

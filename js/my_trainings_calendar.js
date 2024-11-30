@@ -5,7 +5,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (eventInfo) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
-        console.log('My trainings');
+    
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -21,7 +21,6 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                     btCurrentUserId = response.current_user_id;
                     response.events.forEach(function (event) {
                         if (!btAddedTrainingIds.hasOwnProperty(event.id)) {
-                            console.log(event);
                             btAddedTrainingIds[event.id] = event;
                             budatoll_trainings_calendar.addEvent({
                                 'id': event.id,
@@ -39,7 +38,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                 }
             },
             error: function (response) {
-                console.log('AJAX not succed');
+                console.log('my trainings AJAX not succed');
                 console.log(response);
             }
         });
@@ -92,7 +91,6 @@ function btEventClick(eventInfo) {
     let id = eventInfo.event.id;
     let event = btAddedTrainingIds[id];
     let trainings = event.trainings_of_event ?? [];
-    console.log(trainings);
     var is_already_booked = false;
     var is_waiting = false;
     var num_confirmed = 0;

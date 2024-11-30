@@ -16,7 +16,7 @@ function budatoll_is_page_allowed() {
 
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
         'anybody' => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
-        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg'],
+        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg',  '/edzeseim-naptar'],
         'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem',],
     ];
 
@@ -33,6 +33,7 @@ function budatoll_is_page_allowed() {
             return;
         }
     }
+    error_log('Nincs jogosultság');
     wp_redirect(site_url('/nincs-jogosultsag'));
     exit();
 }
@@ -98,12 +99,6 @@ function bt_send_email($user_id, $subject, $message) {
     wp_mail($user_email, $subject, $message, $headers);
 }
 
-function budatoll_deactivated() {
-    remove_role(BUDATOLL_ROLE_COACH);
-    remove_role(BUDATOLL_ROLE_PLAYER);
-    wp_clear_scheduled_hook('budatoll_cron_hook');
-}
-
 function budatoll_menu_based_on_role($args) {
     if (is_user_logged_in() AND ('primary-menu' === $args['theme_location'])) {
         $user = wp_get_current_user();
@@ -139,11 +134,23 @@ function budatoll_redirect_after_login() {
     exit();
 }
 
+function budatoll_deactivated() {
+    $role = get_role(BUDATOLL_ROLE_PLAYER);
+    if ($role) {
+        $role->remove_cap('access_ajax_budatoll');
+    }
+    remove_role(BUDATOLL_ROLE_COACH);
+    remove_role(BUDATOLL_ROLE_PLAYER);
+    wp_clear_scheduled_hook('budatoll_cron_hook');
+}
+
 function budatoll_activated() {
     global $wpdb;
     add_role(BUDATOLL_ROLE_COACH, 'Edző', ['read' => true, BUDATOLL_ACCESS_MANAGE_OPTIONS => false, BUDATOLL_ACCESS_MANAGE_COACH => true]);
     add_role(BUDATOLL_ROLE_PLAYER, 'Játékos', ['read' => true, BUDATOLL_ACCESS_MANAGE_PLAYER => true]);
-    if (get_role(BUDATOLL_ROLE_PLAYER)) {
+    $role = get_role(BUDATOLL_ROLE_PLAYER);
+    if ($role) {
+        $role->add_cap('access_ajax_budatoll');
         update_option('default_role', BUDATOLL_ROLE_PLAYER);
     }
     if (!wp_next_scheduled('budatoll_cron_hook')) {
@@ -256,15 +263,6 @@ function bt_currency($num) {
     return number_format($num, 0, '.', ' ') . ' Ft';
 }
 
-function bt_redirect($url, $arr_post) {
-    $ret = '<form id="btRedirectForm" method="POST" action="' . esc_url(home_url($url)) . '">';
-    foreach ($arr_post as $key => $value) {
-        $ret .= '<input type="hidden" name="' . $key . '" value="' . $value . '">';
-    }
-    $ret .= '</form><script>  document.getElementById("btRedirectForm").submit(); </script>';
-    return $ret;
-}
-
 function bt_get_all_posts() {
     $ret = '';
     foreach ($_POST as $name => $value) {
@@ -281,4 +279,6 @@ function bt_init() {
     if (!headers_sent()) {
         ob_start();
     }
+
+   
 }

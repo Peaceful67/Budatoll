@@ -1,10 +1,18 @@
 <?php
+
 if (!defined('ABSPATH')) {
     die();
 }
 
-
 function budatoll_my_trainings_calendar() {
+    $user = wp_get_current_user();
+    if (current_user_can('access_ajax_budatoll')) {
+        error_log('User has permission for AJAX.' . $user->ID);
+    } else {
+        error_log('User lacks permission for AJAX.' . $user->ID);
+    }
+    error_log(admin_url('admin-ajax.php'));
+
     $player_id = get_current_user_id();
     global $wpdb;
     $ret = '<form id="BudatollForm" method="post">';
@@ -82,6 +90,7 @@ function budatoll_my_trainings_calendar() {
 }
 
 function budatoll_trainings_calendar() {
+   
     global $wpdb;
     $ret = '<form id="BudatollForm" method="post">';
     $ret .= '<div id="budatoll-trainings-info" class="budatoll-popup">'
