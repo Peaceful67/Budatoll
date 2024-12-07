@@ -41,6 +41,7 @@ add_shortcode('budatoll-test-page', 'budatoll_test_page');
 add_shortcode('budatoll-payment-management', 'bt_payment_management');
 add_shortcode('budatoll-balance-of-user', 'bt_balance_of_user');
 add_shortcode('budatoll-my-balance', 'bt_my_balance');
+add_shortcode('budatoll-rules', 'bt_rule_options');
 add_shortcode('budatoll-welcome-message', 'bt_welcome_message');
 
 register_activation_hook(__FILE__, 'budatoll_activated');
@@ -55,14 +56,18 @@ add_filter('wp_nav_menu_args', 'budatoll_menu_based_on_role');
 
 add_action('budatoll_cron_hook', 'budatoll_crontab');
 add_filter('cron_schedules', 'budatoll_cron_interval');
+add_filter('auth_cookie_expiration', 'custom_remember_me_duration', 10, 3);
+add_action('wp_footer', 'add_remember_me_to_divi_login');
 
-add_action('wp_login', 'bt_log_user_login', 5, 2);
+add_action('wp_login', 'bt_log_user_login', 5, 1);
+add_action('wp_logout', 'budatoll_logout');
 add_action('clear_auth_cookie', 'bt_log_user_logout');
 add_action('wp_login_failed', 'bt_log_login_failed');
 add_action('user_register', 'bt_user_register', 10, 1);
 add_action('delete_user', 'bt_user_delete', 10,1);
 add_action('init', 'bt_init');
 add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem működik a crontab
+
 
 add_action('user_register', 'bt_set_default_role');
 function bt_enqueue_dashicons() {
@@ -98,3 +103,5 @@ function budatoll_scripts() {
     wp_enqueue_script('budatoll-end-script', plugins_url('js/budatoll-end-script.js', __FILE__), array('jquery'), null, true);
     wp_localize_script('budatoll-header-script', 'budatoll_ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
 }
+
+

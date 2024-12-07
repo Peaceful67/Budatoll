@@ -32,4 +32,3 @@ function getDateOfEventDate(event_date) {
 
     return  year + '-' + month + '-' + day;
 }
-

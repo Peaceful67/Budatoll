@@ -42,7 +42,7 @@ function bt_charge_passed_trainings() {
                 . ' WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $training->{BUDATOLL_TRAINING_ID};
  //       error_log('Charge training: ' . $sql);
         $wpdb->query($sql);
-        logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, $event->{BUDATOLL_EVENTS_LONG} . ' kifizetve:' . bt_currency($amount));
+        logger(BUDATOLL_LOGGER_TYPE_DEBIT, $user_id, $event->{BUDATOLL_EVENTS_LONG} . ' kifizetve:' . bt_currency($amount));
     }
 }
 

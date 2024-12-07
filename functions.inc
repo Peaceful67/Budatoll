@@ -16,8 +16,8 @@ function budatoll_is_page_allowed() {
 
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
         'anybody' => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
-        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg',  '/edzeseim-naptar'],
-        'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem',],
+        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg',  '/edzeseim-naptar','/szabalyok'],
+        'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem','/szabalyok',],
     ];
 
     if (is_user_logged_in()) {
@@ -33,7 +33,7 @@ function budatoll_is_page_allowed() {
             return;
         }
     }
-    error_log('Nincs jogosultság');
+//    error_log('Nincs jogosultság');
     wp_redirect(site_url('/nincs-jogosultsag'));
     exit();
 }
@@ -207,6 +207,7 @@ function budatoll_activated() {
             . BUDATOLL_TRAINING_EVENT_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_TRAINING_DONE . '` int(1) NOT NULL DEFAULT 0,`'
             . BUDATOLL_TRAINING_CONFIRMED . '` int(1) NOT NULL DEFAULT 0,`'
+            . BUDATOLL_TRAINING_DELETABLE . '` int(1) NOT NULL DEFAULT 0,`'
             . BUDATOLL_TRAINING_PAID . '` int(1) NOT NULL DEFAULT 0,`'
             . BUDATOLL_TRAINING_COMMENT . '` varchar(255) DEFAULT NULL, `'
             . BUDATOLL_TRAINING_CREATED . '` timestamp(1) NOT NULL, '
@@ -279,6 +280,57 @@ function bt_init() {
     if (!headers_sent()) {
         ob_start();
     }
+ 
+}
 
-   
+function bt_rule_options() {
+    $ret = '';
+    $ret .= '<strong>Edzés lemondható: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EVENT_CANCELABLE) ? 'Az edzés megkezdéséig.':'Csak 24 órával az edzés megkezdése előtt.';
+    $ret .= '<br><strong>Negatív egyenleg esetén: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT) ? 'Nem lehet edzést foglalni.':'Szabadon foglalhatóak az edzések.';
+    $ret .= '<br><strong>Email lemondáskor: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL) ? 'Értesítést kapnak a várólistán szereplők.':'Nincs értesítés.';
+    $ret .= '<br><strong>Játékos beállításainak módosításáról: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY) ? 'Értesítést kap a játékos.':'Nincs értesítés.';
+    $ret .= '<br><strong>A befizetés lekönyveléséről: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT) ? 'Értesítést kap a játékos.':'Nincs értesítés.';   
+    $ret .= '<br><strong>Az előző napi jelentkezés: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) ? 'Lemondható a játék kezdetéig.':'Áltatlános szabály szerint mondható le.'; 
+    return $ret;
+}
+
+function add_remember_me_to_divi_login() {
+    ?>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var loginForm = document.querySelector(".et_pb_login form");
+            if (loginForm) {
+                // Create the Remember Me checkbox
+                var rememberMeDiv = document.createElement("div");
+                rememberMeDiv.style.marginTop = "10px"; // Add some spacing
+                rememberMeDiv.innerHTML = `
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" name="rememberme" value="forever" style="margin-right: 5px;">
+                        Remember Me
+                    </label>`;
+                
+                // Append the checkbox to the form
+                loginForm.appendChild(rememberMeDiv);
+            }
+        });
+    </script>
+    <?php
+}
+
+function custom_remember_me_duration($expirein, $user_id, $remember) {
+    if ($remember) {
+        return 90 * DAY_IN_SECONDS; // Keep the user logged in for 90 days
+    }
+    return $expirein;
+}
+
+function budatoll_logout() {
+    wp_redirect(home_url());
+    exit;
 }

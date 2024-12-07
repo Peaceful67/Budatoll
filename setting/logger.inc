@@ -21,6 +21,17 @@ $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_EMAILS => 'Email küldés',
     BUDATOLL_LOGGER_TYPE_LOGIN => 'Belépés',
 ];
+$bt_logger_colors = [
+    BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'lightsteelblue',
+    BUDATOLL_LOGGER_TYPE_EVENTS => 'lightgrey',
+    BUDATOLL_LOGGER_TYPE_TRAININGS => 'wheat',
+    BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'lightgreen',
+    BUDATOLL_LOGGER_TYPE_USER_DATA => 'lightpink',
+    BUDATOLL_LOGGER_TYPE_PAYMENT => 'lightcoral',
+    BUDATOLL_LOGGER_TYPE_DEBIT => 'lightsteelblue',
+    BUDATOLL_LOGGER_TYPE_EMAILS => 'lightblue',
+    BUDATOLL_LOGGER_TYPE_LOGIN => 'khaki',
+];
 
 function bt_logger_list() {
     if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
@@ -76,7 +87,7 @@ function bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $
 }
 
 function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date) {
-    global $wpdb, $bt_logger_types;
+    global $wpdb, $bt_logger_types, $bt_logger_colors;
     $sql = 'SELECT * FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE '
             . ($bt_logger_user > 0 ? ('`' . BUDATOLL_LOGGER_USER . '`=' . $bt_logger_user . ' AND ') : '')
             . ($bt_logger_related > 0 ? ('`' . BUDATOLL_LOGGER_RELATED . '`=' . $bt_logger_related . ' AND ') : '')
@@ -114,7 +125,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
                 $related_name = $related->display_name ?? '---';
                 break;
         }
-        echo '<tr><td class="column-column1">' . $user_name . '</td>';
+        echo '<tr style="background:' . $bt_logger_colors[$row->{BUDATOLL_LOGGER_TYPE}] . ';"><td class="column-column1">' . $user_name . '</td>';
         echo '<td class="column-column2">' . $bt_logger_types[$row->{BUDATOLL_LOGGER_TYPE}] . '</td>';
         echo '<td class="column-column3">' . $related_name . '</td>';
         echo '<td class="column-column4">' . $row->{BUDATOLL_LOGGER_TIME} . '</td>';
@@ -123,8 +134,10 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
     echo '</tbody></table>';
 }
 
-function bt_log_user_login($user_login, $user) {
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user->ID, $user_login . ' belépett');
+function bt_log_user_login($user_login) {
+    $user = get_user_by('user_login', $user_login);
+    $user_id = $user->{ID} ?? -1;
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, $user_login . ' belépett');
 }
 
 function bt_log_user_logout() {
@@ -145,7 +158,7 @@ function logger($type, $related, $comment, $log_data = null) {
     global $wpdb;
     $user = wp_get_current_user();
     if (!is_null($log_data)) {
-        $comment .= ' ' . wp_json_encode($log_data);
+        $comment .= ' ' . serialize($log_data);
     }
     $data = [
         BUDATOLL_LOGGER_USER => $user->ID,
@@ -164,5 +177,3 @@ function arr_to_string($arr) {
     }
     return $ret;
 }
-
-

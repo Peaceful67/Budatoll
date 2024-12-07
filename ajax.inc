@@ -14,8 +14,12 @@ function budatoll_ajax_nopriv() {
 function budatoll_ajax() {
     header('Content-Type: application/json');
     $action = filter_input(INPUT_POST, 'ajax-action');
-    error_log('AJAX action: '.$action);
+//    error_log('AJAX action: ' . $action);
     switch ($action) {
+        case 'logout':
+            wp_logout();
+            wp_send_json_success(['redirect' => home_url()]); // Redirect to homepage or your custom URL
+            break;
         case 'add-event':
             $date = filter_input(INPUT_POST, 'dropped-date');
             $type_id = filter_input(INPUT_POST, 'event_type-id');
@@ -148,10 +152,16 @@ function bt_get_trainings_of_events($events) {
         $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
                 . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=%d ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
         $trainings = bt_get_results($sql, [$event->{BUDATOLL_EVENTS_ID}]);
+        $confirmed = 0;
         foreach ($trainings as $training) {
             $training->player_name = bt_get_full_name($training->player_id);
+            $training->removeable = bt_is_training_deletable($training->id);
+            if($training->{BUDATOLL_TRAINING_CONFIRMED}!=0) {
+                $confirmed++;
+            }
         }
         $event->trainings_of_event = $trainings;
+        $event->confirmed = $confirmed;
         $ret[] = $event;
     }
     return $ret;

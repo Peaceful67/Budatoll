@@ -5,7 +5,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (eventInfo) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
-    
+
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -124,8 +124,6 @@ function btEventClick(eventInfo) {
     }
     trainings_text += '<div class="budatoll-row">';
     if (is_already_booked) {
-//        console.log(event);
-//        console.log('Confirmed:' + num_confirmed);
         if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
             trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
             trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
@@ -133,7 +131,7 @@ function btEventClick(eventInfo) {
             trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
         }
     } else {
-        if (event.max_players > 0 && event.max_players <= trainings.length) {  // Csak várólistára fér fel
+        if (event.max_players > 0 && event.max_players <= num_confirmed) {  // Csak várólistára fér fel
             trainings_text += '<button class="button budatoll-button budatoll-button-warning" name="training_wait"  value="-1" title="Várólistára"><span class="dashicons dashicons-insert-after"></span></button>';
         } else {
             trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Jelentkezés"><span class="dashicons dashicons-insert"></span></button>';
@@ -184,10 +182,10 @@ function btMyTrainingMouseEnter(eventInfo) {
         popup_height = training_info.height();
         training_info.html(trainings_text).show();
         /*
-        training_info.html(trainings_text).show().css({
-            top: budatoll_get_popup_y(popup_height),
-            left: budatoll_get_popup_x(popup_width),
-        })
+         training_info.html(trainings_text).show().css({
+         top: budatoll_get_popup_y(popup_height),
+         left: budatoll_get_popup_x(popup_width),
+         })
          * 
          */;
     }

@@ -5,14 +5,6 @@ if (!defined('ABSPATH')) {
 }
 
 function budatoll_my_trainings_calendar() {
-    $user = wp_get_current_user();
-    if (current_user_can('access_ajax_budatoll')) {
-        error_log('User has permission for AJAX.' . $user->ID);
-    } else {
-        error_log('User lacks permission for AJAX.' . $user->ID);
-    }
-    error_log(admin_url('admin-ajax.php'));
-
     $player_id = get_current_user_id();
     global $wpdb;
     $ret = '<form id="BudatollForm" method="post">';
@@ -33,14 +25,26 @@ function budatoll_my_trainings_calendar() {
             if ($wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_EVENT_ID => $event_id, BUDATOLL_TRAINING_PLAYER_ID => $player_id])) {
                 logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
                         . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                if (btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL)) {
+                    $waiting_list = bt_get_waiting_list($event_id);
+                    foreach ($waiting_list as $waiting_id) {
+                        $msg = 'Tisztelt ' . bt_get_full_name($waiting_id) . '!<br><br>';
+                        $msg .= 'A ' . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END};
+                        $msg .= ' edzésről egy játékos törölte a jelentkezését, így lehetőséged van a várólistás jelentkezésedet megerősíteni. '
+                                . '<br>Siess, mert más várólistások is hasonló értesítést kaphattak!.<br>';
+                        bt_send_email($player_id, 'Várólista felszabadult', $msg);
+                    }
+                }
             }
         }
     }
     if (getPostVariable('training_from_waiting') AND $event_id) {
         $event = bt_get_event_by_id($event_id);
         if ($event) {
+            $cancelable = bt_is_short_application_cancelable($event);
             $data = [
                 BUDATOLL_TRAINING_CONFIRMED => 1,
+                BUDATOLL_TRAINING_DELETABLE => ($cancelable ? 1 : 0),
             ];
             if ($wpdb->update(BUDATOLL_TRAINING_TABLE, $data, [BUDATOLL_TRAINING_EVENT_ID => $event_id, BUDATOLL_TRAINING_PLAYER_ID => $player_id]) > 0) {
                 logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistáról élesítve: '
@@ -68,10 +72,12 @@ function budatoll_my_trainings_calendar() {
     if (getPostVariable('training_add') AND $event_id) {
         $event = bt_get_event_by_id($event_id);
         if ($event) {
+            $cancelable = bt_is_short_application_cancelable($event);
             $data = [
                 BUDATOLL_TRAINING_EVENT_ID => $event_id,
                 BUDATOLL_TRAINING_PLAYER_ID => $player_id,
                 BUDATOLL_TRAINING_CONFIRMED => 1,
+                BUDATOLL_TRAINING_DELETABLE => ($cancelable ? 1 : 0),
             ];
             if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
                 logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés felvéve: '
@@ -90,7 +96,7 @@ function budatoll_my_trainings_calendar() {
 }
 
 function budatoll_trainings_calendar() {
-   
+
     global $wpdb;
     $ret = '<form id="BudatollForm" method="post">';
     $ret .= '<div id="budatoll-trainings-info" class="budatoll-popup">'

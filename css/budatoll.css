@@ -219,3 +219,14 @@
     border: 1px solid darkgoldenrod;
     border-radius: 5px;
 }
+
+
+.et_pb_login form label {
+    font-size: 14px;
+    color: #333; /* Adjust to match your site’s color scheme */
+}
+.et_pb_login form input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
