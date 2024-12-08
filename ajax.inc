@@ -105,10 +105,16 @@ function bt_get_trainings_range_of_user($start, $end) {
         $sql_events = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  (`' . BUDATOLL_EVENTS_DAY . '` BETWEEN "' . $start . '" AND "' . $end . '") ' . $sql_filter;
         $res_events = $wpdb->get_results($sql_events);
         $events = bt_get_trainings_of_events($res_events);
+        if (btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT)) {
+            $allowed = bt_get_balance_of_user($user->ID) > 0;
+        } else {
+            $allowed = true;
+        }
         $ret = [
             'result' => 'success',
             'events' => $events,
             'current_user_id' => $user->ID,
+            'booking_allowed' => $allowed ? 1 : 0,
         ];
     }
     return json_encode($ret);
@@ -156,7 +162,7 @@ function bt_get_trainings_of_events($events) {
         foreach ($trainings as $training) {
             $training->player_name = bt_get_full_name($training->player_id);
             $training->removeable = bt_is_training_deletable($training->id);
-            if($training->{BUDATOLL_TRAINING_CONFIRMED}!=0) {
+            if ($training->{BUDATOLL_TRAINING_CONFIRMED} != 0) {
                 $confirmed++;
             }
         }

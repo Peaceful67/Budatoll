@@ -16,7 +16,7 @@ function bt_get_training_by_id($id) {
 
 function bt_delete_training($id) {
     global $wpdb;
-    echo 'Delete training:' . $id;
+//    echo 'Delete training:' . $id;
     $training = bt_get_training_by_id($id);
     $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
     if ($player_id > 0 && $wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_ID => $id]) > 0) {

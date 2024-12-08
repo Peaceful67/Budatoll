@@ -88,7 +88,7 @@ function budatoll_training_add() {
 }
 
 function budatoll_training_list($player_id = -1) {
-    global $wpdb;
+  
     $ret = '';
     $trainings_from = getPostVariable('trainings_from', wp_date('Y-m-01'));
     $trainings_to = getPostVariable('trainings_to', wp_date('Y-m-t'));

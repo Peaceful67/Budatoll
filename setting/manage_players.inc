@@ -206,7 +206,7 @@ function budatoll_manage_players_save($user_id) {
 
 function budatoll_manage_players_list() {
 
-    $users = bt_get_active_players();
+    $users = bt_get_active_players(false);
     $ret = '<div class="wrap">';
     $ret .= '<table class="wp-list-table widefat fixed striped">';
     $ret .= '<thead><tr>'
@@ -268,17 +268,20 @@ function put_select_player($var_name, $player_id = 0, $submitOnChange = true, $u
     return $ret;
 }
 
-function bt_get_active_players() {
+function bt_get_active_players($only_active = true) {
     $ret = [];
-    $active_players = new WP_User_Query([
+    $selector = [
         'role' => BUDATOLL_ROLE_PLAYER,
         'number' => -1,
         'fields' => 'all',
         'orderby' => 'display_name',
         'count_total' => true,
-            //      'meta_key' => BUDATOLL_USER_META_ACTIVE,
-            //      'meta_value' => 1,
-    ]);
+    ];
+    if ($only_active) {
+        $selector['meta_key'] = BUDATOLL_USER_META_ACTIVE;
+        $selector['meta_value'] = 1;
+    }
+    $active_players = new WP_User_Query($selector);
     foreach ($active_players->get_results() as $player) {
         $ret[] = $player->data;
     }
@@ -309,9 +312,9 @@ function put_players_dropdownlist($user_id) {
 }
 
 function bt_user_register($user_id) {
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos létrehozva  a rendszerben. ID: '.$user_id);
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos létrehozva  a rendszerben. ID: ' . $user_id);
 }
 
 function bt_user_delete($user_id) {
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos törölve a rendszerből. ID: '.$user_id);
+    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos törölve a rendszerből. ID: ' . $user_id);
 }

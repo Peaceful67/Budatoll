@@ -13,17 +13,19 @@ function budatoll_is_page_allowed() {
     if (bt_user_has_role('administrator')) { // Ennek bármit engedünk
         return;
     }
-
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
         'anybody' => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
-        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg',  '/edzeseim-naptar','/szabalyok'],
-        'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem','/szabalyok',],
+        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'],
+        'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok',],
     ];
 
     if (is_user_logged_in()) {
         $user = wp_get_current_user();
         $roles = $user->roles;
     } else {
+        $roles = [];
+    }
+    if (!bt_is_user_active($user->ID)) {
         $roles = [];
     }
     $roles[] = 'anybody';
@@ -264,6 +266,10 @@ function bt_currency($num) {
     return number_format($num, 0, '.', ' ') . ' Ft';
 }
 
+function bt_is_user_active($user_id) {
+    return get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, true) == 1;
+}
+
 function bt_get_all_posts() {
     $ret = '';
     foreach ($_POST as $name => $value) {
@@ -280,23 +286,22 @@ function bt_init() {
     if (!headers_sent()) {
         ob_start();
     }
- 
 }
 
 function bt_rule_options() {
     $ret = '';
     $ret .= '<strong>Edzés lemondható: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EVENT_CANCELABLE) ? 'Az edzés megkezdéséig.':'Csak 24 órával az edzés megkezdése előtt.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EVENT_CANCELABLE) ? 'Az edzés megkezdéséig.' : 'Csak 24 órával az edzés megkezdése előtt.';
     $ret .= '<br><strong>Negatív egyenleg esetén: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT) ? 'Nem lehet edzést foglalni.':'Szabadon foglalhatóak az edzések.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT) ? 'Nem lehet edzést foglalni.' : 'Szabadon foglalhatóak az edzések.';
     $ret .= '<br><strong>Email lemondáskor: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL) ? 'Értesítést kapnak a várólistán szereplők.':'Nincs értesítés.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL) ? 'Értesítést kapnak a várólistán szereplők.' : 'Nincs értesítés.';
     $ret .= '<br><strong>Játékos beállításainak módosításáról: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY) ? 'Értesítést kap a játékos.':'Nincs értesítés.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY) ? 'Értesítést kap a játékos.' : 'Nincs értesítés.';
     $ret .= '<br><strong>A befizetés lekönyveléséről: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT) ? 'Értesítést kap a játékos.':'Nincs értesítés.';   
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT) ? 'Értesítést kap a játékos.' : 'Nincs értesítés.';
     $ret .= '<br><strong>Az előző napi jelentkezés: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) ? 'Lemondható a játék kezdetéig.':'Áltatlános szabály szerint mondható le.'; 
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) ? 'Lemondható a játék kezdetéig.' : 'Áltatlános szabály szerint mondható le.';
     return $ret;
 }
 
@@ -314,13 +319,14 @@ function add_remember_me_to_divi_login() {
                         <input type="checkbox" name="rememberme" value="forever" style="margin-right: 5px;">
                         Remember Me
                     </label>`;
-                
+
                 // Append the checkbox to the form
                 loginForm.appendChild(rememberMeDiv);
             }
         });
     </script>
     <?php
+
 }
 
 function custom_remember_me_duration($expirein, $user_id, $remember) {

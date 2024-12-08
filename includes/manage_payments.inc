@@ -59,7 +59,11 @@ function bt_balance_of_user() {
         exit;
     }
 }
-
+function bt_get_balance_of_user($user_id) {
+    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `total` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
+    $sum = bt_get_results($sql);
+    return intval($sum[0]->total);
+}
 function bt_my_balance() {
     $user_id = bt_get_current_userid();
     $ret = '';
@@ -67,9 +71,7 @@ function bt_my_balance() {
         $ret .= bt_warning('Belső hiba. Valamiért nincs megadva játékos: ' . $user_id);
         return $ret;
     }
-    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `total` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
-    $sum = bt_get_results($sql);
-    $total = intval($sum[0]->total);
+    $total = bt_get_balance_of_user($user_id);
     $ret .= '<h4 ' . ($total < 0 ? 'style="color:red;"' : '') . '>' . bt_get_full_name($user_id) . ' egyenlege: ' . bt_currency($total) . '</h4>';
     $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
             . ' ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';

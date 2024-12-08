@@ -55,7 +55,7 @@ define("BUDATOLL_TRAINING_CREATED", 'created');
 define("BUDATOLL_TRAINING_DONE", 'done');
 define("BUDATOLL_TRAINING_PAID", 'paid');
 define("BUDATOLL_TRAINING_CONFIRMED", 'confirmed');
-define("BUDATOLL_TRAINING_DELETABLE", 'deleatable');
+define("BUDATOLL_TRAINING_DELETABLE", 'deletable');
 define("BUDATOLL_TRAINING_COMMENT", 'comment');
 
 define("BUDATOLL_ACCOUNT_TABLE", $wpdb->prefix .'budatoll_account');

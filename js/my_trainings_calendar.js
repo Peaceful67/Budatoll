@@ -1,5 +1,6 @@
 var btAddedTrainingIds = [];
 var btCurrentUserId = -1;
+var btBookingAllowed = false;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (eventInfo) {
@@ -19,6 +20,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             success: function (response) {
                 if (response.result === 'success') {
                     btCurrentUserId = response.current_user_id;
+                    btBookingAllowed = response.booking_allowed;
                     response.events.forEach(function (event) {
                         if (!btAddedTrainingIds.hasOwnProperty(event.id)) {
                             btAddedTrainingIds[event.id] = event;
@@ -125,7 +127,9 @@ function btEventClick(eventInfo) {
     trainings_text += '<div class="budatoll-row">';
     if (is_already_booked) {
         if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
-            trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
+            if (btBookingAllowed) {
+                trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
+            }
             trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
         } else {
             trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
@@ -133,9 +137,13 @@ function btEventClick(eventInfo) {
     } else {
         if (event.max_players > 0 && event.max_players <= num_confirmed) {  // Csak várólistára fér fel
             trainings_text += '<button class="button budatoll-button budatoll-button-warning" name="training_wait"  value="-1" title="Várólistára"><span class="dashicons dashicons-insert-after"></span></button>';
-        } else {
+        } else if (btBookingAllowed) {
             trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Jelentkezés"><span class="dashicons dashicons-insert"></span></button>';
         }
+    }
+    if (!btBookingAllowed) {
+        console.log('Disabled');
+        trainings_text += '<p style="color:red;">Negatív egyenleg miatt korlátozva</p>';
     }
     trainings_text += '</div>';
     $(function () {
