@@ -122,6 +122,14 @@ function budatoll_trainings_calendar() {
             if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
                 logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $add_player_id, 'Jelentkezés felvéve: '
                         . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
+                    $current_user = wp_get_current_user();
+                    $current_user_name = $current_user ? ($current_user->display_name . '-t') : 'A klub edzőjét';
+                    $message = 'Tisztelt '. bt_get_full_name($add_player_id).'!<br><br> A '
+                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END}
+                    .' edzésre jelentkezesédet felvettük. Amennyiben ezzel kapcsolatban kérdésed van, keresd: '.$current_user_name;
+                    bt_send_email($add_player_id, 'Edzésre jelentkezés', $message);
+                }
             }
         }
     }

@@ -16,11 +16,19 @@ function bt_get_training_by_id($id) {
 
 function bt_delete_training($id) {
     global $wpdb;
-//    echo 'Delete training:' . $id;
     $training = bt_get_training_by_id($id);
+    $event = get_event_by_id($training->{BUDATOLL_TRAINING_EVENT_ID});
     $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
     if ($player_id > 0 && $wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_ID => $id]) > 0) {
         logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: ' . print_r($training, true));
+        if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
+            $current_user = wp_get_current_user();
+            $current_user_name = $current_user ? ($current_user->display_name . '-t') : 'A klub edzőjét';
+            $message = 'Tisztelt ' . bt_get_full_name($player_id) . '!<br><br> A '
+                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END}
+                    . ' edzésre jelentkezesédet letöröltük. Amennyiben ezzel kapcsolatban kérdésed van, keresd: ' . $current_user_name;
+            bt_send_email($player_id, 'Edzésre jelentkezés', $message);
+        }
     }
 }
 

@@ -35,13 +35,13 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                         }
                     });
                 } else {
-                    console.log('Wrong action: ' + response.action);
-                    console.log('SQL: ' + response.sql);
+         //           console.log('Wrong action: ' + response.action);
+         //           console.log('SQL: ' + response.sql);
                 }
             },
             error: function (response) {
                 console.log('my trainings AJAX not succed');
-                console.log(response);
+         //       console.log(response);
             }
         });
     },
@@ -154,11 +154,11 @@ function btEventClick(eventInfo) {
     }
     $(function () {
         $('#close-editor-popup').click(function () {
-            $('#budatoll-trainings-editor').html('trainings_text').hide();
+            $('#budatoll-trainings-editor').fadeOut(budatoll_modal_speed);
         });
     });
-    $("#budatoll-trainings-editor").html(trainings_text).show();
-    $("#budatoll-trainings-info").hide();
+    $("#budatoll-trainings-editor").html(trainings_text).fadeIn(budatoll_modal_speed);
+    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
 }
 
 function btMyTrainingMouseEnter(eventInfo) {
@@ -173,43 +173,21 @@ function btMyTrainingMouseEnter(eventInfo) {
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += showApplicants(trainings);
-        /*
-         'Jelentkeztek: ';
-         let waiting_list = '';
-         if (trainings.length === 0) {
-         trainings_text += 'Még senki';
-         } else {
-         trainings.forEach(function (training) {
-         if (training.confirmed === '1') {
-         trainings_text += training.player_name + ', ';
-         }
-         });
-         }
-         trainings.forEach(function (training) {
-         if (training.confirmed === '0') {
-         waiting_list += training.player_name + ', ';
-         }
-         });
-         if (waiting_list !== '') {
-         trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
-         }
-         */
+      
         training_info = $("#budatoll-trainings-info");
         popup_width = training_info.width();
-        popup_height = training_info.height();
-        training_info.html(trainings_text).show();
-        /*
-         training_info.html(trainings_text).show().css({
-         top: budatoll_get_popup_y(popup_height),
-         left: budatoll_get_popup_x(popup_width),
-         })
-         * 
-         */;
+        screenX = $(window).width();
+        eventX = eventInfo.jsEvent.clientX;
+        popupX = (eventX > screenX / 2) ? (eventX - popup_width - 80) + 'px' : (eventX + 80) + 'px';
+//        console.log('popupX: ' + popupX + 'eventX: ' + eventX + 'popup_width: ' + popup_width);
+        training_info.html(trainings_text).fadeIn(budatoll_modal_speed).css({
+            left: popupX
+        });
     }
 
 }
 function btMyTrainingMouseLeave(eventInfo) {
-    $("#budatoll-trainings-info").hide();
+    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
 }
 
 

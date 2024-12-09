@@ -29,17 +29,32 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                         }
                     });
                 } else {
-                    console.log('Wrong action: ' + response.action);
-                    console.log('SQL: ' + response.sql);
+    //                console.log('Wrong action: ' + response.action);
+    //                console.log('SQL: ' + response.sql);
                 }
             },
             error: function (response) {
-                console.log('training AJAX not succed');
-                console.log(response);
+                console.log('training AJAX not succeed');
+  //              console.log(response);
             }
         });
     },
-
+eventContent: function (day) {
+        var arrayOfDomNodes = [];
+        var title = document.createElement('div');
+        title.innerText = day.event.title;
+        if (day.event.extendedProps.booked) {
+            if (day.event.extendedProps.confirmed) {
+                title.classList.add('budatoll-booked-event');
+            } else {
+                title.classList.add('budatoll-waiting-event');
+            }
+        } else {
+            title.classList.add('budatoll-available-event');
+        }
+        arrayOfDomNodes.push(title);
+        return {domNodes: arrayOfDomNodes};
+    },
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -107,12 +122,12 @@ function btEventClick(eventInfo) {
     }
     $(function () {
         $('#close-editor-popup').click(function () {
-            $('#budatoll-trainings-editor').html('trainings_text').hide();
+            $('#budatoll-trainings-editor').fadeOut(budatoll_modal_speed);
         });
     });
 
-    $("#budatoll-trainings-editor").html(trainings_text).show();
-    $("#budatoll-trainings-info").hide();
+    $("#budatoll-trainings-editor").html(trainings_text).fadeIn(budatoll_modal_speed);
+    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
 }
 
 
@@ -129,18 +144,18 @@ function btTrainingMouseEnter(eventInfo) {
         training_info = $("#budatoll-trainings-info");
         popup_width = training_info.width();
         popup_height = training_info.height();
-        training_info.html(trainings_text).show();
-        /*             training_info.html(trainings_text).show().css({
-         top: budatoll_get_popup_y(popup_height),
-         left: budatoll_get_popup_x(popup_width),
-         });
-         * 
-         */
+        screenX = $(window).width();
+        eventX = eventInfo.jsEvent.clientX;
+        popupX = (eventX > screenX / 2) ? (eventX - popup_width - 80) + 'px' : (eventX + 80) + 'px';
+        training_info.html(trainings_text).fadeIn(budatoll_modal_speed).css({
+            left: popupX,
+        });
+
     }
 }
 
 function btTrainingMouseLeave(eventInfo) {
-    $("#budatoll-trainings-info").hide();
+    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
 }
 
 

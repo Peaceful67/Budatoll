@@ -14,7 +14,6 @@ function bt_get_unpaid_trainings($user_id) {
 }
 
 function bt_charge_passed_trainings() {
-    error_log('charge_passed_trainings');
     global $wpdb;
     $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE '
             . ' `' . BUDATOLL_TRAINING_PAID . '`=0 AND '

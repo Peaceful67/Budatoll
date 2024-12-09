@@ -7,7 +7,7 @@ add_action('wp_ajax_budatoll', 'budatoll_ajax');
 add_action('wp_ajax_nopriv_budatoll', 'budatoll_ajax_nopriv');
 
 function budatoll_ajax_nopriv() {
-    error_log('Non-logged user tried AJAX.');
+ //   error_log('Non-logged user tried AJAX.');
     wp_die();
 }
 

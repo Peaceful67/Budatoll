@@ -1,4 +1,4 @@
-
+let budatoll_modal_speed = 300;
 
 function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat töltsük be
     const calendarTypes = {
