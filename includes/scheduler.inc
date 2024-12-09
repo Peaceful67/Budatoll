@@ -63,7 +63,6 @@ function bt_trainings_make_done() {
             . ' CURDATE()>=`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_DAY . '` AND  CURTIME()>=`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_START . '`)'
             . ' WHERE `' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_DONE . '`=0 AND `' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_CONFIRMED . '`=1;';
     $trainings = $wpdb->get_results($sql);
-//    error_log('Trainings make done: ' . $sql);
     $data = [BUDATOLL_TRAINING_DONE => 1,];
     foreach ($trainings as $training) {
         if (!in_array($training->{BUDATOLL_TRAINING_EVENT_ID}, $events_done)) {
@@ -73,5 +72,8 @@ function bt_trainings_make_done() {
         }
         $wpdb->update(BUDATOLL_TRAINING_TABLE, $data, [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);
 //        bt_training_charge($training->{BUDATOLL_TRAINING_ID});
+    }
+    foreach ($events_done as $event_id) {
+        $wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_DONE => 1], [BUDATOLL_EVENTS_ID => $event_id]);
     }
 }

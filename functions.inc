@@ -10,26 +10,23 @@ function budatoll_is_page_allowed() {
     if (substr($permalink, -1, 1) == '/') {
         $permalink = substr($permalink, 0, -1);
     }
-    if (bt_user_has_role('administrator')) { // Ennek bármit engedünk
+    if (bt_user_has_role(BUDATOLL_ROLE_ADMIN)) { // Ennek bármit engedünk
         return;
     }
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
-        'anybody' => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
-        'coach' => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'],
-        'player' => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok',],
+        BUDATOLL_ROLE_VISITOR => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
+        BUDATOLL_ROLE_COACH => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'],
+        BUDATOLL_ROLE_PLAYER => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok',],
     ];
 
-    if (is_user_logged_in()) {
+    if (is_user_logged_in() && bt_is_user_active(get_current_user_id())) {
         $user = wp_get_current_user();
         $roles = $user->roles;
     } else {
         $roles = [];
     }
-    if (!bt_is_user_active($user->ID)) {
-        $roles = [];
-    }
-    $roles[] = 'anybody';
-//    error_log('Roles: ' . print_r($roles, true) . ', permalink:' . $permalink);
+    $roles[] = BUDATOLL_ROLE_VISITOR;
+//   error_log('Roles: ' . print_r($roles, true) . ', permalink:' . $permalink);
     foreach ($roles as $role) {  // Vesszük az összes szerepet 
         if (in_array($permalink, $page_acccess[$role])) { // Ha benne van az aktuális, örülünk
             return;
@@ -189,6 +186,7 @@ function budatoll_activated() {
             . BUDATOLL_EVENTS_MAX_PLAYERS . '` int(8) NOT NULL DEFAULT 0,`'
             . BUDATOLL_EVENT_TYPE_START . '` time(1) NOT NULL,`'
             . BUDATOLL_EVENT_TYPE_END . '` time(1) NOT NULL, `'
+            . BUDATOLL_EVENTS_DONE . '` int(8) NOT NULL DEFAULT 0,`'
             . BUDATOLL_EVENTS_COMMENT . '` varchar(255) DEFAULT NULL, '
             . 'UNIQUE KEY `' . BUDATOLL_EVENTS_ID . '` (`' . BUDATOLL_EVENTS_ID . '`)) '
             . $wpdb->get_charset_collate() . ';';
@@ -196,7 +194,7 @@ function budatoll_activated() {
     $sql = 'CREATE TABLE IF NOT EXISTS `' . BUDATOLL_ACCOUNT_TABLE . '` (`'
             . BUDATOLL_ACCOUNT_ID . '` int(9) NOT NULL AUTO_INCREMENT,`'
             . BUDATOLL_ACCOUNT_AMOUNT . '` int(8) NOT NULL DEFAULT -1,`'
-            . BUDATOLL_ACCOUNT_EVENT_PLAYER_ID . '` int(8) NOT NULL DEFAULT -1,`'
+            . BUDATOLL_ACCOUNT_EVENT_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_ACCOUNT_PLAYER_ID . '` int(8) NOT NULL DEFAULT -1,`'
             . BUDATOLL_ACCOUNT_COMMENT . '` varchar(255) DEFAULT NULL, `'
             . BUDATOLL_ACCOUNT_TIME . '` timestamp(1) NOT NULL, '
@@ -267,6 +265,9 @@ function bt_currency($num) {
 }
 
 function bt_is_user_active($user_id) {
+    if (user_has_role($user_id, BUDATOLL_ROLE_COACH)) {
+        return true;
+    }
     return get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, true) == 1;
 }
 
@@ -288,6 +289,12 @@ function bt_init() {
     }
 }
 
+function user_has_role($user_id, $role_name) {
+    $user_meta = get_userdata($user_id);
+    $user_roles = $user_meta->roles;
+    return in_array($role_name, $user_roles);
+}
+
 function bt_rule_options() {
     $ret = '';
     $ret .= '<strong>Edzés lemondható: </strong>';
@@ -300,6 +307,8 @@ function bt_rule_options() {
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY) ? 'Értesítést kap a játékos.' : 'Nincs értesítés.';
     $ret .= '<br><strong>A befizetés lekönyveléséről: </strong>';
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT) ? 'Értesítést kap a játékos.' : 'Nincs értesítés.';
+    $ret .= '<br><strong>Az egyenleg elfogyásáról: </strong>';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE) ? 'Értesítést kap a játékos.' : 'Nincs értesítés.';
     $ret .= '<br><strong>Az előző napi jelentkezés: </strong>';
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) ? 'Lemondható a játék kezdetéig.' : 'Áltatlános szabály szerint mondható le.';
     return $ret;
@@ -316,7 +325,7 @@ function add_remember_me_to_divi_login() {
                 rememberMeDiv.style.marginTop = "10px"; // Add some spacing
                 rememberMeDiv.innerHTML = `
                     <label style="display: flex; align-items: center;">
-                        <input type="checkbox" name="rememberme" value="forever" style="margin-right: 5px;">
+                        <input type="checkbox" checked="checked" name="rememberme" value="forever" style="margin-right: 7px;">
                         Remember Me
                     </label>`;
 

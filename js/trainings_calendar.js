@@ -25,7 +25,6 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                                 'title': event.short,
                                 'start': event.day + 'T' + event.start,
                                 'end': event.day + 'T' + event.end
-
                             });
                         }
                     });
@@ -78,28 +77,34 @@ function btEventClick(eventInfo) {
     let event = btAddedTrainingIds[id];
     let trainings = event.trainings_of_event;
     let trainings_text = '<h4>' + event.long + '</h4>';
-    trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
-    trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
-    trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
-    trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
-    trainings_text += '<div class="budatoll-row">';
-    trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
-    budatoll_players.forEach(function (player) {
-        if (!trainings.some(obj => obj['player_id'] === player.ID)) {
-            trainings_text += '<option value="' + player.ID + '">' + player.display_name + '</option>';
-        }
-    });
-    trainings_text += '</select>';
-    trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Hozzáadás"><span class="dashicons dashicons-saved"></span></button>';
-    trainings_text += '</div>';
-
-    trainings.forEach(function (training) {
+    if (event.done === '1') {
+        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
+        trainings_text += '<p class="budatoll-warning">Az edzés lezajlott.</p>';
+        trainings_text += showApplicants(trainings);
+    } else {
+        trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
+        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
+        trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
+        trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += '<div class="budatoll-row">';
-        trainings_text += training.player_name + '<button class="button budatoll-button" name="training_delete" ';
-        trainings_text += ' value="' + training.id + '" title="Törlés" >';
-        trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
+        trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
+        budatoll_players.forEach(function (player) {
+            if (!trainings.some(obj => obj['player_id'] === player.ID)) {
+                trainings_text += '<option value="' + player.ID + '">' + player.display_name + '</option>';
+            }
+        });
+        trainings_text += '</select>';
+        trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Hozzáadás"><span class="dashicons dashicons-saved"></span></button>';
         trainings_text += '</div>';
-    });
+
+        trainings.forEach(function (training) {
+            trainings_text += '<div class="budatoll-row">';
+            trainings_text += training.player_name + '<button class="button budatoll-button" name="training_delete" ';
+            trainings_text += ' value="' + training.id + '" title="Törlés" >';
+            trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
+            trainings_text += '</div>';
+        });
+    }
     $(function () {
         $('#close-editor-popup').click(function () {
             $('#budatoll-trainings-editor').html('trainings_text').hide();
@@ -120,38 +125,44 @@ function btTrainingMouseEnter(eventInfo) {
         let trainings_text = '<h4>' + event.long + '</h4>';
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
-        trainings_text += 'Jelentkeztek: ';
-        let waiting_list = '';
-        if (trainings.length === 0) {
-            trainings_text += 'Még senki';
-        } else {
-            trainings.forEach(function (training) {
-                if (training.confirmed === '1') {
-                    trainings_text += training.player_name + ', ';
-                }
-            });
-        }
-        trainings.forEach(function (training) {
-            if (training.confirmed === '0') {
-                waiting_list += training.player_name + ', ';
-            }
-        });
-        if (waiting_list !== '') {
-            trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
-        }
+        trainings_text += showApplicants(trainings);
         training_info = $("#budatoll-trainings-info");
         popup_width = training_info.width();
         popup_height = training_info.height();
         training_info.html(trainings_text).show();
-/*             training_info.html(trainings_text).show().css({
-            top: budatoll_get_popup_y(popup_height),
-            left: budatoll_get_popup_x(popup_width),
-        });
+        /*             training_info.html(trainings_text).show().css({
+         top: budatoll_get_popup_y(popup_height),
+         left: budatoll_get_popup_x(popup_width),
+         });
          * 
- */
+         */
     }
 }
 
 function btTrainingMouseLeave(eventInfo) {
     $("#budatoll-trainings-info").hide();
+}
+
+
+function showApplicants(trainings) {
+    trainings_text = 'Jelentkeztek: ';
+    waiting_list = '';
+    if (trainings.length === 0) {
+        trainings_text += 'Senki';
+    } else {
+        trainings.forEach(function (training) {
+            if (training.confirmed === '1') {
+                trainings_text += training.player_name + ', ';
+            }
+        });
+    }
+    trainings.forEach(function (training) {
+        if (training.confirmed === '0') {
+            waiting_list += training.player_name + ', ';
+        }
+    });
+    if (waiting_list !== '') {
+        trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
+    }
+    return trainings_text;
 }

@@ -81,7 +81,9 @@
     background-color: #b29a00;
 }
 
-
+.budatoll-warning {
+    color: red;
+}
 .budatoll-label {
     display: flex;
     font-weight: bold;

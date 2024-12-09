@@ -136,7 +136,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
 
 function bt_log_user_login($user_login) {
     $user = get_user_by('user_login', $user_login);
-    $user_id = $user->{ID} ?? -1;
+    $user_id = $user->ID ?? -1;
     logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, $user_login . ' belépett');
 }
 

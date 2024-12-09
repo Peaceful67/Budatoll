@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) {
 define("BUDATOLL_ROLE_COACH", 'coach');
 define("BUDATOLL_ROLE_PLAYER", 'player');
 define("BUDATOLL_ROLE_ADMIN", 'administrator');
+define("BUDATOLL_ROLE_VISITOR", 'anybody');
 
 define("BUDATOLL_ACCESS_MANAGE_OPTIONS", 'budatoll-manage-options');
 define("BUDATOLL_ACCESS_MANAGE_COACH", 'budatoll-manage-coach');
@@ -37,6 +38,7 @@ define("BUDATOLL_EVENTS_MAX_PLAYERS", 'max_players');
 define("BUDATOLL_EVENTS_DAY", 'day');
 define("BUDATOLL_EVENTS_START", 'start');
 define("BUDATOLL_EVENTS_END", 'end');
+define("BUDATOLL_EVENTS_DONE", 'done');
 define("BUDATOLL_EVENTS_COMMENT", 'comment');
 
 define("BUDATOLL_LOGGER_TABLE", $wpdb->prefix . 'budatoll_logger');
@@ -61,7 +63,7 @@ define("BUDATOLL_TRAINING_COMMENT", 'comment');
 define("BUDATOLL_ACCOUNT_TABLE", $wpdb->prefix .'budatoll_account');
 define("BUDATOLL_ACCOUNT_ID", 'id');
 define("BUDATOLL_ACCOUNT_PLAYER_ID", 'player_id');
-define("BUDATOLL_ACCOUNT_EVENT_PLAYER_ID", 'event_id');
+define("BUDATOLL_ACCOUNT_EVENT_ID", 'event_id');
 define("BUDATOLL_ACCOUNT_AMOUNT", 'amount');
 define("BUDATOLL_ACCOUNT_TIME", 'time');
 define("BUDATOLL_ACCOUNT_COMMENT", 'comment');

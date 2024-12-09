@@ -92,60 +92,66 @@ budatoll_trainings_calendar.render();
 function btEventClick(eventInfo) {
     let id = eventInfo.event.id;
     let event = btAddedTrainingIds[id];
+
     let trainings = event.trainings_of_event ?? [];
     var is_already_booked = false;
     var is_waiting = false;
     var num_confirmed = 0;
     let trainings_text = '<h4>' + event.long + '</h4><hr>';
-    trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
-    trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
-    trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
-    trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
-    trainings_text += 'Jelentkeztek: ';
-    let waiting_list = '';
-    if (trainings.length === 0) {
-        trainings_text += 'Még senki';
+    if (event.done === '1') {
+        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
+        trainings_text += '<p class="budatoll-warning">Az edzés lezajlott.</p>';
+        trainings_text += showApplicants(trainings);
     } else {
-        trainings.forEach(function (training) {
-            if (training.player_id == btCurrentUserId) {
-                is_already_booked = true;
-                if (training.confirmed !== '1') {
-                    is_waiting = true;
-                }
-            }
-            if (training.confirmed === '1') {
-                trainings_text += training.player_name + ', ';
-                num_confirmed++;
-            } else {
-                waiting_list += training.player_name + ', ';
-            }
-        });
-    }
-    if (waiting_list !== '') {
-        trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
-    }
-    trainings_text += '<div class="budatoll-row">';
-    if (is_already_booked) {
-        if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
-            if (btBookingAllowed) {
-                trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
-            }
-            trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
+        trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
+        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
+        trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
+        trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
+        trainings_text += 'Jelentkeztek: ';
+        let waiting_list = '';
+        if (trainings.length === 0) {
+            trainings_text += 'Még senki';
         } else {
-            trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
+            trainings.forEach(function (training) {
+                if (training.player_id == btCurrentUserId) {
+                    is_already_booked = true;
+                    if (training.confirmed !== '1') {
+                        is_waiting = true;
+                    }
+                }
+                if (training.confirmed === '1') {
+                    trainings_text += training.player_name + ', ';
+                    num_confirmed++;
+                } else {
+                    waiting_list += training.player_name + ', ';
+                }
+            });
         }
-    } else {
-        if (event.max_players > 0 && event.max_players <= num_confirmed) {  // Csak várólistára fér fel
-            trainings_text += '<button class="button budatoll-button budatoll-button-warning" name="training_wait"  value="-1" title="Várólistára"><span class="dashicons dashicons-insert-after"></span></button>';
-        } else if (btBookingAllowed) {
-            trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Jelentkezés"><span class="dashicons dashicons-insert"></span></button>';
+        if (waiting_list !== '') {
+            trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
         }
+        trainings_text += '<div class="budatoll-row">';
+        if (is_already_booked) {
+            if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
+                if (btBookingAllowed) {
+                    trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
+                }
+                trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
+            } else {
+                trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
+            }
+        } else {
+            if (event.max_players > 0 && event.max_players <= num_confirmed) {  // Csak várólistára fér fel
+                trainings_text += '<button class="button budatoll-button budatoll-button-warning" name="training_wait"  value="-1" title="Várólistára"><span class="dashicons dashicons-insert-after"></span></button>';
+            } else if (btBookingAllowed) {
+                trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Jelentkezés"><span class="dashicons dashicons-insert"></span></button>';
+            }
+        }
+        if (!btBookingAllowed) {
+            trainings_text += '<p class="budatoll-warning">Negatív egyenleg miatt korlátozva</p>';
+        }
+        trainings_text += '</div>';
     }
-    if (!btBookingAllowed) {
-        console.log('Disabled');
-        trainings_text += '<p style="color:red;">Negatív egyenleg miatt korlátozva</p>';
-    }
-    trainings_text += '</div>';
     $(function () {
         $('#close-editor-popup').click(function () {
             $('#budatoll-trainings-editor').html('trainings_text').hide();
@@ -166,25 +172,28 @@ function btMyTrainingMouseEnter(eventInfo) {
         let trainings_text = '<h4>' + event.long + '</h4>';
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
-        trainings_text += 'Jelentkeztek: ';
-        let waiting_list = '';
-        if (trainings.length === 0) {
-            trainings_text += 'Még senki';
-        } else {
-            trainings.forEach(function (training) {
-                if (training.confirmed === '1') {
-                    trainings_text += training.player_name + ', ';
-                }
-            });
-        }
-        trainings.forEach(function (training) {
-            if (training.confirmed === '0') {
-                waiting_list += training.player_name + ', ';
-            }
-        });
-        if (waiting_list !== '') {
-            trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
-        }
+        trainings_text += showApplicants(trainings);
+        /*
+         'Jelentkeztek: ';
+         let waiting_list = '';
+         if (trainings.length === 0) {
+         trainings_text += 'Még senki';
+         } else {
+         trainings.forEach(function (training) {
+         if (training.confirmed === '1') {
+         trainings_text += training.player_name + ', ';
+         }
+         });
+         }
+         trainings.forEach(function (training) {
+         if (training.confirmed === '0') {
+         waiting_list += training.player_name + ', ';
+         }
+         });
+         if (waiting_list !== '') {
+         trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
+         }
+         */
         training_info = $("#budatoll-trainings-info");
         popup_width = training_info.width();
         popup_height = training_info.height();
@@ -204,3 +213,26 @@ function btMyTrainingMouseLeave(eventInfo) {
 }
 
 
+
+function showApplicants(trainings) {
+    trainings_text = 'Jelentkeztek: ';
+    waiting_list = '';
+    if (trainings.length === 0) {
+        trainings_text += 'Senki';
+    } else {
+        trainings.forEach(function (training) {
+            if (training.confirmed === '1') {
+                trainings_text += training.player_name + ', ';
+            }
+        });
+    }
+    trainings.forEach(function (training) {
+        if (training.confirmed === '0') {
+            waiting_list += training.player_name + ', ';
+        }
+    });
+    if (waiting_list !== '') {
+        trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
+    }
+    return trainings_text;
+}

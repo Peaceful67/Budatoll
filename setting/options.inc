@@ -6,6 +6,7 @@ define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ-account');
 define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY", 'email-user-modify');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT", 'email-user-payment');
+define("BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE", 'email-negativ-balance');
 define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cacnelable');
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
@@ -24,6 +25,7 @@ function budatoll_setting_options() {
         ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = btGetCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT);
+        ${BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE);
         ${BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE} = btGetCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE);
     }
     echo '<div class="wrap">';
@@ -39,6 +41,7 @@ function budatoll_setting_options() {
     btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY, 'Játékos módosításáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT, 'A befizetés lekönyveléséről', 'Értesítést kap a játékos.', 'Nincs értesítés.');
+    btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE, 'Az egyenleg elfogyásáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE, 'Az előző napi jelentkezés', 'Lemondható a játék kezdetéig.', 'Áltatlános szabály szerint mondható le.');
     echo '<tr><th scope="row"><label for="last_crontab">Utolsó crontab:</label></th>';
     echo '<td>' . get_option(BUDATOLL_OPTION_LAST_CRONTAB) . '</td></tr>';

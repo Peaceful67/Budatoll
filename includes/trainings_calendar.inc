@@ -32,7 +32,7 @@ function budatoll_my_trainings_calendar() {
                         $msg .= 'A ' . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END};
                         $msg .= ' edzésről egy játékos törölte a jelentkezését, így lehetőséged van a várólistás jelentkezésedet megerősíteni. '
                                 . '<br>Siess, mert más várólistások is hasonló értesítést kaphattak!.<br>';
-                        bt_send_email($player_id, 'Várólista felszabadult', $msg);
+                        bt_send_email($waiting_id, 'Várólista felszabadult', $msg);
                     }
                 }
             }
