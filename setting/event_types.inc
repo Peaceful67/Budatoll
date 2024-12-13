@@ -19,7 +19,7 @@ function budatoll_manage_event_types() {
     }
     $ret .= '<input type="hidden" name="budatoll_edit" id="budatoll_edit" value="' . $edit_id . '">';
     if ($delete_id) {
-        logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus törlése: '.$delete_id);
+        bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus törlése: '.$delete_id);
         $wpdb->delete(BUDATOLL_EVENT_TYPE_TABLE, [BUDATOLL_EVENT_TYPE_ID => $delete_id]);
     }
     if ($save) {
@@ -34,10 +34,10 @@ function budatoll_manage_event_types() {
 
         if ($edit_id > 0) {
             $wpdb->update(BUDATOLL_EVENT_TYPE_TABLE, $data, [BUDATOLL_EVENT_TYPE_ID => $edit_id]);
-            logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus módosítása:'.$edit_id, $data);
+            bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus módosítása:'.$edit_id, $data);
         } else {
             $edit_id = $wpdb->insert(BUDATOLL_EVENT_TYPE_TABLE, $data);
-            logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus létrehozása:'.$edit_id, $data);
+            bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus létrehozása:'.$edit_id, $data);
         }
         $edit_id = -1;
     }

@@ -33,7 +33,7 @@ function budatoll_trainings_list($player_id = -1) {
             BUDATOLL_EVENTS_MAX_PLAYERS => getPostVariable('budatoll-max', 0),
         ];
         if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
-            logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $wpdb->insert_id, 'Edzés létrehozva: ' . print_r($data, true));
+            bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $wpdb->insert_id, 'Edzés létrehozva: ' . print_r($data, true));
         }
 
         $edit_id = -1;

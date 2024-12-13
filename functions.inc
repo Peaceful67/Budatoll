@@ -94,7 +94,7 @@ function bt_send_email($user_id, $subject, $message) {
         'Reply-to: no-reply@budatoll.hu',
     ];
     $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
-    logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
+    bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
     wp_mail($user_email, $subject, $message, $headers);
 }
 
@@ -262,6 +262,12 @@ function bt_get_results($sql, $args = false) {
 
 function bt_currency($num) {
     return number_format($num, 0, '.', ' ') . ' Ft';
+}
+
+function bt_time($sql_format) {
+    $timestamp = strtotime($sql_format);
+    return $timestamp ? date('H:i', $timestamp) : 'Invalid time';
+
 }
 
 function bt_is_user_active($user_id) {

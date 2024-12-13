@@ -115,9 +115,7 @@ function bt_list_balance_of_user($user_id) {
         return $ret;
     }
     $ret .= putHiddenValue('budatoll_user_id', $user_id);
-    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `total` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
-    $sum = bt_get_results($sql);
-    $total = intval($sum[0]->total);
+    $total = bt_get_balance_of_user($user_id);
     $ret .= '<h4 ' . ($total < 0 ? 'style="color:red;"' : '') . '>' . bt_get_full_name($user_id) . ' egyenlege. Összesen: '
             . bt_currency($total) . /* ', ' . bt_add_button($user_id, 'budatoll_add', 'Új befizetés') . */ '</h4>';
     $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
@@ -236,7 +234,7 @@ function bt_payment_save($user_id) {
         global $wpdb;
         if ($account_id > 0) {
             $wpdb->update(BUDATOLL_ACCOUNT_TABLE, $data, [BUDATOLL_ACCOUNT_ID => $account_id]);
-            logger(($amount >= 0 ? BUDATOLL_LOGGER_TYPE_PAYMENT : BUDATOLL_LOGGER_TYPE_DEBIT), $user_id,
+            bt_logger(($amount >= 0 ? BUDATOLL_LOGGER_TYPE_PAYMENT : BUDATOLL_LOGGER_TYPE_CHARGE), $user_id,
                     ($amount >= 0 ? 'Befizetés módosult:' : 'Terhelés módosult:') . bt_currency($amount));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT)) {
                 $msg = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>'
@@ -247,7 +245,7 @@ function bt_payment_save($user_id) {
             }
         } else {
             $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
-            logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, 'Befizetés érkezett:' . bt_currency($amount));
+            bt_logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, 'Befizetés érkezett:' . bt_currency($amount));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT)) {
                 $msg = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>'
                         . bt_currency($amount) . ' összegű befizetésed az egyenlegeden jóváírásra került.<br>'
@@ -283,7 +281,7 @@ function bt_payment_list() {
     $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
             . ($player_id >= 0 ? (' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d') : '')
             . ' AND `' . BUDATOLL_ACCOUNT_TIME . '` BETWEEN "%s 00:00:00" AND "%s 23:59:59" '
-            . 'ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
+            . ' ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
     $format = [0, $player_id, $payments_from, $payments_to];
     $ret .= '<table class="wp-list-table widefat fixed striped">';
     $ret .= '<thead><tr>'
@@ -326,7 +324,7 @@ function getPaymentById($id) {
 
 function get_balance_of_user($user_id) {
     $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
-            . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
+            . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d '
             . 'ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
     $result = bt_get_results($sql, [0, $user_id]);
     if (isset($result[0])) {

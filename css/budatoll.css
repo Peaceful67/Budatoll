@@ -99,8 +99,8 @@
 }
 
 .budatoll-table  tr:nth-child(even) {
-            background-color: lightgray;
-        }
+    background-color: lightgray;
+}
 
 .budatoll-table-row:hover {
     background-color: lightgray;
@@ -109,6 +109,8 @@
 .budatoll-popup {
     display:none;
     position: absolute;
+    border: 1px solid #888;
+    border-radius: 5px;
     left:40%;
     top:150px;
     transform: translate(-50%, -50%);
@@ -119,8 +121,6 @@
     width: auto;
     height: auto;
     z-index: 1150;
-    margin: 15% auto;
-
 }
 
 .budatoll-popup-content {
@@ -129,6 +129,7 @@
     padding: 10px;
     border: 1px solid #888;
     border-radius: 5px;
+    font-size: 5vw;
 }
 .budatoll-popup-close {
     color: #555;

@@ -20,7 +20,7 @@ function budatoll_manage_events_list() {
     }
     if ($delete_id) {
         if ($wpdb->delete(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_ID => $delete_id]) > 0) {
-            logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Alkalom törölve: ');
+            bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Alkalom törölve: ');
         }
     }
     if ($save) {
@@ -34,11 +34,11 @@ function budatoll_manage_events_list() {
         ];
         if ($edit_id > 0) {
             if ($wpdb->update(BUDATOLL_EVENTS_TABLE, $data, [BUDATOLL_EVENTS_ID => $edit_id])) {
-                logger(BUDATOLL_LOGGER_TYPE_EVENTS, $edit_id, 'Alkalom módosítva: ' . print_r($data, true));
+                bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, $edit_id, 'Alkalom módosítva: ' . print_r($data, true));
             }
         } else {
             if ($wpdb->insert(BUDATOLL_EVENTS_TABLE, $data)) {
-                logger(BUDATOLL_LOGGER_TYPE_EVENTS, $wpdb->insert_id, 'Alkalom létrehozva: ' . print_r($data, true));
+                bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, $wpdb->insert_id, 'Alkalom létrehozva: ' . print_r($data, true));
             }
         }
         $edit_id = -1;

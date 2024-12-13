@@ -7,7 +7,7 @@ define("BUDATOLL_LOGGER_TYPE_USER_DATA", 4);
 define("BUDATOLL_LOGGER_TYPE_PAYMENT", 5);
 define("BUDATOLL_LOGGER_TYPE_TRAININGS", 6);
 define("BUDATOLL_LOGGER_TYPE_EMAILS", 7);
-define("BUDATOLL_LOGGER_TYPE_DEBIT", 8);
+define("BUDATOLL_LOGGER_TYPE_CHARGE", 8);
 define("BUDATOLL_LOGGER_TYPE_LOGIN", 9);
 
 $bt_logger_types = [
@@ -17,7 +17,7 @@ $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'Beállítás',
     BUDATOLL_LOGGER_TYPE_USER_DATA => 'Játékos',
     BUDATOLL_LOGGER_TYPE_PAYMENT => 'Befizetés',
-    BUDATOLL_LOGGER_TYPE_DEBIT => 'Terhelés',
+    BUDATOLL_LOGGER_TYPE_CHARGE => 'Terhelés',
     BUDATOLL_LOGGER_TYPE_EMAILS => 'Email küldés',
     BUDATOLL_LOGGER_TYPE_LOGIN => 'Belépés',
 ];
@@ -28,7 +28,7 @@ $bt_logger_colors = [
     BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS => 'lightgreen',
     BUDATOLL_LOGGER_TYPE_USER_DATA => 'lightpink',
     BUDATOLL_LOGGER_TYPE_PAYMENT => 'lightcoral',
-    BUDATOLL_LOGGER_TYPE_DEBIT => 'lightsteelblue',
+    BUDATOLL_LOGGER_TYPE_CHARGE => 'lightsteelblue',
     BUDATOLL_LOGGER_TYPE_EMAILS => 'lightblue',
     BUDATOLL_LOGGER_TYPE_LOGIN => 'khaki',
 ];
@@ -121,6 +121,8 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
             case BUDATOLL_LOGGER_TYPE_USER_DATA:
             case BUDATOLL_LOGGER_TYPE_TRAININGS:
             case BUDATOLL_LOGGER_TYPE_EMAILS:
+            case BUDATOLL_LOGGER_TYPE_CHARGE:
+            case BUDATOLL_LOGGER_TYPE_LOGIN:
                 $related = (get_userdata($related_id));
                 $related_name = $related->display_name ?? '---';
                 break;
@@ -137,37 +139,38 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
 function bt_log_user_login($user_login) {
     $user = get_user_by('user_login', $user_login);
     $user_id = $user->ID ?? -1;
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, $user_login . ' belépett');
+    bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, $user_login . ' belépett');
 }
 
 function bt_log_user_logout() {
     $user = wp_get_current_user(); // Get the current logged-in user
 
     if ($user && $user->exists()) {
-        logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user->ID, $user->user_login . ' kilépett');
+        bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user->ID, $user->user_login . ' kilépett');
     } else {
         error_log('Nem volt belépve senki: ' . print_r($user, true));
     }
 }
 
 function bt_log_login_failed($username) {
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, -1, sanitize_text_field($username) . ' sikeretelen belépés');
+    bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, -1, sanitize_text_field($username) . ' sikeretelen belépés');
 }
 
-function logger($type, $related, $comment, $log_data = null) {
+function bt_logger($type, $related, $comment, $log_data = null) {
     global $wpdb;
     $user = wp_get_current_user();
     if (!is_null($log_data)) {
-        $comment .= ' ' . serialize($log_data);
+        $comment .= ' ' . maybe_serialize($log_data);
     }
+    $user_id = isset($user->ID) ? absint($user->ID) : -1;
     $data = [
-        BUDATOLL_LOGGER_USER => $user->ID,
-        BUDATOLL_LOGGER_RELATED => intval($related),
-        BUDATOLL_LOGGER_TYPE => intval($type),
-        BUDATOLL_LOGGER_COMMENT => $comment,
+        BUDATOLL_LOGGER_USER => $user_id,
+        BUDATOLL_LOGGER_RELATED => $related,
+        BUDATOLL_LOGGER_TYPE => $type,
+        BUDATOLL_LOGGER_COMMENT => sanitize_textarea_field($comment),
     ];
-//    error_log('Logger: ' . print_r($data, true));
-    $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data);
+    error_log('Logger: ' . print_r($data, true));
+    $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data, ['%d', '%d', '%d', '%s']);
 }
 
 function arr_to_string($arr) {

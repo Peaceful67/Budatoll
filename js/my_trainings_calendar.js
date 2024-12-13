@@ -6,7 +6,6 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (eventInfo) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
-
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -35,13 +34,13 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                         }
                     });
                 } else {
-         //           console.log('Wrong action: ' + response.action);
-         //           console.log('SQL: ' + response.sql);
+                    //           console.log('Wrong action: ' + response.action);
+                    //           console.log('SQL: ' + response.sql);
                 }
             },
             error: function (response) {
                 console.log('my trainings AJAX not succed');
-         //       console.log(response);
+                //       console.log(response);
             }
         });
     },
@@ -79,25 +78,45 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     dayMaxEvents: true, // allow "more" link when too many events
     showNonCurrentDates: false,
     eventClick: function (eventInfo) {
-        btEventClick(eventInfo);
+        if (!btIsTouchDevice()) {
+            btEventClick(eventInfo);
+        }
     },
     eventMouseEnter: function (eventInfo) {
-        btMyTrainingMouseEnter(eventInfo);
+        if (!btIsTouchDevice()) {
+            btMyTrainingMouseEnter(eventInfo);
+        }
     },
     eventMouseLeave: function (eventInfo) {
-        btMyTrainingMouseLeave(eventInfo);
+        if (!btIsTouchDevice()) {
+            btMyTrainingMouseLeave(eventInfo);
+        }
+    },
+
+    eventDidMount: function (eventInfo) {
+        if (btIsTouchDevice()) {
+            addLongPressListener(
+                    eventInfo.el,
+                    function () {
+                        btEventClick(eventInfo);  // Open event editor
+                    },
+                    function () {
+                        btMyTrainingMouseEnter(eventInfo);
+                    });
+        }
     }
 });
 budatoll_trainings_calendar.render();
-function btEventClick(eventInfo) {
-    let id = eventInfo.event.id;
-    let event = btAddedTrainingIds[id];
 
-    let trainings = event.trainings_of_event ?? [];
+function btEventClick(eventInfo) {
+    var id = eventInfo.event.id;
+    var event = btAddedTrainingIds[id];
+
+    var trainings = event.trainings_of_event ?? [];
     var is_already_booked = false;
     var is_waiting = false;
     var num_confirmed = 0;
-    let trainings_text = '<h4>' + event.long + '</h4><hr>';
+    var trainings_text = '<h4>' + event.long + '</h4><hr>';
     if (event.done === '1') {
         trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
         trainings_text += '<p class="budatoll-warning">Az edzés lezajlott.</p>';
@@ -152,17 +171,25 @@ function btEventClick(eventInfo) {
         }
         trainings_text += '</div>';
     }
+    training_editor = $("#budatoll-trainings-editor");
+    var popupX, popupY;
+    [popupX, popupY] = getPopupPos(training_info);
     $(function () {
         $('#close-editor-popup').click(function () {
-            $('#budatoll-trainings-editor').fadeOut(budatoll_modal_speed);
+            training_editor.fadeOut(budatoll_modal_speed);
         });
     });
-    $("#budatoll-trainings-editor").html(trainings_text).fadeIn(budatoll_modal_speed);
+    training_editor.html(trainings_text).css({
+        left: popupX,
+        top: popupY
+    }).fadeIn(budatoll_modal_speed);
     $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
 }
 
 function btMyTrainingMouseEnter(eventInfo) {
+    var popupX, popupY;
     if ($("#budatoll-trainings-editor").is(":hidden")) {
+        console.log('editor is hidden');
         let id = eventInfo.event.id;
         let event = btAddedTrainingIds[id];
         let trainings = event.trainings_of_event  ?? null;
@@ -173,16 +200,15 @@ function btMyTrainingMouseEnter(eventInfo) {
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += showApplicants(trainings);
-      
+
         training_info = $("#budatoll-trainings-info");
-        popup_width = training_info.width();
-        screenX = $(window).width();
-        eventX = eventInfo.jsEvent.clientX;
-        popupX = (eventX > screenX / 2) ? (eventX - popup_width - 80) + 'px' : (eventX + 80) + 'px';
-//        console.log('popupX: ' + popupX + 'eventX: ' + eventX + 'popup_width: ' + popup_width);
-        training_info.html(trainings_text).fadeIn(budatoll_modal_speed).css({
-            left: popupX
-        });
+        [popupX, popupY] = getPopupPos(training_info);
+
+        training_info.html(trainings_text).css({
+            left: popupX,
+            top: popupY
+        }).fadeIn(budatoll_modal_speed);
+        ;
     }
 
 }
@@ -214,3 +240,4 @@ function showApplicants(trainings) {
     }
     return trainings_text;
 }
+

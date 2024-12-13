@@ -6,7 +6,7 @@ define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ-account');
 define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY", 'email-user-modify');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT", 'email-user-payment');
-define("BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE", 'email-negativ-balance');
+define("BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE", 'warning-negativ-balance');
 define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cacnelable');
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
@@ -72,7 +72,7 @@ function btGetCheckbox($var_name) {
     }
     if ($var != get_option($var_name)) {
         update_option($var_name, $var);
-        logger(BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS, -1, 'Beállítások, ' . $var_name . ' új érték: ' . $var);
+        bt_logger(BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS, -1, 'Beállítások, ' . $var_name . ' új érték: ' . $var);
     }
 }
 

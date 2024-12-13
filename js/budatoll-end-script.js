@@ -4,7 +4,7 @@ budatoll_center_y = window.innerHeight / 2;
 budatoll_mouse_x = budatoll_center_x;
 budatoll_mouse_y = budatoll_center_y;
 
-$.ajax({
+jQuery.ajax({
     url: budatoll_ajax_object.ajax_url,
     type: 'POST',
     dataType: 'json',

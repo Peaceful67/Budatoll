@@ -22,35 +22,51 @@ function bt_charge_passed_trainings() {
     $res = bt_get_results($sql);
     foreach ($res as $training) {
 
-        $user_id = $training->{BUDATOLL_TRAINING_PLAYER_ID};
+        $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID};
         $event_id = $training->{BUDATOLL_TRAINING_EVENT_ID};
+        $training_id = $training->{BUDATOLL_TRAINING_ID};
+
         $event = bt_get_event_by_id($event_id);
         if (!$event) {
             continue;
         }
         $amount = $event->{BUDATOLL_EVENTS_PRICE};
         $data = [
-            BUDATOLL_ACCOUNT_PLAYER_ID => $user_id,
+            BUDATOLL_ACCOUNT_PLAYER_ID => $player_id,
             BUDATOLL_ACCOUNT_EVENT_ID => $event->{BUDATOLL_EVENTS_ID},
             BUDATOLL_ACCOUNT_COMMENT => $event->{BUDATOLL_EVENTS_LONG},
             BUDATOLL_ACCOUNT_AMOUNT => -$amount,
         ];
-        $format = ['%d', '%s', '%d'];
+        error_log('Charge: '.print_r($data, true));
+        $format = ['%d','%d', '%s', '%d'];
         $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
         $last_id = $wpdb->insert_id;
-        $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET `' . BUDATOLL_TRAINING_PAID . '`='.$last_id
-                . ' WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $training->{BUDATOLL_TRAINING_ID};
- //       error_log('Charge training: ' . $sql);
-        $wpdb->query($sql);
-        logger(BUDATOLL_LOGGER_TYPE_DEBIT, $user_id, $event->{BUDATOLL_EVENTS_LONG} . ' kifizetve:' . bt_currency($amount));
-        if(btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE)) {
-            $balance = get_balance_of_user($user_id);
-            if($balance<=0) {
-                $message = 'Tisztelt '. bt_get_full_name($user_id).'!<br><br>Az egyenleged elfogyott. <br>'
-                        . 'A jelenlegi egyenleged: '.bt_currency($balance).'<br>Kérünk egy befizetéssel töltsd fel.';
-                bt_send_email($user_id, 'Elfogyott az egyenleg', $message);
+        $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET `' . BUDATOLL_TRAINING_PAID . '`=' . $last_id
+                . ' WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $training_id;
+        //       error_log('Charge training: ' . $sql);
+        bt_get_results($sql);
+        bt_logger(BUDATOLL_LOGGER_TYPE_CHARGE, $player_id, $event->{BUDATOLL_EVENTS_LONG} . ' kifizetve: ' . bt_currency($amount));
+        bt_warn_user_negativ_balance($player_id);
+    }
+}
+
+function bt_warn_user_negativ_balance($user_id) {
+    if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE)) {
+        $balance = get_balance_of_user($user_id);
+        $already_warned = unserialize(get_option(BUDATOLL_NEGATIV_BALANCE_ALREADY_WARNED, ''));
+        if ($balance <= 0) {
+            if (!isset($already_warned[$user_id])) {
+                $message = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>Az egyenleged elfogyott. <br>'
+                        . 'A jelenlegi egyenleged: ' . bt_currency($balance) . '<br>Kérünk egy befizetéssel töltsd fel.';
+                bt_send_email($user_id, 'Negatív egyenleg', $message);
+                $already_warned[$user_id] = 1;
+            } else {
+                $already_warned[$user_id]++;
             }
+        } else {
+            unset($already_warned[$user_id]);
         }
+        update_option(BUDATOLL_NEGATIV_BALANCE_ALREADY_WARNED, serialize($already_warned));
     }
 }
 

@@ -23,13 +23,15 @@ function budatoll_my_trainings_calendar() {
         $event = bt_get_event_by_id($event_id);
         if ($event) {
             if ($wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_EVENT_ID => $event_id, BUDATOLL_TRAINING_PLAYER_ID => $player_id])) {
-                logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
-                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-' 
+                                . bt_time($event->{BUDATOLL_EVENTS_END}));
                 if (btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL)) {
                     $waiting_list = bt_get_waiting_list($event_id);
                     foreach ($waiting_list as $waiting_id) {
                         $msg = 'Tisztelt ' . bt_get_full_name($waiting_id) . '!<br><br>';
-                        $msg .= 'A ' . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END};
+                        $msg .= 'A ' . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                        . '-' . bt_time($event->{BUDATOLL_EVENTS_END});
                         $msg .= ' edzésről egy játékos törölte a jelentkezését, így lehetőséged van a várólistás jelentkezésedet megerősíteni. '
                                 . '<br>Siess, mert más várólistások is hasonló értesítést kaphattak!.<br>';
                         bt_send_email($waiting_id, 'Várólista felszabadult', $msg);
@@ -47,8 +49,9 @@ function budatoll_my_trainings_calendar() {
                 BUDATOLL_TRAINING_DELETABLE => ($cancelable ? 1 : 0),
             ];
             if ($wpdb->update(BUDATOLL_TRAINING_TABLE, $data, [BUDATOLL_TRAINING_EVENT_ID => $event_id, BUDATOLL_TRAINING_PLAYER_ID => $player_id]) > 0) {
-                logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistáról élesítve: '
-                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistáról élesítve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-' 
+                                . bt_time($event->{BUDATOLL_EVENTS_END}));
             }
         }
     }
@@ -61,8 +64,9 @@ function budatoll_my_trainings_calendar() {
                 BUDATOLL_TRAINING_CONFIRMED => 0,
             ];
             if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
-                logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistára felvéve: '
-                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistára felvéve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                        . '-' . bt_time($event->{BUDATOLL_EVENTS_END}));
                 if (!bt_is_training_full($wpdb->insert_id)) {
                     bt_training_confirm($wpdb->insert_id);
                 }
@@ -80,8 +84,9 @@ function budatoll_my_trainings_calendar() {
                 BUDATOLL_TRAINING_DELETABLE => ($cancelable ? 1 : 0),
             ];
             if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
-                logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés felvéve: '
-                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés felvéve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                        . '-' . bt_time($event->{BUDATOLL_EVENTS_END}));
                 if (!bt_is_training_full($wpdb->insert_id)) {
                     bt_training_confirm($wpdb->insert_id);
                 }
@@ -120,13 +125,15 @@ function budatoll_trainings_calendar() {
                 BUDATOLL_TRAINING_CONFIRMED => 1,
             ];
             if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
-                logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $add_player_id, 'Jelentkezés felvéve: '
-                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END});
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $add_player_id, 'Jelentkezés felvéve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                        . '-' . bt_time($event->{BUDATOLL_EVENTS_END}));
                 if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                     $current_user = wp_get_current_user();
                     $current_user_name = $current_user ? ($current_user->display_name . '-t') : 'A klub edzőjét';
                     $message = 'Tisztelt '. bt_get_full_name($add_player_id).'!<br><br> A '
-                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END}
+                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                    . '-' . bt_time($event->{BUDATOLL_EVENTS_END})
                     .' edzésre jelentkezesédet felvettük. Amennyiben ezzel kapcsolatban kérdésed van, keresd: '.$current_user_name;
                     bt_send_email($add_player_id, 'Edzésre jelentkezés', $message);
                 }

@@ -20,12 +20,13 @@ function bt_delete_training($id) {
     $event = get_event_by_id($training->{BUDATOLL_TRAINING_EVENT_ID});
     $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
     if ($player_id > 0 && $wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_ID => $id]) > 0) {
-        logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: ' . print_r($training, true));
+        bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: ' . print_r($training, true));
         if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
             $current_user = wp_get_current_user();
             $current_user_name = $current_user ? ($current_user->display_name . '-t') : 'A klub edzőjét';
             $message = 'Tisztelt ' . bt_get_full_name($player_id) . '!<br><br> A '
-                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . $event->{BUDATOLL_EVENTS_START} . '-' . $event->{BUDATOLL_EVENTS_END}
+                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                    . '-' . bt_time($event->{BUDATOLL_EVENTS_END})
                     . ' edzésre jelentkezesédet letöröltük. Amennyiben ezzel kapcsolatban kérdésed van, keresd: ' . $current_user_name;
             bt_send_email($player_id, 'Edzésre jelentkezés', $message);
         }
@@ -59,22 +60,10 @@ function bt_training_confirm($id) {
     $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
     $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET ';
     if ($wpdb->get_results($sql)) {
-        logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés visszaigazolva.');
+        bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés visszaigazolva.');
         return true;
     }
     return false;
-}
-
-function bt_training_charge($id) {
-    $already_warned = get_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE);
-    $training = bt_get_training_by_id($id);
-    $player_id = $training->BUDATOLL_TRAINING_PLAYER_ID;
-
-    if (!isset($already_warned[$player_id])) {
-        $already_warned[] = 3;
-        update_option(BUDATOLL_EMAIL_WARNING_NEGATIV_BALANCE, $already_warned);
-        bt_send_email($player_id, 'Negatív egyenleg', 'Az egyenleged negatív lett.');
-    }
 }
 
 function bt_get_waiting_list($event_id) {

@@ -200,7 +200,7 @@ function btAddEvent($type_id, $date) {
         BUDATOLL_EVENTS_END => $event->{BUDATOLL_EVENT_TYPE_END},
     ];
     if ($wpdb->insert(BUDATOLL_EVENTS_TABLE, $data)) {
-        logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés felvéve : ' . $wpdb->insert_id, $data);
+        bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés felvéve : ' . $wpdb->insert_id, $data);
         $ret = json_encode([
             'result' => 'success',
             'event' => $data,

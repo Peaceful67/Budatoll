@@ -119,7 +119,7 @@ function budatoll_manage_players_save($user_id) {
                 'role' => 'player',
             ]);
             if ($user_id > 0 AND !is_wp_error($user_id)) {
-                logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, $user_login . ' nevű játékos létrehozva');
+                bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, $user_login . ' nevű játékos létrehozva');
                 if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                     bt_send_email($user_id, 'Felhasználó létrehozva', 'Játékos létrehozva az alábbi adatokkal:');
                 }
@@ -136,7 +136,7 @@ function budatoll_manage_players_save($user_id) {
     $leased = getPostVariable('budatoll-leased', '0');
     if ($leased != get_user_meta($user_id, BUDATOLL_USER_META_LEASED, true)) {
         if (update_user_meta($user_id, BUDATOLL_USER_META_LEASED, $leased)) {
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, ($leased == 1 ? 'Bérletes lett' : 'Már nem bérletes'));
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, ($leased == 1 ? 'Bérletes lett' : 'Már nem bérletes'));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Tisztelt ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
                         . 'Az új adat: ' . ($leased == 1 ? 'bérletes lettél.' : 'már nem vagy bérletes.');
@@ -147,7 +147,7 @@ function budatoll_manage_players_save($user_id) {
     $active = getPostVariable('budatoll-active', '0');
     if ($active != get_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, true)) {
         if (update_user_meta($user_id, BUDATOLL_USER_META_ACTIVE, $active)) {
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, ($active == 1 ? 'Aktív lett' : 'Inaktív lett'));
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, ($active == 1 ? 'Aktív lett' : 'Inaktív lett'));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Tisztelt ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
                         . 'Az új adat: ' . ($active == 1 ? 'aktív státuszú lettél.' : 'már nem vagy aktív státuszú.');
@@ -158,7 +158,7 @@ function budatoll_manage_players_save($user_id) {
     $phone = getPostVariable('budatoll-tel');
     if ($phone != get_user_meta($user_id, BUDATOLL_USER_META_PHONE, true)) {
         if (update_user_meta($user_id, BUDATOLL_USER_META_PHONE, $phone)) {
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új telefonszám' . $phone);
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új telefonszám' . $phone);
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Kedves ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
                         . 'Az új adat a telefonszámod: ' . $phone;
@@ -173,7 +173,7 @@ function budatoll_manage_players_save($user_id) {
             'user_email' => sanitize_email($email),
         ]);
         if (!is_wp_error($result)) {
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új email cím: ' . $email);
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új email cím: ' . $email);
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Kedves ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
                         . 'Az új adat az email címed: ' . $email;
@@ -197,7 +197,7 @@ function budatoll_manage_players_save($user_id) {
         $event_type_id = $event_type->{BUDATOLL_EVENT_TYPE_ID};
         $event_type_name = $event_type->{BUDATOLL_EVENT_TYPE_LONG};
         if (in_array($event_type_id, $events_new) AND !in_array($event_type_id, $events_old)) {
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Felvett edzés típus: ' . $event_type_name);
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Felvett edzés típus: ' . $event_type_name);
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Kedves ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
                         . 'Új edzés típusra jelentkezhetsz: ' . $event_type_name;
@@ -206,7 +206,7 @@ function budatoll_manage_players_save($user_id) {
 
             $event_type_changed = true;
         } elseif (!in_array($event_type_id, $events_new) AND in_array($event_type_id, $events_old)) {
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Kitörölt edzés típus: ' . $event_type_name);
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Kitörölt edzés típus: ' . $event_type_name);
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Kedves ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
                         . 'Ezután már nem jelentkezhetsz erre az edzés típusra: ' . $event_type_name;
@@ -329,9 +329,9 @@ function put_players_dropdownlist($user_id) {
 }
 
 function bt_user_register($user_id) {
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos létrehozva  a rendszerben. ID: ' . $user_id);
+    bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos létrehozva  a rendszerben. ID: ' . $user_id);
 }
 
 function bt_user_delete($user_id) {
-    logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos törölve a rendszerből. ID: ' . $user_id);
+    bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos törölve a rendszerből. ID: ' . $user_id);
 }
