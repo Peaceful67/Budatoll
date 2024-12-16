@@ -192,3 +192,5 @@ function bt_get_event_by_id($event_id) {
         return $results[0];
     }
 }
+
+

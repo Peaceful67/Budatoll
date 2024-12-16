@@ -137,8 +137,8 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
 }
 
 function bt_log_user_login($user_login) {
-    $user = get_user_by('user_login', $user_login);
-    $user_id = $user->ID ?? -1;
+    $user = get_user_by('login', $user_login);
+    $user_id = ($user && $user->exists()) ? $user->ID:-1;
     bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, $user_login . ' belépett');
 }
 
@@ -169,7 +169,6 @@ function bt_logger($type, $related, $comment, $log_data = null) {
         BUDATOLL_LOGGER_TYPE => $type,
         BUDATOLL_LOGGER_COMMENT => sanitize_textarea_field($comment),
     ];
-    error_log('Logger: ' . print_r($data, true));
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data, ['%d', '%d', '%d', '%s']);
 }
 

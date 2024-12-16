@@ -1,6 +1,7 @@
 var btAddedEventIds = [];
 
 var eventListEl_types = document.getElementById('event-types-list');
+
 new FullCalendar.Draggable(eventListEl_types, {
     itemSelector: '.fc-event',
     eventData: function (dropInfo) {
@@ -12,7 +13,7 @@ new FullCalendar.Draggable(eventListEl_types, {
     }
 });
 var calendarEl_events = document.getElementById('budatoll-alkalom-calendar');
-budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
+const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
 
     datesSet: function (eventInfo) {
         var active_start = getDateOfEventDate(eventInfo.start);
@@ -29,26 +30,31 @@ budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
             },
             success: function (response) {
                 if (response.result === 'success') {
-                    console.log(eventInfo);
+//                    console.log(response.events);
                     response.events.forEach(function (event) {
                         if (!btAddedEventIds.includes(event.id)) {
                             btAddedEventIds.push(event.id);
                             budatoll_events_calendar.addEvent({
-                                'id:': event.id,
-                                'title': event.short,
-                                'start': event.day + 'T' + event.start,
-                                'end': event.day + 'T' + event.end,
-
+                                id: event.id,
+                                title: event.short,
+                                start: event.day + 'T' + event.start,
+                                end: event.day + 'T' + event.end,
+                                extendedProps: {
+                                    long_title: event.long
+                                }
                             });
                         }
                     });
                 }
             },
             error: function (response) {
+                console.log('error');
                 console.log(response);
                 $('#budatoll-message').html('Az edzések beolvasása sikertelen').addClass('budatoll-error');
                 $('#budatoll-message').show(1000).delay(1500).hide(1000);
             }
+
+
         });
     },
 
@@ -67,29 +73,78 @@ budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
     forceEventDuration: true,
     defaultAllDay: false,
     dayMaxEvents: true, // allow "more" link when too many events
+
     eventClick: function (eventInfo) {
-        btEventClick(eventInfo);
+        if (!btIsTouchDevice()) {
+            btEventRemove(eventInfo);
+        }
     },
     eventReceive: function (eventInfo) {
         btEventReceive(eventInfo);
     },
     eventMouseEnter: function (eventInfo) {
-        btEventMouseEnter(eventInfo);
+        if (!btIsTouchDevice()) {
+            btEventMouseEnter(eventInfo);
+        }
     },
     eventMouseLeave: function (eventInfo) {
-        btEventMouseLeave(eventInfo);
+        if (!btIsTouchDevice()) {
+            btEventMouseLeave(eventInfo);
+        }
     },
     eventDrop: function (eventInfo) {
         btEventDrop(eventInfo);
     },
+    eventDidMount: function (eventInfo) {
+        if (btIsTouchDevice()) {
+            addLongPressListener(
+                    eventInfo.el,
+                    function () {
+                        btEventRemove(eventInfo);  // Open event editor
+                    },
+                    function () {
+                        btMouseEnter(eventInfo);
+                    });
+        }
+    }
 
 });
 budatoll_events_calendar.render();
 
 
 
-function btEventClick(eventInfo) {
- //   alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
+function btEventRemove(eventInfo) {
+//       alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
+    if (!confirm('Biztosan törölni akarod az edzés alkalmat?'))
+        return;
+    $.ajax({
+        url: budatoll_ajax_object.ajax_url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'budatoll',
+            'ajax-action': 'remove-event',
+            'event-id': eventInfo.event.id
+        },
+        success: function (response) {
+            switch (response.result) {
+                case 'deleted':
+                    eventInfo.event.remove();
+                    $('#budatoll-message').html('Törlés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
+                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
+                case 'error':
+                    message = response.message;
+                    $('#budatoll-message').html('A törlés sikeretelen. ' + message).removeClass('budatoll-success').addClass('budatoll-error');
+                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
+            }
+        },
+        error: function (response) {
+            $('#budatoll-message').html('A törlés hibás').addClass('budatoll-error');
+            $('#budatoll-message').show(1000).delay(2500).hide(1000);
+        }
+    });
 }
 
 function btEventReceive(eventInfo) {
@@ -103,7 +158,7 @@ function btEventReceive(eventInfo) {
             action: 'budatoll',
             'ajax-action': 'add-event',
             'event_type-id': eventInfo.event.id,
-            'dropped-date': droppedDate,
+            'dropped-date': droppedDate
         },
         success: function (response) {
             switch (response.result) {
@@ -116,13 +171,16 @@ function btEventReceive(eventInfo) {
                     start_time = droppedDate + 'T' + response.event.start;
                     end_time = droppedDate + 'T' + response.event.end;
                     event_id = response.event_id;
-                    console.log('event id: ' + event_id);
+                    message = response.message;
                     eventInfo.event.setProp('id', event_id);
                     eventInfo.event.setDates(start_time, end_time);
                     eventInfo.event.setAllDay(false);
                     //                           console.log(eventInfo.event);
-                    $('#budatoll-message').html('Mentés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    $('#budatoll-message').html('Mentés sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
+                    $('#budatoll-message').show(1000).delay(2500).hide(1000);
+                    setTimeout(function () {
+                        window.location.reload(false);
+                    }, 3000);
                     break;
                 case 'error':
                     eventInfo.event.remove();
@@ -140,15 +198,36 @@ function btEventReceive(eventInfo) {
 }
 
 function btEventMouseEnter(eventInfo) {
-    console.log(eventInfo.event);
+    const event_info = $("#budatoll-event-info");
+    const event = eventInfo.event;
+    const title = event.extendedProps.long_title;
+    const start = event.startStr.substring(11, 16);
+    const end = event.endStr.substring(11, 16);
+    var event_text = '<h4>' + title + '</h4>';
+    event_text += 'Idősáv: ' + start + ' - ' + end + '<br>';
+    const [popupX, popupY] = btIsTouchDevice()
+            ? getPopupPosTouchDevice(event_info)
+            : getPopupPos(event_info);
+
+    event_info.html(event_text).css({
+        left: popupX,
+        top: popupY
+    }).fadeIn(budatoll_modal_speed);
+    if (btIsTouchDevice()) {
+        event_info.off("click").on("click", function () {
+            event_info.fadeOut(budatoll_modal_speed);
+        });
+    }
 }
 
-function btEventMouseLeave(eventInfo) {
-    console.log('Mouse leave: ' + eventInfo.event.title);
+function btEventMouseLeave(eventInfo)
+{
+    $("#budatoll-event-info").fadeOut(budatoll_modal_speed);
 
 }
+
 
 function btEventDrop(eventInfo) {
-//    alert('Drop event:' + eventInfo.event.id);
-    console.log('EventDrop: ' + eventInfo.event.start + ' - ' + eventInfo.event.start);
+    console.log('EventDrop: ' + eventInfo.event.start + ' - ' + eventInfo.event.end);
 }
+

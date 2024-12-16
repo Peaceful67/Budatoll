@@ -37,13 +37,11 @@ function bt_charge_passed_trainings() {
             BUDATOLL_ACCOUNT_COMMENT => $event->{BUDATOLL_EVENTS_LONG},
             BUDATOLL_ACCOUNT_AMOUNT => -$amount,
         ];
-        error_log('Charge: '.print_r($data, true));
         $format = ['%d','%d', '%s', '%d'];
         $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
         $last_id = $wpdb->insert_id;
         $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET `' . BUDATOLL_TRAINING_PAID . '`=' . $last_id
                 . ' WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $training_id;
-        //       error_log('Charge training: ' . $sql);
         bt_get_results($sql);
         bt_logger(BUDATOLL_LOGGER_TYPE_CHARGE, $player_id, $event->{BUDATOLL_EVENTS_LONG} . ' kifizetve: ' . bt_currency($amount));
         bt_warn_user_negativ_balance($player_id);

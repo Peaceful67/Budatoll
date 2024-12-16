@@ -158,7 +158,7 @@ function list_balance_of_all_users($list = false, $add_new = false) {
     $res = bt_get_results($sql);
     $ret .= '<h4>Egyenlegek</h4>';
     if ($res) {
-        $ret .= 'Összesen: ' . bt_currency($res[0]->total);
+        $ret .= '<p>Összesen: ' . bt_currency($res[0]->total).'</p>';
     }
     $ret .= '<table class="budatoll-table">';
     $ret .= '<thead><tr><th>Felhasználónév</th><th>Egyenleg</th><th>Utolsó változás</th><th>Művelet</th></tr></thead>';

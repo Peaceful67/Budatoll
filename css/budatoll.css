@@ -108,7 +108,7 @@
 
 .budatoll-popup {
     display:none;
-    position: absolute;
+    position: fixed;
     border: 1px solid #888;
     border-radius: 5px;
     left:40%;
@@ -120,7 +120,7 @@
     overflow: auto;
     width: auto;
     height: auto;
-    z-index: 1150;
+    z-index: 9999;
 }
 
 .budatoll-popup-content {

@@ -25,7 +25,7 @@ function bt_delete_training($id) {
             $current_user = wp_get_current_user();
             $current_user_name = $current_user ? ($current_user->display_name . '-t') : 'A klub edzőjét';
             $message = 'Tisztelt ' . bt_get_full_name($player_id) . '!<br><br> A '
-                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . bt_time($event->{BUDATOLL_EVENTS_START}) 
+                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . bt_time($event->{BUDATOLL_EVENTS_START})
                     . '-' . bt_time($event->{BUDATOLL_EVENTS_END})
                     . ' edzésre jelentkezesédet letöröltük. Amennyiben ezzel kapcsolatban kérdésed van, keresd: ' . $current_user_name;
             bt_send_email($player_id, 'Edzésre jelentkezés', $message);
@@ -118,4 +118,19 @@ function bt_is_short_application_cancelable($event) {
         return ($currentTime >= $eventTime);
     }
     return false;
+}
+
+function get_trainings_by_event($event_id) {
+    $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id;
+    return bt_get_results($sql);
+}
+
+function bt_count_trainings($event_id) {
+    $sql = 'SELECT COUNT(*) as `NUM` FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id;
+    $res = bt_get_results($sql);
+    if (isset($res[0]->NUM)) {
+        return $res[0]->NUM;
+    } else {
+        return false;
+    }
 }

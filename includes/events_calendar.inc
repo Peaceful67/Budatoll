@@ -29,6 +29,9 @@ function budatoll_list_event_types() {
                 . '</div></div>';
     }
     $ret .= '</div></div>';
+    $ret .= '<div id="budatoll-event-info" class="budatoll-popup">'
+            . '<div class="budatoll-popup-content">'
+            . '</div></div>';
     $ret .= '<div class="budatoll-message budatoll-success" id="budatoll-message"></div>';
     $ret .= '<div class="budatoll-message budatoll-error" id="error-message">Mentés sikertelen</div>';
     $ret .= '<div class="budatoll-message budatoll-error" id="already-message">Ilyen edzés már van.</div>';

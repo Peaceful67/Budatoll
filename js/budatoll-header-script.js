@@ -1,5 +1,6 @@
 var budatoll_modal_speed = 300;
 var btMouseX = -1, btMouseY = -1;
+var btTouchX = btTouchY = -1;
 
 function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat töltsük be
     const calendarTypes = {
@@ -35,45 +36,6 @@ function getDateOfEventDate(event_date) {
 }
 
 
-
-function getPopupPos(popupModal) {
-    popup_width = popupModal.outerWidth();
-    popup_height = popupModal.outerHeight();
-    popup_width = Math.max(80, popup_width);
-    popup_height = Math.max(50, popup_height);
-    screenX = $(window).width();
-    screenY = $(window).height();
-    if (btMouseX < 0) {
-        btMouseX = screenX / 2;
-    }
-    if (btMouseY < 0) {
-        btMouseY = screenY / 2;
-    }
-    // Adjust horizontal position
-    let popupX = btMouseX + 80;
-    if (btMouseX > screenX / 2) {
-        popupX = btMouseX - popup_width - 80;
-    }
-    // Ensure the modal stays within the screen horizontally
-    popupX = Math.max(10, Math.min(popupX, screenX - popup_width - 10));
-
-    // Adjust vertical position
-    let popupY = btMouseY + 80;
-    if (btMouseY > screenY / 2) {
-        popupY = btMouseY - popup_height - 80;
-    }
-    // Ensure the modal stays within the screen vertically
-    popupY = Math.max(10, Math.min(popupY, screenY - popup_height - 10));
-
-    return [popupX + 'px', popupY + 'px'];
-
-}
-
-jQuery(document).on('mousemove', function (event) {
-    btMouseX = event.pageX;
-    btMouseY = event.pageY;
-});
-
 function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
 
     var long_press = false;
@@ -82,6 +44,8 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
     // Start timer on touchstart
     element.addEventListener('touchstart', function (event) {
         event.stopPropagation();
+        const touch = event.touches[0];
+
         long_press = false;
         //       console.log('touchstart');
         pressed = true;
@@ -100,6 +64,7 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
             return;
         }
         //       console.log('Long press: ' + (long_press ? 'true' : 'false'));
+
         if (long_press) {
             long_press = false;
             //           console.log('onLongPress');
@@ -111,7 +76,7 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
         pressed = false;
     }, {passive: true});
 
-    element.addEventListener('touchcancel', function () {
+    element.addEventListener('touchcancel', function (event) {
         event.stopPropagation();
         clearTimeout(bt_timer);
         if (!pressed) {
@@ -130,5 +95,47 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
 
 function btIsTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+function getPopupPos(popupModal) {
+
+    popup_width = popupModal.outerWidth();
+    popup_height = popupModal.outerHeight();
+    popup_width = Math.max(80, popup_width);
+    popup_height = Math.max(50, popup_height);
+    screenX = $(window).width();
+    screenY = $(window).height();
+    if (btMouseX < 0) {
+        btMouseX = screenX / 2;
+    }
+    if (btMouseY < 0) {
+        btMouseY = screenY / 2;
+    }
+    // Adjust horizontal position
+    let popupX = btMouseX + 80;
+    if (btMouseX > screenX / 2) {
+        popupX = btMouseX - (popup_width / 2) - 80;
+    }
+    // Ensure the modal stays within the screen horizontally
+    popupX = Math.max(10, Math.min(popupX, screenX - popup_width - 10));
+
+    // Adjust vertical position
+    let popupY = btMouseY + 80;
+    if (btMouseY > screenY / 2) {
+        popupY = btMouseY - (popup_height / 2) - 80;
+    }
+    // Ensure the modal stays within the screen vertically
+    popupY = Math.max(10, Math.min(popupY, screenY - popup_height - 10));
+
+    return [popupX + 'px', popupY + 'px'];
+
+}
+function getPopupPosTouchDevice(popupModal) {
+    var popup_width = popupModal.outerWidth();
+    var popup_height = popupModal.outerHeight();
+    var popupX = popup_width / 2 + 100;
+    var popupY = popup_height / 2 + 150;
+    return [popupX + 'px', popupY + 'px'];
+
 }
 

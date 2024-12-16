@@ -173,7 +173,7 @@ function btEventClick(eventInfo) {
     }
     training_editor = $("#budatoll-trainings-editor");
     var popupX, popupY;
-    [popupX, popupY] = getPopupPos(training_info);
+    [popupX, popupY] = getPopupPos(training_editor);
     $(function () {
         $('#close-editor-popup').click(function () {
             training_editor.fadeOut(budatoll_modal_speed);
@@ -189,7 +189,7 @@ function btEventClick(eventInfo) {
 function btMyTrainingMouseEnter(eventInfo) {
     var popupX, popupY;
     if ($("#budatoll-trainings-editor").is(":hidden")) {
-        console.log('editor is hidden');
+        const training_info = $("#budatoll-trainings-info");
         let id = eventInfo.event.id;
         let event = btAddedTrainingIds[id];
         let trainings = event.trainings_of_event  ?? null;
@@ -197,13 +197,20 @@ function btMyTrainingMouseEnter(eventInfo) {
             return;
         }
         let trainings_text = '<h4>' + event.long + '</h4>';
+        if (btIsTouchDevice()) {
+            [popupX, popupY] = getPopupPosTouchDevice(training_info);
+            $(function () {
+                training_info.click(function () {
+                    training_info.fadeOut(budatoll_modal_speed);
+                });
+            });
+        } else {
+            [popupX, popupY] = getPopupPos(training_info);
+
+        }
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += showApplicants(trainings);
-
-        training_info = $("#budatoll-trainings-info");
-        [popupX, popupY] = getPopupPos(training_info);
-
         training_info.html(trainings_text).css({
             left: popupX,
             top: popupY

@@ -7,7 +7,7 @@ add_action('wp_ajax_budatoll', 'budatoll_ajax');
 add_action('wp_ajax_nopriv_budatoll', 'budatoll_ajax_nopriv');
 
 function budatoll_ajax_nopriv() {
- //   error_log('Non-logged user tried AJAX.');
+    //   error_log('Non-logged user tried AJAX.');
     wp_die();
 }
 
@@ -24,6 +24,10 @@ function budatoll_ajax() {
             $date = filter_input(INPUT_POST, 'dropped-date');
             $type_id = filter_input(INPUT_POST, 'event_type-id');
             $ret = btAddEvent($type_id, $date);
+            break;
+        case 'remove-event':
+            $event_id = filter_input(INPUT_POST, 'event-id');
+            $ret = btRemoveEvent($event_id);
             break;
         case 'get-all-events':
             $ret = bt_get_events();
@@ -203,11 +207,29 @@ function btAddEvent($type_id, $date) {
         bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés felvéve : ' . $wpdb->insert_id, $data);
         $ret = json_encode([
             'result' => 'success',
+            'message' => $event->{BUDATOLL_EVENT_TYPE_LONG}. '<br>' . $date.' : '.$event->{BUDATOLL_EVENT_TYPE_START}.' - '.$event->{BUDATOLL_EVENT_TYPE_END},
             'event' => $data,
             'event_id' => $wpdb->insert_id,
         ]);
     }
     return $ret;
+}
+
+function btRemoveEvent($event_id) {
+    $event = bt_get_event_by_id($event_id);
+    if (!$event) {
+        bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés törlése sikertelen, mert nem találtuk!');
+        return json_encode(['result' => 'error', 'message' => 'Nem találtuk az edzése']);
+    }
+    $trainings = bt_count_trainings($event_id);
+    if ($trainings AND $trainings > 0) {
+        bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés törlése sikertelen, mert már vannak foglalások!');
+        return json_encode(['result' => 'error', 'message' => 'Már vannak foglalások az edzésre']);
+    }
+    bt_get_results('DELETE FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  `' . BUDATOLL_EVENTS_ID . '`=' . $event_id);
+    bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés törölve : '
+            . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}));
+    return json_encode(['result' => 'deleted']);
 }
 
 function bt_get_trainings_of_event($event_id) {

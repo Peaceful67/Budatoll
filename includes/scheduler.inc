@@ -56,26 +56,22 @@ function budatoll_crontab() {
 
 function bt_trainings_make_done() {
     global $wpdb;
-    $events_done = [];
-    $sql = 'SELECT `' . BUDATOLL_TRAINING_TABLE . '`.*, `' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_LONG . '`, `' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_DAY . '`,  `' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_START . '` '
-            . ' FROM `' . BUDATOLL_TRAINING_TABLE . '` INNER JOIN `' . BUDATOLL_EVENTS_TABLE . '` ON ('
-            . '`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_ID . '`=`' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_EVENT_ID . '` AND '
-            . ' (CURDATE()>`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_DAY . '` OR '
-            . '(CURDATE()=`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_DAY . '`  AND  CURTIME()>=`' . BUDATOLL_EVENTS_TABLE . '`.`' . BUDATOLL_EVENTS_START . '`)))'
-            . ' WHERE `' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_DONE . '`=0 AND `' . BUDATOLL_TRAINING_TABLE . '`.`' . BUDATOLL_TRAINING_CONFIRMED . '`=1;';
-    $trainings = $wpdb->get_results($sql);
-    error_log($sql);
-    $data = [BUDATOLL_TRAINING_DONE => 1,];
-    foreach ($trainings as $training) {
-        if (!in_array($training->{BUDATOLL_TRAINING_EVENT_ID}, $events_done)) {
-            $events_done[] = $training->{BUDATOLL_TRAINING_EVENT_ID};
-            bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, -1, 'Edzés lezajlott: ' . $training->{BUDATOLL_EVENTS_LONG} . ' ('
-                    . $training->{BUDATOLL_EVENTS_DAY} . ' / ' . $training->{BUDATOLL_EVENTS_START} . ')');
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DONE . '`=0 '
+            . ' AND (CURDATE()>`' . BUDATOLL_EVENTS_DAY . '` OR '
+            . '(CURDATE()=`' . BUDATOLL_EVENTS_DAY . '`  AND  CURTIME()>=`' . BUDATOLL_EVENTS_START . '`))';
+    $events = bt_get_results($sql);
+    if ($events) {
+        foreach ($events as $event) {
+            $event_id = $event->{BUDATOLL_EVENTS_ID};
+            $trainings = get_trainings_by_event($event_id);
+            if ($trainings) {
+                foreach ($trainings as $training) {
+                    $wpdb->update(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_DONE => 1,], [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);         
+                }
+            }
+            bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, -1, 'Edzés lezajlott: ' . $event->{BUDATOLL_EVENTS_LONG} . ' ('
+                    . $event->{BUDATOLL_EVENTS_DAY} . ' / ' . $event->{BUDATOLL_EVENTS_START} . ')');
+            $wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_DONE => 1], [BUDATOLL_EVENTS_ID => $event_id]);
         }
-        $wpdb->update(BUDATOLL_TRAINING_TABLE, $data, [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);
-//        bt_training_charge($training->{BUDATOLL_TRAINING_ID});
-    }
-    foreach ($events_done as $event_id) {
-        $wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_DONE => 1], [BUDATOLL_EVENTS_ID => $event_id]);
     }
 }

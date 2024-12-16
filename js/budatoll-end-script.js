@@ -45,3 +45,7 @@ function budatoll_get_popup_y(height) {
     return y;
 }
 
+jQuery(document).on('mousemove', function (event) {
+    btMouseX = event.pageX;
+    btMouseY = event.pageY;
+});

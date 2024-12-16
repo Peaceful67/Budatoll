@@ -2,6 +2,8 @@
 
 define("BUDATOLL_PLAYERS_FIELD_EVENTS", 'players_events_assignment');
 define("BUDATOLL_USER_META_LEASED", 'leased');
+define("BUDATOLL_USER_META_LOGIN", 'login-name');
+define("BUDATOLL_USER_META_FULLANME", 'display-name');
 define("BUDATOLL_USER_META_EVENTS", 'events');
 define("BUDATOLL_USER_META_PHONE", 'phone');
 define("BUDATOLL_USER_META_ACTIVE", 'active');
@@ -71,7 +73,7 @@ function budatoll_manage_players_edit($user_id) {
     }
     $ret .= '<table class="form-table"><tbody>';
     $ret .= '<tr><th scope="row"><label>Felhasználó név:</label></th>'
-            . '<td><input type="text" id="budatoll-user-login" name="budatoll-user-login" value="' . $user_login . '"/></td></tr>';
+            . '<td>' . $user_login . '</td></tr>';
     $ret .= '<tr><th scope="row"><label>Teljes név:</label></th>'
             . '<td><input type="text" id="budatoll-display-name" name="budatoll-display-name" value="' . $display_name . '"/></td></tr>';
     $ret .= '<tr><th scope="row"><label>Email cím:</label></th>'
@@ -133,6 +135,34 @@ function budatoll_manage_players_save($user_id) {
         }
     }
     $user = get_userdata($user_id);
+    /*
+      $login_name = getPostVariable('budatoll-user-login', 'dummy');
+      echo 'User id: '.$user_id. ', User: '. json_encode($user);
+      if ($login_name != $user->user_login) {
+      echo 'login_name: '.$login_name;
+      if (wp_update_user(['ID' => $user_id, 'login_name' => $login_name])) {
+      bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új felhasználó név' . $login_name);
+      if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
+      $message = 'Tisztelt ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
+      . 'Az új adat a felhasználó név: ' . $login_name;
+      bt_send_email($user_id, 'Felhasználó módosítás', $message);
+      }
+      }
+      }
+     * 
+     */
+    $display_name = getPostVariable('budatoll-display-name', 'dummy');
+    if ($display_name != $user->display_name) {
+        echo 'display_name: ' . $display_name;
+        if (wp_update_user(['ID' => $user_id, 'display_name' => $display_name])) {
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új teljes név' . $display_name);
+            if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
+                $message = 'Tisztelt ' . $display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
+                        . 'Az új adat a teljes név: ' . $display_name;
+                bt_send_email($user_id, 'Felhasználó módosítás', $message);
+            }
+        }
+    }
     $leased = getPostVariable('budatoll-leased', '0');
     if ($leased != get_user_meta($user_id, BUDATOLL_USER_META_LEASED, true)) {
         if (update_user_meta($user_id, BUDATOLL_USER_META_LEASED, $leased)) {
@@ -166,13 +196,10 @@ function budatoll_manage_players_save($user_id) {
             }
         }
     }
-    $email = getPostVariable('budatoll-user-email');
-    if ($email != get_user_meta($user_id, BUDATOLL_USER_META_EMAIL, true)) {
-        $result = wp_update_user([
-            'ID' => $user_id,
-            'user_email' => sanitize_email($email),
-        ]);
-        if (!is_wp_error($result)) {
+    $email = sanitize_email(getPostVariable('budatoll-user-email'));
+
+    if (is_email($email) AND $email != $user->user_email) {
+        if (wp_update_user(['ID' => $user_id, 'user_email' => $email])) {
             bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, 'Az új email cím: ' . $email);
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                 $message = 'Kedves ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
