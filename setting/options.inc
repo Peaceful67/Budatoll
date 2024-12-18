@@ -7,11 +7,34 @@ define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY", 'email-user-modify');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT", 'email-user-payment');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE", 'warning-negativ-balance');
-define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cacnelable');
+define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cancelable');
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
 
+define("BUDATOLL_CURRENT_VERSION", '1.0');
+
+define("BUDATOLL_VERSION_ID", 'id');
+define("BUDATOLL_VERSION_DATE", 'date');
+define("BUDATOLL_VERSION_TITLE", 'title');
+define("BUDATOLL_VERSION_DESCRIPTION", 'desc');
+
 function budatoll_setting_options() {
+    $bt_versions = [
+        '1.0' => [
+            BUDATOLL_VERSION_DATE => '2024-12-17',
+            BUDATOLL_VERSION_TITLE => 'Első teszt verzió',
+            BUDATOLL_VERSION_DESCRIPTION => 'Alapfunckciók elsőre',
+        ],
+        '1.1' => [
+            BUDATOLL_VERSION_DATE => '2024-23',
+            BUDATOLL_VERSION_TITLE => 'Apróbb javítások',
+            BUDATOLL_VERSION_DESCRIPTION => '<ul>'
+            . '<li>- Képek cseréje a kezdő oldalon.<li>'
+            . '<li>- Az edző a múltat is tudja módosítani.</li>'
+            . '<li>- A nem bérletes csak előző nap jelentkezhet egy edzésre.</li>'
+            . '</ul>',
+        ],
+    ];
 
     $hidden_var_name = 'bt_save_options';
     if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
@@ -43,11 +66,22 @@ function budatoll_setting_options() {
     btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT, 'A befizetés lekönyveléséről', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE, 'Az egyenleg elfogyásáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE, 'Az előző napi jelentkezés', 'Lemondható a játék kezdetéig.', 'Áltatlános szabály szerint mondható le.');
-    echo '<tr><th scope="row"><label for="last_crontab">Utolsó crontab:</label></th>';
+    echo '<tr><th scope="row"><label>Utolsó crontab:</label></th>';
     echo '<td>' . get_option(BUDATOLL_OPTION_LAST_CRONTAB) . '</td></tr>';
+    echo '<tr><th></th><td>' . get_submit_button() . '</td></tr>';
+    echo '<tr><th>Aktuális verzió:</th><td>' . BUDATOLL_CURRENT_VERSION . ', legutóbb frissítve: ' . $bt_versions[BUDATOLL_CURRENT_VERSION][BUDATOLL_VERSION_DATE] . '</td></tr>';
+    $selected_version = getPostVariable('budatoll_versions', BUDATOLL_CURRENT_VERSION);
+    echo '<tr><th>Verziók: </th>';
+    echo '<td><select name="budatoll_versions" onChange="document.getElementById(\'submit\').click();">';
+    foreach ($bt_versions as $ver_id => $version) {
+        echo printf('<option value="%s" %s>%s</option>',
+                esc_attr($ver_id),
+                selected($selected_version, $ver_id, false),
+                esc_html($ver_id.' : '.$version[BUDATOLL_VERSION_DATE] . ' - ' . $version[BUDATOLL_VERSION_TITLE]));
+    }
+    echo '</select></td></tr>';
+    echo '<tr><th>Leírás:</th><td>'.$bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION].'</td></tr>';
     echo '</tbody></table>';
-    echo
-    submit_button();
     echo '</form>';
     echo '</div>';
 }
