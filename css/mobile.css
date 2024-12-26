@@ -1,0 +1,7 @@
+@media (max-width: 768px) {
+  #budatoll-edzes-calendar {
+    max-width: 100%;
+    font-size: 0.8em; /* Smaller fonts for smaller screens */
+  }
+}
+

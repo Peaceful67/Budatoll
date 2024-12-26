@@ -12,12 +12,6 @@ define("BUDATOLL_ACCESS_MANAGE_OPTIONS", 'budatoll-manage-options');
 define("BUDATOLL_ACCESS_MANAGE_COACH", 'budatoll-manage-coach');
 define("BUDATOLL_ACCESS_MANAGE_PLAYER", 'budatoll-manage-player');
 
-define("BUDATOLL_PAYMENT_TABLE", $wpdb->prefix .'budatoll_payments');
-define("BUDATOLL_PAYMENT_ID", 'id');
-define("BUDATOLL_PAYMENT_USER_ID", 'user-id');
-define("BUDATOLL_PAYMENT_AMOUNT", 'amount');
-define("BUDATOLL_PAYMENT_EVENT_ID", 'event-id');
-define("BUDATOLL_PAYMENT_TIME", 'time');
 
 define("BUDATOLL_EVENT_TYPE_TABLE", $wpdb->prefix .'budatoll_event_type');
 define("BUDATOLL_EVENT_TYPE_ID", 'id');
@@ -25,6 +19,7 @@ define("BUDATOLL_EVENT_TYPE_SHORT", 'short');
 define("BUDATOLL_EVENT_TYPE_LONG", 'long');
 define("BUDATOLL_EVENT_TYPE_PRICE", 'price');
 define("BUDATOLL_EVENT_TYPE_MAX_PLAYERS", 'max_players');
+define("BUDATOLL_EVENT_TYPE_PUBLIC", 'public');
 define("BUDATOLL_EVENT_TYPE_START", 'start');
 define("BUDATOLL_EVENT_TYPE_END", 'end');
 

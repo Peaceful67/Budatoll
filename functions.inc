@@ -49,6 +49,13 @@ function bt_is_deletable($item_id, $related_arr) {
     return true;
 }
 
+function bt_is_day_before($day) {
+    $eventTime = new DateTime($day, new DateTimeZone(wp_timezone_string()));
+    $eventTime->modify('-1 day')->setTime(0, 0);
+    $currentTime = new DateTime('now', new DateTimeZone(wp_timezone_string()));
+    return ($currentTime >= $eventTime);
+}
+
 function getPostVariable($var_name, $default = false) {
 //    $ret = filter_input(INPUT_POST, $var_name, FILTER_NULL_ON_FAILURE);
 //    error_log('getPostVariable '.$var_name.': '.$_POST[$var_name]);
@@ -69,7 +76,13 @@ function bt_welcome_message() {
     if ($user->ID == 0) {
         $ret = 'Lépj be vagy regisztrálj játékosként!';
     } else {
+        $balance = bt_get_balance_of_user($user->ID);
         $ret = 'Belépve: ' . $user->display_name;
+        if (bt_user_has_role(BUDATOLL_ROLE_PLAYER)) {
+            $ret .= '<p ';
+            $ret .= $balance < 0 ? ' style="color:red">' : '>';
+            $ret .= 'Egyenleged: ' . bt_currency($balance) . '</p>';
+        }
     }
     return $ret;
 }
@@ -161,6 +174,7 @@ function budatoll_activated() {
             . BUDATOLL_EVENT_TYPE_LONG . '` varchar(255) DEFAULT NULL,`'
             . BUDATOLL_EVENT_TYPE_PRICE . '` int(8) NOT NULL DEFAULT 0,`'
             . BUDATOLL_EVENT_TYPE_MAX_PLAYERS . '` int(8) NOT NULL DEFAULT 0,`'
+            . BUDATOLL_EVENT_TYPE_PUBLIC . '` int(1) NOT NULL DEFAULT 0,`'
             . BUDATOLL_EVENT_TYPE_START . '` time(1) NOT NULL,`'
             . BUDATOLL_EVENT_TYPE_END . '` time(1) NOT NULL, '
             . 'UNIQUE KEY `' . BUDATOLL_EVENT_TYPE_ID . '` (`' . BUDATOLL_EVENT_TYPE_ID . '`)) '
@@ -267,7 +281,6 @@ function bt_currency($num) {
 function bt_time($sql_format) {
     $timestamp = strtotime($sql_format);
     return $timestamp ? date('H:i', $timestamp) : 'Invalid time';
-
 }
 
 function bt_is_user_active($user_id) {
@@ -306,7 +319,7 @@ function bt_rule_options() {
     $ret .= '<strong>Edzés lemondható: </strong>';
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EVENT_CANCELABLE) ? 'Az edzés megkezdéséig.' : 'Csak 24 órával az edzés megkezdése előtt.';
     $ret .= '<br><strong>Negatív egyenleg esetén: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT) ? 'Nem lehet edzést foglalni.' : 'Szabadon foglalhatóak az edzések.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT) ? 'Csak előző napon lehet edzést foglalni.' : 'Szabadon foglalhatóak az edzések.';
     $ret .= '<br><strong>Email lemondáskor: </strong>';
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL) ? 'Értesítést kapnak a várólistán szereplők.' : 'Nincs értesítés.';
     $ret .= '<br><strong>Játékos beállításainak módosításáról: </strong>';
@@ -316,7 +329,7 @@ function bt_rule_options() {
     $ret .= '<br><strong>Az egyenleg elfogyásáról: </strong>';
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE) ? 'Értesítést kap a játékos.' : 'Nincs értesítés.';
     $ret .= '<br><strong>Az előző napi jelentkezés: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) ? 'Lemondható a játék kezdetéig.' : 'Áltatlános szabály szerint mondható le.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) ? 'Lemondható a játék kezdetéig.' : 'Általános szabály szerint mondható le.';
     return $ret;
 }
 

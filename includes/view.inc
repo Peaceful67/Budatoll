@@ -20,8 +20,8 @@ function bt_cancel_button($id, $var_name = 'budatoll_cancel', $title='Mégsem') 
             . '<span class="dashicons dashicons-undo"></span></button>';
 }
 
-function bt_delete_button($id, $var_name='budatoll_delete', $title='') {
-    return '<button class="button budatoll-button button-small button-action" onclick="return confirm(\'Biztosan törölni akarod\');" '
+function bt_delete_button($id, $var_name='budatoll_delete', $title='Törlés') {
+    return '<button class="button budatoll-button button-small button-link" onclick="return confirm(\'Biztosan törölni akarod\');" '
     . 'name="'.$var_name.'" id="'.$var_name.'" value="' . $id . '" title="'.$title.'">'
             . '<span class="dashicons dashicons-trash" ></span></button>';
 }

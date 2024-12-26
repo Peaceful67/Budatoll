@@ -26,12 +26,27 @@ function budatoll_setting_options() {
             BUDATOLL_VERSION_DESCRIPTION => 'Alapfunckciók elsőre',
         ],
         '1.1' => [
-            BUDATOLL_VERSION_DATE => '2024-23',
+            BUDATOLL_VERSION_DATE => '2025-01-01',
             BUDATOLL_VERSION_TITLE => 'Apróbb javítások',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
             . '<li>- Képek cseréje a kezdő oldalon.<li>'
-            . '<li>- Az edző a múltat is tudja módosítani.</li>'
+            . '<li>- Az edző a múltat is tudja módosítani, az egyenleg automatikusan módosul.</li>'
             . '<li>- A nem bérletes csak előző nap jelentkezhet egy edzésre.</li>'
+            . '<li>- A negatív egyenlegű csak előző nap jelentkezhet egy edzésre.( kapcsolható )</li>'
+            . '<li>- Az edzésre jelentkezés egyszerűsítése, az állapot színekkel jelölve.</li>'
+            . '<li>- Az egyenleg változásakor küldött emailben szerepel az új egyenleg.</li>'
+            . '<li>- Van publikus edzés típus, amit minden aktív játékos lát, nem kell külön beállítani.</li>'
+            . '<li>- Ha egy játékos 6 hónapja nem volt egyik edzésen sem, inaktívvá válik.</li>'
+            . '<li>- Az olyan játékost, aki még semmilyen edzésen nem volt (fake), ki lehet törölni.</li>'
+            . '<li>- Az új játékos kap egy üdvözlő emailt, azzal a kéréssel, hogy vegye fel az edzővel a kapcsolatot.</li>'
+            . '<li>- Mobil és desktop megjelenítés feljavítása.</li>'
+            . '</ul>',
+        ],
+        '1.2' => [
+            BUDATOLL_VERSION_DATE => '2025--',
+            BUDATOLL_VERSION_TITLE => 'További fejlesztések',
+            BUDATOLL_VERSION_DESCRIPTION => '<ul>'
+            . '<li>- Alkalom heti beosztása másolása a következő hétre.</li>'
             . '</ul>',
         ],
     ];
@@ -60,7 +75,7 @@ function budatoll_setting_options() {
 
     btPutCheckbox(BUDATOLL_OPTION_EVENT_CANCELABLE, 'Edzés lemondható', 'Az edzés kezdetéig.', 'Csak 24 órával az edzés előtt mondtható le.');
 //    btPutCheckbox(BUDATOLL_OPTION_AUTO_CHARGE, 'Edzés költsége', 'Automatikusan levonódik.', 'Kézzel kell lekönyvelni.');
-    btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Nem lehet edzést foglalni.', 'Szabadon foglalhat edzést.');
+    btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Csak előző nap foglalhat.', 'Szabadon foglalhat edzést.');
     btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY, 'Játékos módosításáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT, 'A befizetés lekönyveléséről', 'Értesítést kap a játékos.', 'Nincs értesítés.');
@@ -77,10 +92,10 @@ function budatoll_setting_options() {
         echo printf('<option value="%s" %s>%s</option>',
                 esc_attr($ver_id),
                 selected($selected_version, $ver_id, false),
-                esc_html($ver_id.' : '.$version[BUDATOLL_VERSION_DATE] . ' - ' . $version[BUDATOLL_VERSION_TITLE]));
+                esc_html($ver_id . ' : ' . $version[BUDATOLL_VERSION_DATE] . ' - ' . $version[BUDATOLL_VERSION_TITLE]));
     }
     echo '</select></td></tr>';
-    echo '<tr><th>Leírás:</th><td>'.$bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION].'</td></tr>';
+    echo '<tr><th>Leírás:</th><td>' . $bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION] . '</td></tr>';
     echo '</tbody></table>';
     echo '</form>';
     echo '</div>';

@@ -202,7 +202,7 @@
 }
 
 .budatoll-booked-event {
-    background-color: #ff686b;
+    background-color: #0B5394;
     color:white;
     border: 1px solid darkred;
     border-radius: 5px;
@@ -222,6 +222,12 @@
     border-radius: 5px;
 }
 
+.budatoll-full-event {
+    background-color: #ff686b;
+    color:white;
+    border: 1px solid darkred;
+    border-radius: 5px;
+}
 
 .et_pb_login form label {
     font-size: 14px;

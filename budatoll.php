@@ -64,25 +64,25 @@ add_action('wp_logout', 'budatoll_logout');
 add_action('clear_auth_cookie', 'bt_log_user_logout');
 add_action('wp_login_failed', 'bt_log_login_failed');
 add_action('user_register', 'bt_user_register', 10, 1);
-add_action('delete_user', 'bt_user_delete', 10,1);
+add_action('delete_user', 'bt_user_delete', 10, 1);
 add_action('init', 'bt_init');
 add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem működik a crontab
 
 
 add_action('user_register', 'bt_set_default_role');
+
 function bt_enqueue_dashicons() {
     wp_enqueue_style('dashicons');
 }
+
 add_action('wp_enqueue_scripts', 'bt_enqueue_dashicons');
-
-
 
 function budatoll_scripts() {
     global $post;
     wp_enqueue_style('budatoll-jquery-style', plugins_url('jquery-ui/jquery-ui.css', __FILE__));
     wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__));
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__));
-
+    wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__));
 
     wp_enqueue_script('budatoll-fc', plugins_url('js/fullcalendar/index.global.min.js', __FILE__), array('jquery'), false, false);
     wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('js/fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'), false, false);
@@ -90,7 +90,7 @@ function budatoll_scripts() {
 
     switch ($post->post_name) {
         case 'alkalom-naptar':
-            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'),'2.3', true);
+            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '2.3', true);
             break;
         case 'edzesek-naptar':
             wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '2.2', true);
@@ -103,5 +103,3 @@ function budatoll_scripts() {
     wp_enqueue_script('budatoll-end-script', plugins_url('js/budatoll-end-script.js', __FILE__), array('jquery'), null, true);
     wp_localize_script('budatoll-header-script', 'budatoll_ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
 }
-
-

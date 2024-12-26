@@ -34,12 +34,16 @@ function bt_delete_training($id) {
 }
 
 function bt_is_training_full($id) {
-    global $wpdb;
     $training = bt_get_training_by_id($id);
     if (!$training) {  // Nem is jó az id, nincs ilyen
         return true;
     }
     $event_id = $training->{BUDATOLL_TRAINING_EVENT_ID} ?? -1;
+    return bt_is_event_full($event_id);
+}
+
+function bt_is_event_full($event_id) {
+    global $wpdb;
     $event = bt_get_event_by_id($event_id);
     $max_players = $event->{BUDATOLL_EVENTS_MAX_PLAYERS} ?? 0;
     if ($max_players == 0) { // Nincs is korlátozva
@@ -109,15 +113,12 @@ function bt_is_training_deletable($id) {
 }
 
 function bt_is_short_application_cancelable($event) {
-
-    if ($event AND btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE)) {
+    if (!isset($event->{BUDATOLL_EVENTS_DAY})) {
+        return false;
+    } else {
         $day = $event->{BUDATOLL_EVENTS_DAY};
-        $eventTime = new DateTime($day, new DateTimeZone(wp_timezone_string()));
-        $eventTime->modify('-1 day')->setTime(0, 0);
-        $currentTime = new DateTime('now', new DateTimeZone(wp_timezone_string()));
-        return ($currentTime >= $eventTime);
     }
-    return false;
+    return btIsOptionEnabled(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE) AND bt_is_day_before($day);
 }
 
 function get_trainings_by_event($event_id) {

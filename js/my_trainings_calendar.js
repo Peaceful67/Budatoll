@@ -28,8 +28,9 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                                 'title': event.short,
                                 'start': event.day + 'T' + event.start,
                                 'end': event.day + 'T' + event.end,
-                                'booked': true,
-                                'confirmed': false
+                                'booked': event.booked,
+                                'full': event.full,
+                                'confirmed': event.confirmed
                             });
                         }
                     });
@@ -54,6 +55,8 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             } else {
                 title.classList.add('budatoll-waiting-event');
             }
+        } else if (day.event.extendedProps.full) {
+            title.classList.add('budatoll-full-event');
         } else {
             title.classList.add('budatoll-available-event');
         }
@@ -61,12 +64,18 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         return {domNodes: arrayOfDomNodes};
     },
     headerToolbar: {
-        left: 'prev,next today',
+        left: window.innerWidth < 768 ? '' : 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek'
-
+        right: window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth'
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
+    windowResize: function (view) {
+        if (window.innerWidth < 768) {
+            budatoll_trainings_calendar.changeView('listWeek');
+        } else {
+            budatoll_trainings_calendar.changeView('dayGridMonth');
+        }
+    },
     locale: 'hu',
     firstDay: 1,
     editable: false,
@@ -74,6 +83,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     droppable: false,
     expandRows: true,
     forceEventDuration: true,
+    height: 'auto', // Adjusts height dynamically
     defaultAllDay: false,
     dayMaxEvents: true, // allow "more" link when too many events
     showNonCurrentDates: false,
@@ -108,6 +118,12 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
 });
 budatoll_trainings_calendar.render();
 
+window.addEventListener('resize', function () {
+    //   budatoll_trainings_calendar.destroy();
+    //   budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl, getCalendarOptions());
+    budatoll_trainings_calendar.render();
+});
+
 function btEventClick(eventInfo) {
     var id = eventInfo.event.id;
     var event = btAddedTrainingIds[id];
@@ -116,6 +132,7 @@ function btEventClick(eventInfo) {
     var is_already_booked = false;
     var is_waiting = false;
     var num_confirmed = 0;
+    var eventBookable = btBookingAllowed || isBeforeTomorrow(event.day);
     var trainings_text = '<h4>' + event.long + '</h4><hr>';
     if (event.done === '1') {
         trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
@@ -152,7 +169,7 @@ function btEventClick(eventInfo) {
         trainings_text += '<div class="budatoll-row">';
         if (is_already_booked) {
             if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
-                if (btBookingAllowed) {
+                if (eventBookable) {
                     trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
                 }
                 trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
@@ -162,12 +179,12 @@ function btEventClick(eventInfo) {
         } else {
             if (event.max_players > 0 && event.max_players <= num_confirmed) {  // Csak várólistára fér fel
                 trainings_text += '<button class="button budatoll-button budatoll-button-warning" name="training_wait"  value="-1" title="Várólistára"><span class="dashicons dashicons-insert-after"></span></button>';
-            } else if (btBookingAllowed) {
+            } else if (eventBookable) {
                 trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Jelentkezés"><span class="dashicons dashicons-insert"></span></button>';
             }
         }
         if (!btBookingAllowed) {
-            trainings_text += '<p class="budatoll-warning">Negatív egyenleg miatt korlátozva</p>';
+            trainings_text += '<p class="budatoll-warning">Negatív az egyenleged</p>';
         }
         trainings_text += '</div>';
     }

@@ -63,6 +63,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     locale: 'hu',
+    height: 'auto', // Adjusts height dynamically
     firstDay: 1,
     editable: false,
     weekends: false,
@@ -70,7 +71,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     expandRows: true,
     forceEventDuration: true,
     defaultAllDay: false,
-    dayMaxEvents: true, // allow "more" link when too many events
+    dayMaxEvents: false, // allow "more" link when too many events
     showNonCurrentDates: false,
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {

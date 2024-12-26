@@ -65,6 +65,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
 
     },
     initialView: 'dayGridMonth',
+    height: 'auto', // Adjusts height dynamically
     locale: 'hu',
     firstDay: 1,
     editable: true,

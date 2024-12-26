@@ -80,7 +80,6 @@ function bt_get_events() {
 }
 
 function bt_get_trainings_range_of_user($start, $end) {
-    global $wpdb;
     $user = wp_get_current_user();
     if ($user->ID == 0) {
         $ret = [
@@ -99,18 +98,23 @@ function bt_get_trainings_range_of_user($start, $end) {
         if (isset($visible[0]) AND is_array($visible[0])) {
             $visible = $visible[0];
         }
-        $sql_filter = '';
-        foreach ($visible as $visible_id) {
-            $sql_filter .= ' `' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=' . $visible_id . ' OR';
+        $visible_filter = ' `et`.`' . BUDATOLL_EVENT_TYPE_PUBLIC . '`=1 OR';
+        if (!empty($visible)) {
+            foreach ($visible as $visible_id) {
+                $visible_filter .= ' `e`.`' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=' . $visible_id . ' OR';
+            }
         }
-        if (!empty($sql_filter)) {
-            $sql_filter = ' AND (' . substr($sql_filter, 0, -2) . ')';
-        }
-        $sql_events = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE  (`' . BUDATOLL_EVENTS_DAY . '` BETWEEN "' . $start . '" AND "' . $end . '") ' . $sql_filter;
-        $res_events = $wpdb->get_results($sql_events);
-        $events = bt_get_trainings_of_events($res_events);
+        $sql_filter = substr($visible_filter, 0, -2);
+
+        $sql_events = 'SELECT `e`.* FROM `' . BUDATOLL_EVENTS_TABLE . '` AS `e` '
+                . ' JOIN `' . BUDATOLL_EVENT_TYPE_TABLE . '` AS `et` ON (`e`.`' . BUDATOLL_EVENTS_EVENT_TYPE_ID . '`=`et`.`' . BUDATOLL_EVENTS_ID . '`) '
+                . ' WHERE  (`' . BUDATOLL_EVENTS_DAY . '` BETWEEN "' . $start . '" AND "' . $end . '") ' .
+                ' AND (' . $sql_filter . ')';
+        //       error_log($sql_events);
+        $res_events = bt_get_results($sql_events);
+        $events = bt_get_trainings_of_events($res_events, $user->ID);
         if (btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT)) {
-            $allowed = bt_get_balance_of_user($user->ID) > 0;
+            $allowed = (bt_get_balance_of_user($user->ID) >= 0);
         } else {
             $allowed = true;
         }
@@ -155,23 +159,32 @@ function bt_get_trainings_range($from, $to) {
     return json_encode($ret);
 }
 
-function bt_get_trainings_of_events($events) {
+function bt_get_trainings_of_events($events, $user_id = -1) {
 
     $ret = [];
     foreach ($events as $event) {
+        $event_id = $event->{BUDATOLL_EVENTS_ID};
         $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
                 . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=%d ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
-        $trainings = bt_get_results($sql, [$event->{BUDATOLL_EVENTS_ID}]);
-        $confirmed = 0;
+        $trainings = bt_get_results($sql, [$event_id]);
+        $confirmed = false;
+        $booked = false;
         foreach ($trainings as $training) {
             $training->player_name = bt_get_full_name($training->player_id);
             $training->removeable = bt_is_training_deletable($training->id);
-            if ($training->{BUDATOLL_TRAINING_CONFIRMED} != 0) {
-                $confirmed++;
+            if ($user_id == $training->player_id) {
+                $booked = true;
+                $confirmed = $training->{BUDATOLL_TRAINING_CONFIRMED} == 1;
             }
         }
         $event->trainings_of_event = $trainings;
         $event->confirmed = $confirmed;
+        $event->booked = $booked;
+        if (empty($trainings)) {
+            $event->full = false;
+        } else {
+            $event->full = bt_is_event_full($event_id);
+        }
         $ret[] = $event;
     }
     return $ret;
@@ -207,7 +220,7 @@ function btAddEvent($type_id, $date) {
         bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés felvéve : ' . $wpdb->insert_id, $data);
         $ret = json_encode([
             'result' => 'success',
-            'message' => $event->{BUDATOLL_EVENT_TYPE_LONG}. '<br>' . $date.' : '.$event->{BUDATOLL_EVENT_TYPE_START}.' - '.$event->{BUDATOLL_EVENT_TYPE_END},
+            'message' => $event->{BUDATOLL_EVENT_TYPE_LONG} . '<br>' . $date . ' : ' . $event->{BUDATOLL_EVENT_TYPE_START} . ' - ' . $event->{BUDATOLL_EVENT_TYPE_END},
             'event' => $data,
             'event_id' => $wpdb->insert_id,
         ]);

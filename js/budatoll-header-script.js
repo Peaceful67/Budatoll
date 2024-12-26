@@ -139,3 +139,12 @@ function getPopupPosTouchDevice(popupModal) {
 
 }
 
+function isBeforeTomorrow(dateInput) {
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    let inputDate = new Date(dateInput);
+    inputDate.setHours(0, 0, 0, 0); // Consider only the date part for comparison
+    return inputDate <= tomorrow;
+}

@@ -46,6 +46,7 @@ function budatoll_crontab() {
         try {
             bt_trainings_make_done();
             bt_charge_passed_trainings();
+            bt_inactive_players();
         } finally {
             if (ob_get_length()) {
                 ob_end_flush();
@@ -66,12 +67,35 @@ function bt_trainings_make_done() {
             $trainings = get_trainings_by_event($event_id);
             if ($trainings) {
                 foreach ($trainings as $training) {
-                    $wpdb->update(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_DONE => 1,], [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);         
+                    $wpdb->update(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_DONE => 1,], [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);
                 }
             }
             bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, -1, 'Edzés lezajlott: ' . $event->{BUDATOLL_EVENTS_LONG} . ' ('
                     . $event->{BUDATOLL_EVENTS_DAY} . ' / ' . $event->{BUDATOLL_EVENTS_START} . ')');
             $wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_DONE => 1], [BUDATOLL_EVENTS_ID => $event_id]);
+        }
+    }
+}
+
+function bt_inactive_players() {
+    global $wpdb;
+    $month = 6;
+    $players = bt_get_active_players();
+    if (empty($players)) {
+        return;
+    }
+    foreach ($players as $player) {
+        $player_id = $player->ID;
+        $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_PLAYER_ID . '`=' . $player_id . ' AND '
+                . ' `' . BUDATOLL_TRAINING_CREATED . '` > DATE_SUB(NOW(), INTERVAL ' . $month . ' MONTH);';
+        $wpdb->query($sql);
+        $last = $wpdb->num_rows;
+        $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_PLAYER_ID . '`=' . $player_id . ' AND '
+                . ' `' . BUDATOLL_TRAINING_CREATED . '` <= DATE_SUB(NOW(), INTERVAL ' . $month . ' MONTH);';
+        $wpdb->query($sql);
+        if ($wpdb->num_rows > 0 AND $last == 0) {
+            update_user_meta($player_id, BUDATOLL_USER_META_ACTIVE, 0);
+            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $player_id, $month . ' hónapja nem jelentkezett, inaktiváltuk');
         }
     }
 }

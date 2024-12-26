@@ -10,6 +10,9 @@ define("BUDATOLL_LOGGER_TYPE_EMAILS", 7);
 define("BUDATOLL_LOGGER_TYPE_CHARGE", 8);
 define("BUDATOLL_LOGGER_TYPE_LOGIN", 9);
 
+
+define("BUDATOLL_LOGGER_DATA_DELIMITER", '#&@');
+
 $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'Edzés típus',
     BUDATOLL_LOGGER_TYPE_EVENTS => 'Alkalom',
@@ -94,7 +97,7 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
             . ($bt_logger_cat > 0 ? ('`' . BUDATOLL_LOGGER_TYPE . '`=' . $bt_logger_cat . ' AND ') : '')
             . ' `' . BUDATOLL_LOGGER_TIME . '` BETWEEN "' . $bt_logger_from_date . ' 00:00:00" AND "' . $bt_logger_to_date . ' 23:59:59" '
             . 'ORDER BY `' . BUDATOLL_LOGGER_TIME . '` DESC;';
-    echo '<table class="wp-list-table widefat fixed striped">';
+    echo '<table class="wp-list-table widefat fixed">';
     echo '<thead><tr><th scope="col" id="column1" class="manage-column column-column1" style="width:80px;">Elkövető</th>'
     . '<th scope="col" id="column2" class="manage-column column-column2" style="width:80px;">Típus</th>'
     . '<th scope="col" id="column3" class="manage-column column-column3"  style="width:80px;">Érintett</th>'
@@ -106,13 +109,12 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
         $user_name = $user->display_name ?? '---';
         $related_id = $row->{BUDATOLL_LOGGER_RELATED};
         $comment = $row->{BUDATOLL_LOGGER_COMMENT};
-        $obj_pos = strpos($comment, 'a:');
+        $obj_pos = strpos($comment, BUDATOLL_LOGGER_DATA_DELIMITER);
         if ($obj_pos !== false) { // Van benne kibontandó object
-            $obj_end = strpos($comment, ';}', $obj_pos) + 2;
-            $obj_str = substr($comment, $obj_pos, $obj_end - $obj_pos);
+            $obj_str = substr($comment, $obj_pos + strlen(BUDATOLL_LOGGER_DATA_DELIMITER));
             $obj_arr = unserialize($obj_str);
             if ($obj_arr !== false) {
-                $comment = substr($comment, 0, $obj_pos) . ': ' . arr_to_string($obj_arr, true);
+                $comment = substr($comment, 0, $obj_pos) . ', Adatok: ' . arr_to_string($obj_arr, true);
             }
         }
         $related_name = '---';
@@ -160,7 +162,7 @@ function bt_logger($type, $related, $comment, $log_data = null) {
     global $wpdb;
     $user = wp_get_current_user();
     if (!is_null($log_data)) {
-        $comment .= ' ' . maybe_serialize($log_data);
+        $comment .= BUDATOLL_LOGGER_DATA_DELIMITER . maybe_serialize($log_data);
     }
     $user_id = isset($user->ID) ? absint($user->ID) : -1;
     $data = [

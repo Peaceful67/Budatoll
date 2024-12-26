@@ -74,7 +74,7 @@ function bt_my_balance() {
         return $ret;
     }
     $total = bt_get_balance_of_user($user_id);
-    $ret .= '<h4 ' . ($total < 0 ? 'style="color:red;"' : '') . '>' . bt_get_full_name($user_id) . ' egyenlege: ' . bt_currency($total) . '</h4>';
+//    $ret .= '<h4 ' . ($total < 0 ? 'style="color:red;"' : '') . '>' . bt_get_full_name($user_id) . ' Egyenlege: ' . bt_currency($total) . '</h4>';
     $sql = 'SELECT * FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d'
             . ' ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
     $result = bt_get_results($sql, [$user_id]);
@@ -158,7 +158,7 @@ function list_balance_of_all_users($list = false, $add_new = false) {
     $res = bt_get_results($sql);
     $ret .= '<h4>Egyenlegek</h4>';
     if ($res) {
-        $ret .= '<p>Összesen: ' . bt_currency($res[0]->total).'</p>';
+        $ret .= '<p>Összesen: ' . bt_currency($res[0]->total) . '</p>';
     }
     $ret .= '<table class="budatoll-table">';
     $ret .= '<thead><tr><th>Felhasználónév</th><th>Egyenleg</th><th>Utolsó változás</th><th>Művelet</th></tr></thead>';
@@ -323,15 +323,11 @@ function getPaymentById($id) {
 }
 
 function get_balance_of_user($user_id) {
-    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
+    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `amount` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
             . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d '
             . 'ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
     $result = bt_get_results($sql, [0, $user_id]);
-    if (isset($result[0])) {
-        return get_object_vars($result[0]);
-    } else {
-        return 0;
-    }
+    return $result[0]->amount ?? 0;
 }
 
 function get_event_description($event_id) {
@@ -339,7 +335,7 @@ function get_event_description($event_id) {
     $ret = '---';
     if ($event) {
         $ret = $event->{BUDATOLL_EVENTS_SHORT};
-        $ret .='<br>'.$event->{BUDATOLL_EVENTS_DAY}.'';
-    } 
+        $ret .= '<br>' . $event->{BUDATOLL_EVENTS_DAY} . '';
+    }
     return $ret;
 }
