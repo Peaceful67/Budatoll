@@ -3,9 +3,10 @@ var btCurrentUserId = -1;
 var btBookingAllowed = false;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
-    datesSet: function (eventInfo) {
+    events: function (eventInfo, successCallback, failureCallback) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
+        btAddedTrainingIds = [];
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -18,28 +19,39 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             },
             success: function (response) {
                 if (response.result === 'success') {
+                    if (!Array.isArray(response.events)) {
+                        console.error('Invalid events response:', response.events);
+                        failureCallback();
+                        return;
+                    }
                     btCurrentUserId = response.current_user_id;
                     btBookingAllowed = response.booking_allowed;
-                    response.events.forEach(function (event) {
-                        if (!btAddedTrainingIds.hasOwnProperty(event.id)) {
+                    var events = response.events.map(function (event) {
+                        if (event && !btAddedTrainingIds.hasOwnProperty(event.id)) {
                             btAddedTrainingIds[event.id] = event;
-                            budatoll_trainings_calendar.addEvent({
-                                'id': event.id,
-                                'title': event.short,
-                                'start': event.day + 'T' + event.start,
-                                'end': event.day + 'T' + event.end,
-                                'booked': event.booked,
-                                'full': event.full,
-                                'confirmed': event.confirmed
-                            });
+                            return {
+                                id: event.id,
+                                title: event.short,
+                                start: event.day + 'T' + event.start,
+                                end: event.day + 'T' + event.end,
+                                extendedProps: {
+                                    booked: event.booked,
+                                    full: event.full,
+                                    confirmed: event.confirmed
+                                }
+                            };
                         }
-                    });
+                        return null;
+                    }).filter(Boolean);
+                    successCallback(events);
                 } else {
+                    failureCallback();
                     //           console.log('Wrong action: ' + response.action);
                     //           console.log('SQL: ' + response.sql);
                 }
             },
             error: function (response) {
+                failureCallback();
                 console.log('my trainings AJAX not succed');
                 //       console.log(response);
             }
@@ -89,7 +101,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     showNonCurrentDates: false,
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {
-            btEventClick(eventInfo);
+            btEventClicked(eventInfo);
         }
     },
     eventMouseEnter: function (eventInfo) {
@@ -102,13 +114,12 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             btMyTrainingMouseLeave(eventInfo);
         }
     },
-
     eventDidMount: function (eventInfo) {
         if (btIsTouchDevice()) {
             addLongPressListener(
                     eventInfo.el,
                     function () {
-                        btEventClick(eventInfo);  // Open event editor
+                        btEventClicked(eventInfo); // Open event editor
                     },
                     function () {
                         btMyTrainingMouseEnter(eventInfo);
@@ -117,90 +128,64 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     }
 });
 budatoll_trainings_calendar.render();
-
 window.addEventListener('resize', function () {
-    //   budatoll_trainings_calendar.destroy();
-    //   budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl, getCalendarOptions());
     budatoll_trainings_calendar.render();
 });
 
-function btEventClick(eventInfo) {
+
+function btEventClicked(eventInfo) {
     var id = eventInfo.event.id;
     var event = btAddedTrainingIds[id];
-
-    var trainings = event.trainings_of_event ?? [];
-    var is_already_booked = false;
-    var is_waiting = false;
-    var num_confirmed = 0;
-    var eventBookable = btBookingAllowed || isBeforeTomorrow(event.day);
-    var trainings_text = '<h4>' + event.long + '</h4><hr>';
-    if (event.done === '1') {
-        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
-        trainings_text += '<p class="budatoll-warning">Az edzés lezajlott.</p>';
-        trainings_text += showApplicants(trainings);
-    } else {
-        trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
-        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
-        trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
-        trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
-        trainings_text += 'Jelentkeztek: ';
-        let waiting_list = '';
-        if (trainings.length === 0) {
-            trainings_text += 'Még senki';
-        } else {
-            trainings.forEach(function (training) {
-                if (training.player_id == btCurrentUserId) {
-                    is_already_booked = true;
-                    if (training.confirmed !== '1') {
-                        is_waiting = true;
-                    }
-                }
-                if (training.confirmed === '1') {
-                    trainings_text += training.player_name + ', ';
-                    num_confirmed++;
-                } else {
-                    waiting_list += training.player_name + ', ';
-                }
-            });
-        }
-        if (waiting_list !== '') {
-            trainings_text += '<br>' + 'Várólistás: ' + waiting_list;
-        }
-        trainings_text += '<div class="budatoll-row">';
-        if (is_already_booked) {
-            if (is_waiting && (event.max_players === 0 || event.max_players > num_confirmed)) {
-                if (eventBookable) {
-                    trainings_text += '<button class="button budatoll-button" name="training_from_waiting"  value="-1" title="Jelentkezés aktiválása"><span class="dashicons dashicons-insert"></span></button>';
-                }
-                trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
+    console.log(event);
+    $.ajax({
+        url: budatoll_ajax_object.ajax_url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'budatoll',
+            'ajax-action': 'my-event-clicked',
+            'my-event-id': id
+        },
+        success: function (response) {
+            if (response.result === 'success') {
+                console.log(response);
             } else {
-                trainings_text += '<button class="button budatoll-button" name="training_remove"  value="-1" title="Lemondás"><span class="dashicons dashicons-remove"></span></button>';
+                console.log(response);
             }
-        } else {
-            if (event.max_players > 0 && event.max_players <= num_confirmed) {  // Csak várólistára fér fel
-                trainings_text += '<button class="button budatoll-button budatoll-button-warning" name="training_wait"  value="-1" title="Várólistára"><span class="dashicons dashicons-insert-after"></span></button>';
-            } else if (eventBookable) {
-                trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Jelentkezés"><span class="dashicons dashicons-insert"></span></button>';
+            btAddedTrainingIds = [];
+            budatoll_trainings_calendar.refetchEvents();
+            success_msg = $("#budatoll-success-message");
+            error_msg = $("#budatoll-error-message");
+            switch (response.status) { // done, deleted, deleted-waiting, waiting, confirmed, confirmed-waiting
+                case 'done':
+                    error_msg.html('Az edzés már lezajlott, nem lehet változtatni.').show(1000).delay(2500).hide(1000);
+                    break;
+                case 'deleted':
+                    success_msg.html('Jelentkezésed az edzésre sikeresen törölted.').show(1000).delay(2500).hide(1000);
+                    break;
+                case 'deleted-waiting':
+                    success_msg.html('Jelentkezésed az edzés várólistájáról sikeresen törölted.').show(1000).delay(2500).hide(1000);
+                    break;
+                case 'waiting':
+                    success_msg.html('Az edzés betelt, jelentkezésed várólistára került.').show(1000).delay(2500).hide(1000);
+                    break;
+                case 'confirmed-waiting':
+                    success_msg.html('Jelentkezésed várólistáról érvényesre váltott.').show(1000).delay(2500).hide(1000);
+                    break;
+                case 'confirmed':
+                    success_msg.html('Jelentkezésed az edzésre érvényes.').show(1000).delay(2500).hide(1000);
+                    break;
+                default:
+                    error_msg.html('Belső ismeretlen hiba: ' + response.status + ', nem történt változtatás').show(1000).delay(2500).hide(1000);
+                    break;
             }
+
+        },
+        error: function (response) {
+            console.log('my-event-clicked AJAX not succed');
+            console.log(response);
         }
-        if (!btBookingAllowed) {
-            trainings_text += '<p class="budatoll-warning">Negatív az egyenleged</p>';
-        }
-        trainings_text += '</div>';
-    }
-    training_editor = $("#budatoll-trainings-editor");
-    var popupX, popupY;
-    [popupX, popupY] = getPopupPos(training_editor);
-    $(function () {
-        $('#close-editor-popup').click(function () {
-            training_editor.fadeOut(budatoll_modal_speed);
-        });
     });
-    training_editor.html(trainings_text).css({
-        left: popupX,
-        top: popupY
-    }).fadeIn(budatoll_modal_speed);
-    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
 }
 
 function btMyTrainingMouseEnter(eventInfo) {
@@ -223,7 +208,6 @@ function btMyTrainingMouseEnter(eventInfo) {
             });
         } else {
             [popupX, popupY] = getPopupPos(training_info);
-
         }
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';

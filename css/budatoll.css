@@ -237,4 +237,9 @@
     width: 16px;
     height: 16px;
 }
+.fc-event {
+    user-select: none; /* Disable text selection */
+    -webkit-user-drag: none; /* Disable dragging in WebKit browsers */
+    -webkit-touch-callout: none; /* Disable context menu on iOS */
+}
 

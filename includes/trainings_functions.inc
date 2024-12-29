@@ -135,3 +135,91 @@ function bt_count_trainings($event_id) {
         return false;
     }
 }
+
+function bt_my_event_clicked($event_id) {
+    /* Possibles states: 
+     *  done, deleted, deleted-waiting, waiting, confirmed, confirmed-waiting
+     */
+    global $wpdb;
+    $ret = [];
+    $player_id = bt_get_current_userid();
+    $event = bt_get_event_by_id($event_id);
+    if (!$event) {
+        return json_encode(['status' => 'event_error', 'result' => 'error']);
+    }
+    if ($event->{BUDATOLL_EVENTS_DONE} == 1) {
+        return json_encode(['status' => 'done', 'result' => 'success']);
+    }
+    $training = bt_get_results('SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
+            . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id . ' AND `' . BUDATOLL_TRAINING_PLAYER_ID . '`=' . $player_id);
+    $ret['result'] = 'success';
+    if (isset($training[0])) { // Már van foglalás
+        $training_id = $training[0]->{BUDATOLL_TRAINING_ID};
+        if ($training[0]->{BUDATOLL_TRAINING_DONE} == 1) { // Már lezajlott, nem lehet módosítani
+            $ret['status'] = 'done';
+            return json_encode($ret);
+        }
+        if ($training[0]->{BUDATOLL_TRAINING_CONFIRMED} == 1) { // Le volt foglalva, tehát töröljük.
+            if ($wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_ID => $training_id])) {
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-'
+                        . bt_time($event->{BUDATOLL_EVENTS_END}));
+            }
+            $ret['status'] = 'deleted';
+            return json_encode($ret);
+        } // Váró listán van
+        if (bt_is_event_full($event_id)) { // Még tele van, töröljük
+            if ($wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_ID => $training_id])) {
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés a várólistáról törölve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-'
+                        . bt_time($event->{BUDATOLL_EVENTS_END}));
+            }
+            $ret['status'] = 'deleted-waiting';
+        } else { // Nincs tele, biztosan jelentkezni akart
+            $cancelable = bt_is_short_application_cancelable($event);
+            $data = [
+                BUDATOLL_TRAINING_CONFIRMED => 1,
+                BUDATOLL_TRAINING_DELETABLE => ($cancelable ? 1 : 0),
+            ];
+            if ($wpdb->update(BUDATOLL_TRAINING_TABLE, $data, [BUDATOLL_TRAINING_ID => $training_id]) > 0) {
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistáról élesítve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-'
+                        . bt_time($event->{BUDATOLL_EVENTS_END}));
+            }
+            $ret['status'] = 'confirmed-waiting';
+        }
+        return json_encode($ret);
+    } else { // Még nincs foglalás
+        if (bt_is_event_full($event_id)) { // Még tele van, wainting listre tesszük
+            $data = [
+                BUDATOLL_TRAINING_EVENT_ID => $event_id,
+                BUDATOLL_TRAINING_PLAYER_ID => $player_id,
+                BUDATOLL_TRAINING_CONFIRMED => 0,
+            ];
+            if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés várólistára felvéve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . bt_time($event->{BUDATOLL_EVENTS_START})
+                        . '-' . bt_time($event->{BUDATOLL_EVENTS_END}));
+            }
+
+            $ret['status'] = 'waiting';
+        } else { // Nincs tele, biztosan jelentkezni akart
+            $cancelable = bt_is_short_application_cancelable($event);
+            $data = [
+                BUDATOLL_TRAINING_EVENT_ID => $event_id,
+                BUDATOLL_TRAINING_PLAYER_ID => $player_id,
+                BUDATOLL_TRAINING_CONFIRMED => 1,
+                BUDATOLL_TRAINING_DELETABLE => ($cancelable ? 1 : 0),
+            ];
+            if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
+                bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés felvéve: '
+                        . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START})
+                        . '-' . bt_time($event->{BUDATOLL_EVENTS_END}));
+            }
+            $ret['status'] = 'confirmed';
+        }
+        return json_encode($ret);
+    }
+    $ret['status'] = 'unknown';
+    return json_encode($ret);
+}

@@ -45,9 +45,8 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
     element.addEventListener('touchstart', function (event) {
         event.stopPropagation();
         const touch = event.touches[0];
-
         long_press = false;
-        //       console.log('touchstart');
+        console.log('touchstart');
         pressed = true;
         clearTimeout(bt_timer);
         bt_timer = setTimeout(function () {
@@ -58,12 +57,12 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
     // Clear timer if touch ends/cancels quickly
     element.addEventListener('touchend', function (event) {
         event.stopPropagation();
-//        console.log('touchend');
+        console.log('touchend');
         clearTimeout(bt_timer);
         if (!pressed) {
             return;
         }
-        //       console.log('Long press: ' + (long_press ? 'true' : 'false'));
+        console.log('Long press: ' + (long_press ? 'true' : 'false'));
 
         if (long_press) {
             long_press = false;

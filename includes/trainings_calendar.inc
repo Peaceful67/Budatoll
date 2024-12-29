@@ -14,6 +14,8 @@ function budatoll_my_trainings_calendar() {
     $ret .= '<div id="budatoll-trainings-editor" class="budatoll-popup">'
             . '<div id="budatoll-trainings-editor-popup" class="budatoll-popup-content">'
             . '</div></div>';
+    $ret .= '<div class="budatoll-message budatoll-success" id="budatoll-success-message"></div>';
+    $ret .= '<div class="budatoll-message budatoll-error" id="budatoll-error-message"></div>';
     $training_delete = getPostVariable('training_delete');
     if ($training_delete AND $training_delete > 0) {
         bt_delete_training($training_delete);
