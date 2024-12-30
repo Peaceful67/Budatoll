@@ -39,6 +39,7 @@ function budatoll_setting_options() {
             . '<li>- Ha egy játékos 6 hónapja nem volt egyik edzésen sem, inaktívvá válik.</li>'
             . '<li>- Az olyan játékost, aki még semmilyen edzésen nem volt (fake), ki lehet törölni.</li>'
             . '<li>- Az új játékos kap egy üdvözlő emailt, azzal a kéréssel, hogy vegye fel az edzővel a kapcsolatot.</li>'
+            . '<li>- Egy új játékos regisztrációjáról kap email értesítést az összes edző.</li>'
             . '<li>- Mobil és desktop megjelenítés feljavítása.</li>'
             . '</ul>',
         ],
