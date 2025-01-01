@@ -3,7 +3,7 @@
 /*
   Plugin Name: Budatoll Plugin for Wordpress
   Description: Kezeli a befizetéseket és a pályafoglalásokat.
-  Version: 1.0
+  Version: 1.1
   Author: Baksa Zsolt
  */
 

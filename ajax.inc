@@ -14,7 +14,7 @@ function budatoll_ajax_nopriv() {
 function budatoll_ajax() {
     header('Content-Type: application/json');
     $action = filter_input(INPUT_POST, 'ajax-action');
-    error_log('AJAX action: ' . $action);
+//    error_log('AJAX action: ' . $action);
     switch ($action) {
         case 'logout':
             wp_logout();

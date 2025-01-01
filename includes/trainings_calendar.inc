@@ -136,7 +136,7 @@ function budatoll_trainings_calendar() {
                     $message = 'Tisztelt '. bt_get_full_name($add_player_id).'!<br><br> A '
                     . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) 
                     . '-' . bt_time($event->{BUDATOLL_EVENTS_END})
-                    .' edzésre jelentkezesédet felvettük. Amennyiben ezzel kapcsolatban kérdésed van, keresd: '.$current_user_name;
+                    .' edzésre jelentkezesédet felvettük.<br>Amennyiben ezzel kapcsolatban kérdésed van, keresd: '.$current_user_name;
                     bt_send_email($add_player_id, 'Edzésre jelentkezés', $message);
                 }
             }

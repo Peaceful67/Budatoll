@@ -317,7 +317,7 @@ function user_has_role($user_id, $role_name) {
 function bt_rule_options() {
     $ret = '';
     $ret .= '<strong>Edzés lemondható: </strong>';
-    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_EVENT_CANCELABLE) ? 'Az edzés megkezdéséig.' : 'Csak 24 órával az edzés megkezdése előtt.';
+    $ret .= btIsOptionEnabled(BUDATOLL_OPTION_TRAINING_CANCELABLE) ? 'Az edzés megkezdéséig.' : 'Csak 24 órával az edzés megkezdése előtt.';
     $ret .= '<br><strong>Negatív egyenleg esetén: </strong>';
     $ret .= btIsOptionEnabled(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT) ? 'Csak előző napon lehet edzést foglalni.' : 'Szabadon foglalhatóak az edzések.';
     $ret .= '<br><strong>Email lemondáskor: </strong>';
@@ -367,4 +367,20 @@ function custom_remember_me_duration($expirein, $user_id, $remember) {
 function budatoll_logout() {
     wp_redirect(home_url());
     exit;
+}
+
+function bt_get_coaches() {
+    $ret = [];
+    $selector = [
+        'role' => BUDATOLL_ROLE_COACH,
+        'number' => -1,
+        'fields' => 'all',
+        'orderby' => 'display_name',
+        'count_total' => true,
+    ];
+    $coaches= new WP_User_Query($selector);
+    foreach ($coaches->get_results() as $coach) {
+        $ret[] = $coach->data;
+    }
+    return $ret;
 }

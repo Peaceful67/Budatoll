@@ -15,7 +15,7 @@ function budatoll_cron_interval($schedules) {
     return $schedules;
 }
 
-function budatoll_crontab() {
+function budatoll_crontab($instant = false) {
     global $wpdb;
 
     // Get WordPress timezone
@@ -31,7 +31,7 @@ function budatoll_crontab() {
     $last = $last_datetime->getTimestamp();
 
     // Check if the interval has passed
-    if (($datetime->getTimestamp() - $last) > BUDATOLL_CRONTAB_INTERVAL - 10) {
+    if ($instant OR (($datetime->getTimestamp() - $last) > BUDATOLL_CRONTAB_INTERVAL - 10)) {
         //       error_log('Crontab executed at: ' . $now);
         // Delete old logs
         $wpdb->query('DELETE FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE `' . BUDATOLL_LOGGER_TIME . '` < DATE_SUB(NOW(), INTERVAL 2 YEAR)');
@@ -63,18 +63,15 @@ function bt_trainings_make_done() {
     $events = bt_get_results($sql);
     if ($events) {
         foreach ($events as $event) {
-            $event_id = $event->{BUDATOLL_EVENTS_ID};
-            $trainings = get_trainings_by_event($event_id);
-            if ($trainings) {
-                foreach ($trainings as $training) {
-                    $wpdb->update(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_DONE => 1,], [BUDATOLL_TRAINING_ID => $training->{BUDATOLL_TRAINING_ID}]);
-                }
-            }
             bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, -1, 'Edzés lezajlott: ' . $event->{BUDATOLL_EVENTS_LONG} . ' ('
                     . $event->{BUDATOLL_EVENTS_DAY} . ' / ' . $event->{BUDATOLL_EVENTS_START} . ')');
-            $wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_DONE => 1], [BUDATOLL_EVENTS_ID => $event_id]);
+            $wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_DONE => 1], [BUDATOLL_EVENTS_ID => $event->{BUDATOLL_EVENTS_ID}]);
         }
     }
+    $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` AS `bt`'
+            . ' INNER JOIN `' . BUDATOLL_EVENTS_TABLE . '` AS `be` ON `bt`.`event_id` = `be`.`id`'
+            . ' SET `bt`.`done` = 1 WHERE `be`.`done` = 1;';
+    $wpdb->query($sql);
 }
 
 function bt_inactive_players() {
@@ -93,7 +90,7 @@ function bt_inactive_players() {
         $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_PLAYER_ID . '`=' . $player_id . ' AND '
                 . ' `' . BUDATOLL_TRAINING_CREATED . '` <= DATE_SUB(NOW(), INTERVAL ' . $month . ' MONTH);';
         $wpdb->query($sql);
-        if ($wpdb->num_rows > 0 AND $last == 0) {
+        if ($wpdb->num_rows > 0 AND $last == 0) { // Ha régen volt, de az utóbbi időben semmi.
             update_user_meta($player_id, BUDATOLL_USER_META_ACTIVE, 0);
             logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $player_id, $month . ' hónapja nem jelentkezett, inaktiváltuk');
         }

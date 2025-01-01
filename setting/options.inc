@@ -1,6 +1,6 @@
 <?php
 
-define("BUDATOLL_OPTION_EVENT_CANCELABLE", 'event-cancelable');
+define("BUDATOLL_OPTION_TRAINING_CANCELABLE", 'event-cancelable');
 define("BUDATOLL_OPTION_AUTO_CHARGE", 'auto-charge');
 define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ-account');
 define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
@@ -11,7 +11,7 @@ define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cancel
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
 
-define("BUDATOLL_CURRENT_VERSION", '1.0');
+define("BUDATOLL_CURRENT_VERSION", '1.1');
 
 define("BUDATOLL_VERSION_ID", 'id');
 define("BUDATOLL_VERSION_DATE", 'date');
@@ -19,6 +19,7 @@ define("BUDATOLL_VERSION_TITLE", 'title');
 define("BUDATOLL_VERSION_DESCRIPTION", 'desc');
 
 function budatoll_setting_options() {
+    budatoll_crontab(true); // Ezt itt lefutattjuk
     $bt_versions = [
         '1.0' => [
             BUDATOLL_VERSION_DATE => '2024-12-17',
@@ -47,7 +48,9 @@ function budatoll_setting_options() {
             BUDATOLL_VERSION_DATE => '2025--',
             BUDATOLL_VERSION_TITLE => 'További fejlesztések',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
-            . '<li>- Alkalom heti beosztása másolása a következő hétre.</li>'
+            . '<li>- Heti beosztás sablon készítés és másolása.</li>'
+            . '<li>- Az edzés időpontok beállítása után értesítő levél a játékosoknak, hogy jelentkezhetnek.</li>'
+            . '<li>- Az összes kimenő levél szerkeszthetősége.</li>'
             . '</ul>',
         ],
     ];
@@ -58,7 +61,7 @@ function budatoll_setting_options() {
     }
 
     if (getPostVariable($hidden_var_name) == 'options') { // az oldal újratöltődik. Valószínüleg mentés történt
-        ${BUDATOLL_OPTION_EVENT_CANCELABLE} = btGetCheckbox(BUDATOLL_OPTION_EVENT_CANCELABLE);
+        ${BUDATOLL_OPTION_TRAINING_CANCELABLE} = btGetCheckbox(BUDATOLL_OPTION_TRAINING_CANCELABLE);
         ${BUDATOLL_OPTION_AUTO_CHARGE} = btGetCheckbox(BUDATOLL_OPTION_AUTO_CHARGE);
         ${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT} = btGetCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT);
         ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = btGetCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
@@ -74,7 +77,7 @@ function budatoll_setting_options() {
     echo '<input type="hidden" name="page" value="options"/>';
     echo '<table class="form-table"><tbody>';
 
-    btPutCheckbox(BUDATOLL_OPTION_EVENT_CANCELABLE, 'Edzés lemondható', 'Az edzés kezdetéig.', 'Csak 24 órával az edzés előtt mondtható le.');
+    btPutCheckbox(BUDATOLL_OPTION_TRAINING_CANCELABLE, 'Edzés lemondható', 'Az edzés kezdetéig.', 'Csak 24 órával az edzés előtt mondtható le.');
 //    btPutCheckbox(BUDATOLL_OPTION_AUTO_CHARGE, 'Edzés költsége', 'Automatikusan levonódik.', 'Kézzel kell lekönyvelni.');
     btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Csak előző nap foglalhat.', 'Szabadon foglalhat edzést.');
     btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
@@ -87,7 +90,7 @@ function budatoll_setting_options() {
     echo '<tr><th></th><td>' . get_submit_button() . '</td></tr>';
     echo '<tr><th>Aktuális verzió:</th><td>' . BUDATOLL_CURRENT_VERSION . ', legutóbb frissítve: ' . $bt_versions[BUDATOLL_CURRENT_VERSION][BUDATOLL_VERSION_DATE] . '</td></tr>';
     $selected_version = getPostVariable('budatoll_versions', BUDATOLL_CURRENT_VERSION);
-    echo '<tr><th>Verziók: </th>';
+    echo '<tr><th>Verziók tartalma: </th>';
     echo '<td><select name="budatoll_versions" onChange="document.getElementById(\'submit\').click();">';
     foreach ($bt_versions as $ver_id => $version) {
         echo printf('<option value="%s" %s>%s</option>',

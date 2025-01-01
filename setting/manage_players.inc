@@ -326,17 +326,21 @@ function bt_get_full_name($user_id) {
     }
 }
 
-function put_players_dropdownlist($user_id) {
-    $ret = '';
-    return $ret;
-}
 
 function bt_user_register($user_id) {
-    $message = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br>Üdvözöllek tollaslabda klubunkban!<br>'
+    $message_player = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>Üdvözöllek tollaslabda klubunkban!<br>'
             . 'Kérlek vedd fel velem telefonon a kapcsolatot az alábbi számon: +36203752539<br>'
             . 'Egy rövid beszélgetés közben felteheted a kérdéseidet és én is kérdezek pár dolgot, hogy a neked megfelelő információval tudjak szolgálni. ';
-    bt_send_email($user_id, 'Kapcsolat felvétel', $message);
-    bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos létrehozva a rendszerben. ID: ' . $user_id);
+    bt_send_email($user_id, 'Kapcsolat felvétel', $message_player);
+    bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos regisztrált a rendszerben. ID: ' . $user_id);
+    $coaches = bt_get_coaches();
+    if(!empty($coaches)) {
+        foreach ($coaches as $coach) {
+            $message = 'Tisztelt '.$coach->display_name.'!<br><br>Egy új játékos regisztrált a tollasklubban. A felhasználó neve: '.bt_get_user_name($user_id).'<br>'
+                    . 'A vezérlőpulton álltsd be számára a megfelelő játékokat, edzéseket.<br>Ő az alábbi levelet kapta:<br><br>'.$message_player.'<br>';
+            bt_send_email($coach->ID, 'Új játékos regisztrált', $message);
+        }
+    }
 }
 
 function bt_user_delete($user_id) {

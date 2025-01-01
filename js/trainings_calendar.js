@@ -34,7 +34,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                 }
             },
             error: function (response) {
-                console.log('training AJAX not succeed');
+                console.logy('training AJAX not succeed');
                 //              console.log(response);
             }
         });
@@ -58,10 +58,17 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek'
+        right: 'dayGridMonth,listWeek'
 
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
+    windowResize: function (view) {
+        if (window.innerWidth < 768) {
+            budatoll_trainings_calendar.changeView('listWeek');
+        } else {
+            budatoll_trainings_calendar.changeView('dayGridMonth');
+        }
+    },
     locale: 'hu',
     height: 'auto', // Adjusts height dynamically
     firstDay: 1,
@@ -112,34 +119,32 @@ function btEventClick(eventInfo) {
     var event = btAddedTrainingIds[id];
     var trainings = event.trainings_of_event;
     var trainings_text = '<h4>' + event.long + '</h4>';
+    trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
+    trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
     if (event.done === '1') {
-        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
         trainings_text += '<p class="budatoll-warning">Az edzés lezajlott.</p>';
-        trainings_text += showApplicants(trainings);
-    } else {
-        trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
-        trainings_text += '<span id="close-editor-popup" class="budatoll-popup-close">&times;</span>';
-        trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
-        trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
-        trainings_text += '<div class="budatoll-row">';
-        trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
-        budatoll_players.forEach(function (player) {
-            if (!trainings.some(obj => obj['player_id'] === player.ID)) {
-                trainings_text += '<option value="' + player.ID + '">' + player.display_name + '</option>';
-            }
-        });
-        trainings_text += '</select>';
-        trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Hozzáadás"><span class="dashicons dashicons-saved"></span></button>';
-        trainings_text += '</div>';
-
-        trainings.forEach(function (training) {
-            trainings_text += '<div class="budatoll-row">';
-            trainings_text += training.player_name + '<button class="button budatoll-button" name="training_delete" ';
-            trainings_text += ' value="' + training.id + '" title="Törlés" >';
-            trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
-            trainings_text += '</div>';
-        });
     }
+    trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
+    trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
+    trainings_text += '<div class="budatoll-row">';
+    trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
+    budatoll_players.forEach(function (player) {
+        if (!trainings.some(obj => obj['player_id'] === player.ID)) {
+            trainings_text += '<option value="' + player.ID + '">' + player.display_name + '</option>';
+        }
+    });
+    trainings_text += '</select>';
+    trainings_text += '<button class="button budatoll-button" name="training_add"  value="-1" title="Hozzáadás"><span class="dashicons dashicons-saved"></span></button>';
+    trainings_text += '</div>';
+
+    trainings.forEach(function (training) {
+        trainings_text += '<div class="budatoll-row">';
+        trainings_text += training.player_name + '<button class="button budatoll-button" name="training_delete" ';
+        trainings_text += ' value="' + training.id + '" title="Törlés" >';
+        trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
+        trainings_text += '</div>';
+    });
+
     training_editor = $("#budatoll-trainings-editor");
     var popupX, popupY;
     [popupX, popupY] = getPopupPos(training_info);

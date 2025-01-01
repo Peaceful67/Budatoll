@@ -160,6 +160,9 @@ function btEventClicked(eventInfo) {
                 case 'done':
                     error_msg.html('Az edzés már lezajlott, nem lehet változtatni.').show(1000).delay(2500).hide(1000);
                     break;
+                case 'not-leased':
+                    error_msg.html('Nem vagy bérletes, csak egy napon belüli edzésekre jelentkezhetsz.').show(1000).delay(2500).hide(1000);
+                    break;
                 case 'deleted':
                     success_msg.html('Jelentkezésed az edzésre sikeresen törölted.').show(1000).delay(2500).hide(1000);
                     break;
