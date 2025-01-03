@@ -76,9 +76,9 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         return {domNodes: arrayOfDomNodes};
     },
     headerToolbar: {
-        left: window.innerWidth < 768 ? '' : 'prev,next today',
+        left: 'prev,next today',
         center: 'title',
-        right: window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth'
+        right: 'dayGridMonth,listWeek'
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
@@ -136,7 +136,7 @@ window.addEventListener('resize', function () {
 function btEventClicked(eventInfo) {
     var id = eventInfo.event.id;
     var event = btAddedTrainingIds[id];
-    console.log(event);
+    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
     $.ajax({
         url: budatoll_ajax_object.ajax_url,
         type: 'POST',

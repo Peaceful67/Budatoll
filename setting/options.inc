@@ -24,7 +24,28 @@ function budatoll_setting_options() {
         '1.0' => [
             BUDATOLL_VERSION_DATE => '2024-12-17',
             BUDATOLL_VERSION_TITLE => 'Első teszt verzió',
-            BUDATOLL_VERSION_DESCRIPTION => 'Alapfunckciók elsőre',
+            BUDATOLL_VERSION_DESCRIPTION => '<strong>Alapfunckciók:</strong><br><ul>'
+            . '<li>- Két féle szerepkörű felhasználót kezel a rendszer: edző, játékos.</li>'
+            . '<li>- Regisztráció után mindenki automatikusan játékos szerepkört kap.</li>'
+            . '<li>- Az edzői szerepkört a rendszergazda tud beállítani.</li>'
+            . '<li>- Változásokról az érintettek email értesítőt kapnak</li>'
+            . '<li>- Minden aktivitás naplózva van két évre visszamenően.</li>'
+            . '</ul>'
+            . '<dl><strong>Edző szerepkör funkciói:</strong>'
+            . '<dt>- Vezérlőpult'
+            . '<dd>- Rendszer beállítások</dd>'
+            . '<dd>- Műveletek naplóinak listázása</dd>'
+            . '<dd>- Edzés sablonok szerekesztése: név, ár, idősáv, max játékos, publikus-e</dd>'
+            . '<dd>- Játékosok kezelése: Név, tel.szám, email, választható edézsek, aktív, bérletes</dd>'
+            . '</dt>'
+            . '<dt>- Edzés alkalmak szerkesztése naptár felületen</dt>'
+            . '<dt>- Játékosok edzéseinek áttekintése, szerkesztése naptár felületen</dt>'
+            . '<dt>- Játékosok egyenlégeinek áttekintése, szerekesztése táblázatos formában</dt>'
+            . '</dl><dl><strong>Játékos szerepkör funkciói:</strong>'
+            . '<dt>- Az elérhető edzések áttekintése, jelentkezések kezelése naptár felületen</dt>'
+            . '<dt>- Befizetések és terhelések áttekintése táblázatos formában</dt>'
+            . '</dl>'
+            . '',
         ],
         '1.1' => [
             BUDATOLL_VERSION_DATE => '2025-01-01',
@@ -34,7 +55,7 @@ function budatoll_setting_options() {
             . '<li>- Az edző a múltat is tudja módosítani, az egyenleg automatikusan módosul.</li>'
             . '<li>- A nem bérletes csak előző nap jelentkezhet egy edzésre.</li>'
             . '<li>- A negatív egyenlegű csak előző nap jelentkezhet egy edzésre.( kapcsolható )</li>'
-            . '<li>- Az edzésre jelentkezés egyszerűsítése, az állapot színekkel jelölve.</li>'
+            . '<li>- Az edzésre jelentkezés egyszerűsítése, az állapot színekkel jelölve: zöld-szabad, kék-jelentkezve, piros-betelt, sárga-várólistán</li>'
             . '<li>- Az egyenleg változásakor küldött emailben szerepel az új egyenleg.</li>'
             . '<li>- Van publikus edzés típus, amit minden aktív játékos lát, nem kell külön beállítani.</li>'
             . '<li>- Ha egy játékos 6 hónapja nem volt egyik edzésen sem, inaktívvá válik.</li>'
@@ -42,6 +63,7 @@ function budatoll_setting_options() {
             . '<li>- Az új játékos kap egy üdvözlő emailt, azzal a kéréssel, hogy vegye fel az edzővel a kapcsolatot.</li>'
             . '<li>- Egy új játékos regisztrációjáról kap email értesítést az összes edző.</li>'
             . '<li>- Mobil és desktop megjelenítés feljavítása.</li>'
+            . '<li>- Belépett játékos egyenlege a neve alatt mindig.</li>'
             . '</ul>',
         ],
         '1.2' => [

@@ -147,7 +147,7 @@ function bt_my_event_clicked($event_id) {
     global $wpdb;
     $ret = [];
     $player_id = bt_get_current_userid();
-    $leased = get_user_meta($player_id_id, BUDATOLL_USER_META_LEASED, true);
+    $leased = get_user_meta($player_id, BUDATOLL_USER_META_LEASED, true);
     $event = bt_get_event_by_id($event_id);
     if (!$event) {
         return json_encode(['status' => 'event_error', 'result' => 'error']);
