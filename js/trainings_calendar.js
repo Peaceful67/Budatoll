@@ -1,5 +1,5 @@
 var btAddedTrainingIds = [];
-
+let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (eventInfo) {
@@ -63,10 +63,15 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
-        if (window.innerWidth < 768) {
-            budatoll_trainings_calendar.changeView('listWeek');
-        } else {
-            budatoll_trainings_calendar.changeView('dayGridMonth');
+        const currentWidth = window.innerWidth;
+        const widthDifference = Math.abs(currentWidth - previousWidth);
+        if (widthDifference > 10) {
+            if (window.innerWidth < 768) {
+                budatoll_trainings_calendar.changeView('listWeek');
+            } else {
+                budatoll_trainings_calendar.changeView('dayGridMonth');
+            }
+            previousWidth = currentWidth;
         }
     },
     locale: 'hu',

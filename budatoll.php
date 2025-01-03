@@ -81,7 +81,7 @@ function budatoll_scripts() {
     global $post;
     wp_enqueue_style('budatoll-jquery-style', plugins_url('jquery-ui/jquery-ui.css', __FILE__));
     wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__));
-    wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__));
+    wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__), [],'1.1.1', false);
     wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__));
 
     wp_enqueue_script('budatoll-fc', plugins_url('js/fullcalendar/index.global.min.js', __FILE__), array('jquery'), false, false);
