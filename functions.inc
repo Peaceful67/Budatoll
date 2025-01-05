@@ -67,7 +67,7 @@ function putHiddenValue($var_name, $value) {
     return '<input type="hidden" name="' . $var_name . '" id="' . $var_name . '" value="' . $value . '">';
 }
 
-function putScript($script) {
+function bt_put_script($script) {
     return '<script type="text/javascript">' . $script . '</script>';
 }
 

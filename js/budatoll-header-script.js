@@ -22,9 +22,6 @@ function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat
     return false;
 }
 
-function submitForm(form_id) {
-    document.getElementById(form_id).submit();
-}
 
 function getDateOfEventDate(event_date) {
     var date = new Date(event_date);

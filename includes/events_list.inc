@@ -100,7 +100,7 @@ function budatollEventsList() {
     $event_type_id = getPostVariable('bt_event_type', -1);
     $event_type_year = wp_date("Y", strtotime($events_from));
     $event_type_month = wp_date("m", strtotime($events_from));
-    putScript('$(function() {'
+    bt_put_script('$(function() {'
             . '$("#events_from").datepicker({dateFormat: "yyyy-mm-dd" });'
             . '$("#events_to").datepicker({dateFormat: "yyyy-mm-dd" });'
             . '});');

@@ -10,6 +10,7 @@ require_once plugin_dir_path(__FILE__) . 'setting/event_types.inc';
 require_once plugin_dir_path(__FILE__) . 'setting/options.inc';
 require_once plugin_dir_path(__FILE__) . 'setting/logger.inc';
 require_once plugin_dir_path(__FILE__) . 'setting/manage_players.inc';
+require_once plugin_dir_path(__FILE__) . 'setting/manage_emails.inc';
 
 add_action('admin_init', 'budatoll_settings_init');
 add_action('admin_menu', 'budatoll_add_settings_pages', 99);
@@ -56,6 +57,14 @@ function budatoll_add_settings_pages() {
             BUDATOLL_ACCESS_MANAGE_COACH,
             'jatekosok',
             'budatoll_manage_players',
+    );
+    add_submenu_page(
+            'options',
+            'Emailek kezelése',
+            'Emailek',
+            BUDATOLL_ACCESS_MANAGE_COACH,
+            'emailek',
+            'budatoll_manage_emails',
     );
 }
 

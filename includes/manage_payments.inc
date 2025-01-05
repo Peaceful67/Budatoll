@@ -218,6 +218,7 @@ function bt_payment_edit($user_id, $edit_id = -1) {
     $ret .= bt_cancel_button(-1);
     $ret .= '</td></tr>';
     $ret .= '</table></div></form>';
+
     return $ret;
 }
 
@@ -237,21 +238,13 @@ function bt_payment_save($user_id) {
             bt_logger(($amount >= 0 ? BUDATOLL_LOGGER_TYPE_PAYMENT : BUDATOLL_LOGGER_TYPE_CHARGE), $user_id,
                     ($amount >= 0 ? 'Befizetés módosult:' : 'Terhelés módosult:') . bt_currency($amount));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT)) {
-                $msg = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>'
-                        . 'Egy korábbi ' . ($amount >= 0 ? 'befizetésed ' : 'terhelésed ') . bt_currency($amount) . ' összegre módosult.<br>'
-                        . 'Az új egyenleged: ' . bt_currency(get_balance_of_user($user_id));
-
-                bt_send_email($user_id, ($amount >= 0 ? 'Befizetés ' : 'Terhelés ') . ' módosítása', $msg);
+                bt_send_custom_email($user_id, ($amount >= 0 ? BT_CUSTOM_EMAIL_PAYMENT_MODIFY : BT_CUSTOM_EMAIL_CHARGE_MODIFY), [bt_currency($amount), bt_currency(get_balance_of_user($user_id))]);
             }
         } else {
             $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
             bt_logger(BUDATOLL_LOGGER_TYPE_PAYMENT, $user_id, 'Befizetés érkezett:' . bt_currency($amount));
             if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT)) {
-                $msg = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>'
-                        . bt_currency($amount) . ' összegű befizetésed az egyenlegeden jóváírásra került.<br>'
-                        . 'Az új egyenleged: ' . bt_currency(get_balance_of_user($user_id));
-
-                bt_send_email($user_id, 'Befizetés lekönyvelése', $msg);
+                bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_PAYMENT_CREATE, [bt_currency($amount), bt_currency(get_balance_of_user($user_id))]);
             }
         }
     } else {

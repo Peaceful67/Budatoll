@@ -26,12 +26,12 @@ jQuery.ajax({
 });
 
 /*
-$(document).on('mousemove', function (event) {
-    budatoll_mouse_x = event.pageX;
-    budatoll_mouse_y = event.pageY;
-    console.log('X: ' + budatoll_mouse_x + ', Y: ' + budatoll_mouse_y);
-});
-*/
+ $(document).on('mousemove', function (event) {
+ budatoll_mouse_x = event.pageX;
+ budatoll_mouse_y = event.pageY;
+ console.log('X: ' + budatoll_mouse_x + ', Y: ' + budatoll_mouse_y);
+ });
+ */
 function budatoll_get_popup_x(width) {
     x = (budatoll_mouse_x > budatoll_center_x) ? budatoll_center_x - width - 50 : budatoll_center_x + 50;
     x = (budatoll_mouse_x > budatoll_center_x) ? 0 : budatoll_center_x * 2 - width;
@@ -49,3 +49,4 @@ jQuery(document).on('mousemove', function (event) {
     btMouseX = event.pageX;
     btMouseY = event.pageY;
 });
+

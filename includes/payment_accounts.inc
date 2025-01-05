@@ -37,7 +37,7 @@ function bt_charge_passed_trainings() {
             BUDATOLL_ACCOUNT_COMMENT => $event->{BUDATOLL_EVENTS_LONG},
             BUDATOLL_ACCOUNT_AMOUNT => -$amount,
         ];
-        $format = ['%d','%d', '%s', '%d'];
+        $format = ['%d', '%d', '%s', '%d'];
         $wpdb->insert(BUDATOLL_ACCOUNT_TABLE, $data, $format);
         $last_id = $wpdb->insert_id;
         $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET `' . BUDATOLL_TRAINING_PAID . '`=' . $last_id
@@ -54,9 +54,7 @@ function bt_warn_user_negativ_balance($user_id) {
         $already_warned = unserialize(get_option(BUDATOLL_NEGATIV_BALANCE_ALREADY_WARNED, ''));
         if ($balance <= 0) {
             if (!isset($already_warned[$user_id])) {
-                $message = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>Az egyenleged elfogyott. <br>'
-                        . 'A jelenlegi egyenleged: ' . bt_currency($balance) . '<br>Kérünk egy befizetéssel töltsd fel.';
-                bt_send_email($user_id, 'Negatív egyenleg', $message);
+                bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_WARN_NEGATIV, [bt_currency($balance)]);
                 $already_warned[$user_id] = 1;
             } else {
                 $already_warned[$user_id]++;

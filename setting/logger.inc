@@ -9,6 +9,7 @@ define("BUDATOLL_LOGGER_TYPE_TRAININGS", 6);
 define("BUDATOLL_LOGGER_TYPE_EMAILS", 7);
 define("BUDATOLL_LOGGER_TYPE_CHARGE", 8);
 define("BUDATOLL_LOGGER_TYPE_LOGIN", 9);
+define("BUDATOLL_LOGGER_TYPE_EMAIL_MODIFY", 10);
 
 
 define("BUDATOLL_LOGGER_DATA_DELIMITER", '#&@');
@@ -23,6 +24,7 @@ $bt_logger_types = [
     BUDATOLL_LOGGER_TYPE_CHARGE => 'Terhelés',
     BUDATOLL_LOGGER_TYPE_EMAILS => 'Email küldés',
     BUDATOLL_LOGGER_TYPE_LOGIN => 'Belépés',
+    BUDATOLL_LOGGER_TYPE_EMAIL_MODIFY => 'Email módosítás',
 ];
 $bt_logger_colors = [
     BUDATOLL_LOGGER_TYPE_EVENT_TYPE => 'lightsteelblue',
@@ -34,6 +36,7 @@ $bt_logger_colors = [
     BUDATOLL_LOGGER_TYPE_CHARGE => 'lightsteelblue',
     BUDATOLL_LOGGER_TYPE_EMAILS => 'lightblue',
     BUDATOLL_LOGGER_TYPE_LOGIN => 'khaki',
+    BUDATOLL_LOGGER_TYPE_EMAIL_MODIFY => 'grey',
 ];
 
 function bt_logger_list() {
