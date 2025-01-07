@@ -316,10 +316,9 @@ function getPaymentById($id) {
 }
 
 function get_balance_of_user($user_id) {
-    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `amount` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE `' . BUDATOLL_ACCOUNT_AMOUNT . '`>=%d '
-            . ' AND `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=%d '
-            . 'ORDER BY `' . BUDATOLL_ACCOUNT_TIME . '` DESC;';
-    $result = bt_get_results($sql, [0, $user_id]);
+    $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `amount` FROM `' . BUDATOLL_ACCOUNT_TABLE . '` WHERE  '
+            . ' `' . BUDATOLL_ACCOUNT_PLAYER_ID . '`=' . $user_id;
+    $result = bt_get_results($sql);
     return $result[0]->amount ?? 0;
 }
 

@@ -106,7 +106,7 @@ function bt_send_email($user_id, $subject, $message) {
         'From: ' . get_option('blogname') . ' <from@budatoll.hu>',
         'Reply-to: no-reply@budatoll.hu',
     ];
-    $message .= '<br><br>Üdvözlettel:<br>Budatoll csapata';
+    $message .= '<br><br>'.get_option(BT_CUSTOM_EMAIL_SIGN, 'Üdvözlettel:<br>Budatoll csapata');
     bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
     wp_mail($user_email, $subject, $message, $headers);
 }

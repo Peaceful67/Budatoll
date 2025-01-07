@@ -129,11 +129,8 @@ function budatoll_manage_players_save($user_id) {
             if ($user_id > 0 AND !is_wp_error($user_id)) {
                 bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, $user_login . ' nevű játékos létrehozva');
                 if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
-                    $message = 'Tisztelt '.$display_name.'!<br>Üdvözöllek a tollaslabda klubbunk oldalán.<br>'
-                            . 'A belépéshez tartozó felhasználó neved: '.$user_id.'<br>'
-                            . 'Jelszót a megadott '.$user_email.' email címre tudsz kérni.';
-                    bt_send_email($user_id, 'Játékos regisztráció', $message_body);
-                }
+                    bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_PLAYER_REGISTERED, [$user_login, $user_email]);
+                    }
             } else {
                 echo '<p style = "color:red;">' . $user_id->get_error_message() . '</p>';
                 return false;
@@ -214,9 +211,7 @@ function budatoll_manage_players_save($user_id) {
     }
     if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY) AND !empty($message_body)) {
         $user = get_userdata($user_id);
-        $message = 'Kedves ' . $user->display_name . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
-                . $message_body;
-        bt_send_email($user_id, 'Felhasználó módosítás', $message);
+        bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_PLAYER_MODIFIED, [$message_body]);
     }
     return true;
 }
@@ -328,18 +323,13 @@ function bt_get_full_name($user_id) {
 
 
 function bt_user_register($user_id) {
-    $message_player = 'Tisztelt ' . bt_get_full_name($user_id) . '!<br><br>Üdvözöllek tollaslabda klubunkban!<br>'
-            . 'Kérlek vedd fel velem telefonon a kapcsolatot az alábbi számon: +36203752539<br>'
-            . 'Egy rövid beszélgetés közben felteheted a kérdéseidet és én is kérdezek pár dolgot, hogy a neked megfelelő információval tudjak szolgálni. ';
-    bt_send_email($user_id, 'Kapcsolat felvétel', $message_player);
+    bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_SELF_REGISTERED_PLAYER);
     bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos regisztrált a rendszerben. ID: ' . $user_id);
     $coaches = bt_get_coaches();
     if(!empty($coaches)) {
         foreach ($coaches as $coach) {
-            $message = 'Tisztelt '.$coach->display_name.'!<br><br>Egy új játékos regisztrált a tollasklubban. A felhasználó neve: '.bt_get_user_name($user_id).'<br>'
-                    . 'A vezérlőpulton álltsd be számára a megfelelő játékokat, edzéseket.<br>Ő az alábbi levelet kapta:<br><br>'.$message_player.'<br>';
-            bt_send_email($coach->ID, 'Új játékos regisztrált', $message);
-        }
+            bt_send_custom_email($coach->ID, BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH, [bt_get_user_name($user_id),]);
+            }
     }
 }
 

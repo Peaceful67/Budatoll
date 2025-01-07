@@ -28,11 +28,9 @@ function bt_delete_training($id) {
         if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
             $current_user = wp_get_current_user();
             $current_user_name = $current_user ? ($current_user->display_name . '-t') : 'A klub edzőjét';
-            $message = 'Tisztelt ' . bt_get_full_name($player_id) . '!<br><br> A '
-                    . $event->{BUDATOLL_EVENTS_LONG} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ':' . bt_time($event->{BUDATOLL_EVENTS_START})
-                    . '-' . bt_time($event->{BUDATOLL_EVENTS_END})
-                    . ' edzésre jelentkezesédet letöröltük.<br>Amennyiben ezzel kapcsolatban kérdésed van, keresd: ' . $current_user_name;
-            bt_send_email($player_id, 'Edzésre jelentkezés', $message);
+            bt_send_custom_email($player_id, BT_CUSTOM_EMAIL_TRAINING_DELETED,
+                    [$event->{BUDATOLL_EVENTS_LONG}, $event->{BUDATOLL_EVENTS_DAY}, bt_time($event->{BUDATOLL_EVENTS_START})
+                        , bt_time($event->{BUDATOLL_EVENTS_END}), $current_user_name]);
         }
     }
 }
@@ -155,15 +153,15 @@ function bt_my_event_clicked($event_id) {
     if ($event->{BUDATOLL_EVENTS_DONE} == 1) {
         return json_encode(['status' => 'done', 'result' => 'success']);
     }
-    if(!$leased) { // Ha nem bérletes, csak a következő napra foglalhat.
-         $day = $event->{BUDATOLL_EVENTS_DAY};
-                $time = $event->{BUDATOLL_EVENTS_START};
-                $eventTime = new DateTime($day . ' ' . $time, new DateTimeZone(wp_timezone_string()));
-                $currentTime = new DateTime('now', new DateTimeZone(wp_timezone_string()));
-                $interval = $currentTime->diff($eventTime);
-                if ($interval->days > 1) {
-                    return json_encode(['status' => 'not-leased', 'result' => 'success']);
-                }
+    if (!$leased) { // Ha nem bérletes, csak a következő napra foglalhat.
+        $day = $event->{BUDATOLL_EVENTS_DAY};
+        $time = $event->{BUDATOLL_EVENTS_START};
+        $eventTime = new DateTime($day . ' ' . $time, new DateTimeZone(wp_timezone_string()));
+        $currentTime = new DateTime('now', new DateTimeZone(wp_timezone_string()));
+        $interval = $currentTime->diff($eventTime);
+        if ($interval->days > 1) {
+            return json_encode(['status' => 'not-leased', 'result' => 'success']);
+        }
     }
     $training = bt_get_results('SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
             . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id . ' AND `' . BUDATOLL_TRAINING_PLAYER_ID . '`=' . $player_id);
@@ -179,6 +177,15 @@ function bt_my_event_clicked($event_id) {
                 bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
                         . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-'
                         . bt_time($event->{BUDATOLL_EVENTS_END}));
+            }
+            if (btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL)) {
+                $waiting_list = bt_get_waiting_list($event_id);
+                if (!empty($waiting_list)) {
+                    foreach ($waiting_list as $waiting_id) {
+                        bt_send_custom_email($waiting_id, BT_CUSTOM_EMAIL_WAITING,
+                                [$event->{BUDATOLL_EVENTS_SHORT}, $event->{BUDATOLL_EVENTS_DAY}, bt_time($event->{BUDATOLL_EVENTS_START}), bt_time($event->{BUDATOLL_EVENTS_END})]);
+                    }
+                }
             }
             $ret['status'] = 'deleted';
             return json_encode($ret);
