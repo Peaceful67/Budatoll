@@ -108,7 +108,7 @@ $bt_default_emails = [
         BUDATOLL_EMAIL_SUBJECT => 'Kapcsolat felvétel',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Üdvözöllek tollaslabda klubunkban!<br>'
         . 'Kérlek vedd fel velem telefonon a kapcsolatot az alábbi számon: +36203752539<br>'
-        . 'Egy rövid beszélgetés közben felteheted a kérdéseidet és én is kérdezek pár dolgot, hogy a neked megfelelő információval tudjak szolgálni.',
+        . 'Egy rövid beszélgetés közben felteheted a kérdéseidet és együtt megtaláljuk melyik óratípus passzol hozzád a legjobban.',
     ],
     BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH => [
         BUDATOLL_EMAIL_TITLE => 'Ismeretlen játékos regisztrált',

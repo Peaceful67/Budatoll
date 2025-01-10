@@ -156,10 +156,12 @@ function list_balance_of_all_users($list = false, $add_new = false) {
     $players = bt_get_active_players();
     $sql = 'SELECT SUM(`' . BUDATOLL_ACCOUNT_AMOUNT . '`) AS `total` FROM `' . BUDATOLL_ACCOUNT_TABLE . '`';
     $res = bt_get_results($sql);
-    $ret .= '<h4>Egyenlegek</h4>';
+
     if ($res) {
+        $ret .= '<h4>Egyenlegek</h4>';
         $ret .= '<p>Összesen: ' . bt_currency($res[0]->total) . '</p>';
     }
+      $ret .= '<div class="wrap">';
     $ret .= '<table class="budatoll-table">';
     $ret .= '<thead><tr><th>Felhasználónév</th><th>Egyenleg</th><th>Utolsó változás</th><th>Művelet</th></tr></thead>';
     $ret .= '<tbody>';
@@ -183,7 +185,7 @@ function list_balance_of_all_users($list = false, $add_new = false) {
         $ret .= '</td>';
         $ret .= '</tr>';
     }
-    $ret .= '</tbody>';
+    $ret .= '</tbody></table></div>';
 
     return $ret;
 }
