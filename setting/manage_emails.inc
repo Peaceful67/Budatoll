@@ -152,9 +152,9 @@ function budatoll_manage_emails() {
             bt_logger(BUDATOLL_LOGGER_TYPE_EMAIL_MODIFY, -1, 'Az aláírás vissza lett állítva: ' . BT_CUSTOM_EMAIL_DEFAULT_SIGN);
         }
         if (isset($bt_default_emails[$selected_custom_email])) {
+            $subject = $bt_default_emails[$selected_custom_email][BUDATOLL_EMAIL_SUBJECT];
+            $body = $bt_default_emails[$selected_custom_email][BUDATOLL_EMAIL_BODY];
             if (strcmp($subject, $email_arr[BUDATOLL_EMAIL_SUBJECT]) != 0 OR strcmp($body, $email_arr[BUDATOLL_EMAIL_BODY]) != 0) {
-                $subject = $bt_default_emails[$selected_custom_email][BUDATOLL_EMAIL_SUBJECT];
-                $body = $bt_default_emails[$selected_custom_email][BUDATOLL_EMAIL_BODY];
                 update_option(bt_get_ce_option_name($selected_custom_email), [
                     BUDATOLL_EMAIL_SUBJECT => $subject,
                     BUDATOLL_EMAIL_BODY => $body,
