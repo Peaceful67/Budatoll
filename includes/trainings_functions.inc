@@ -17,6 +17,9 @@ function bt_get_training_by_id($id) {
 function bt_delete_training($id) {
     global $wpdb;
     $training = bt_get_training_by_id($id);
+    if(!isset($training->{BUDATOLL_TRAINING_EVENT_ID})) {
+        return;
+    }
     $event = get_event_by_id($training->{BUDATOLL_TRAINING_EVENT_ID});
     $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
     if ($player_id > 0 && $wpdb->delete(BUDATOLL_TRAINING_TABLE, [BUDATOLL_TRAINING_ID => $id]) > 0) {
@@ -244,4 +247,12 @@ function bt_my_event_clicked($event_id) {
     }
     $ret['status'] = 'unknown';
     return json_encode($ret);
+}
+
+
+function bt_is_player_already($player_id, $event_id) {
+    $sql = 'SELECT * FROM `'. BUDATOLL_TRAINING_TABLE.'` WHERE '
+            . '`'.BUDATOLL_TRAINING_EVENT_ID.'`='.$event_id.' AND `'.BUDATOLL_TRAINING_PLAYER_ID.'`='.$player_id;
+    $res = bt_get_results($sql);
+    return $res && !empty($res);
 }

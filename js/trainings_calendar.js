@@ -136,8 +136,8 @@ function btEventClick(eventInfo) {
     if (event.done === '1') {
         trainings_text += '<p class="budatoll-warning">Az edzés lezajlott.</p>';
     }
-    trainings_text += '<p>Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</p>';
-    trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
+    trainings_text += '<div class="budatoll-row">Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</div>';
+    trainings_text += '<div class="budatoll-row">Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '</div>';
     trainings_text += '<div class="budatoll-row">';
     trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
     budatoll_players.forEach(function (player) {

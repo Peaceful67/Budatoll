@@ -84,8 +84,8 @@ function budatoll_scripts() {
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__), [],'1.1.1', false);
     wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__));
 
-    wp_enqueue_script('budatoll-fc', plugins_url('js/fullcalendar/index.global.min.js', __FILE__), array('jquery'), false, false);
-    wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('js/fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'), false, false);
+    wp_enqueue_script('budatoll-fc', plugins_url('fullcalendar/index.global.min.js', __FILE__), array('jquery'), false, false);
+    wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'), false, false);
     wp_enqueue_script('budatoll-header-script', plugins_url('js/budatoll-header-script.js', __FILE__), array('jquery'), '2.5', false);
 
     switch ($post->post_name) {

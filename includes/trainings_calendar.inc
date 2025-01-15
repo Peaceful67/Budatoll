@@ -114,7 +114,7 @@ function budatoll_trainings_calendar() {
     }
     $add_player_id = getPostVariable('select_players');
     $event_id = getPostVariable('event_id');
-    if ($add_player_id > 0 AND getPostVariable('training_add') AND $event_id) {
+    if ($add_player_id > 0 AND getPostVariable('training_add') AND $event_id AND !bt_is_player_already($add_player_id, $event_id)) {
         $event = bt_get_event_by_id($event_id);
         if ($event) {
             $data = [

@@ -106,7 +106,7 @@ function bt_send_email($user_id, $subject, $message) {
         'From: ' . get_option('blogname') . ' <from@budatoll.hu>',
         'Reply-to: no-reply@budatoll.hu',
     ];
-    $message .= '<br><br>'.get_option(BT_CUSTOM_EMAIL_SIGN, 'Üdvözlettel:<br>Budatoll csapata');
+    $message .= '<br><br>' . get_option(BT_CUSTOM_EMAIL_SIGN, 'Üdvözlettel:<br>Budatoll csapata');
     bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
     wp_mail($user_email, $subject, $message, $headers);
 }
@@ -378,7 +378,7 @@ function bt_get_coaches() {
         'orderby' => 'display_name',
         'count_total' => true,
     ];
-    $coaches= new WP_User_Query($selector);
+    $coaches = new WP_User_Query($selector);
     foreach ($coaches->get_results() as $coach) {
         $ret[] = $coach->data;
     }

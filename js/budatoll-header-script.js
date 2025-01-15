@@ -50,7 +50,7 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
         clearTimeout(bt_timer);
         bt_timer = setTimeout(function () {
             long_press = true;
-        }, 1000);
+        }, 800);
     }, {passive: true});
 
     // Clear timer if touch ends/cancels quickly
