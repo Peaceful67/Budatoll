@@ -83,16 +83,16 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
-         const currentWidth = window.innerWidth;
+        const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);
         if (widthDifference > 10) {
-        if (window.innerWidth < 768) {
-            budatoll_trainings_calendar.changeView('listWeek');
-        } else {
-            budatoll_trainings_calendar.changeView('dayGridMonth');
+            if (window.innerWidth < 768) {
+                budatoll_trainings_calendar.changeView('listWeek');
+            } else {
+                budatoll_trainings_calendar.changeView('dayGridMonth');
+            }
+            previousWidth = currentWidth;
         }
-         previousWidth = currentWidth;
-    }
     },
     locale: 'hu',
     firstDay: 1,
@@ -108,6 +108,11 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {
             btEventClicked(eventInfo);
+        } else {
+            if (eventInfo.jsEvent.pointerType === 'touch') {
+                btTouchX = eventInfo.jsEvent.clientX;
+                btTouchY = eventInfo.jsEvent.clientY;
+            }
         }
     },
     eventMouseEnter: function (eventInfo) {
@@ -136,9 +141,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
 budatoll_trainings_calendar.render();
 window.addEventListener('resize', function () {
     budatoll_trainings_calendar.render();
-});
-
-
+}, {passive: true});
 function btEventClicked(eventInfo) {
     var id = eventInfo.event.id;
     var event = btAddedTrainingIds[id];
@@ -153,11 +156,6 @@ function btEventClicked(eventInfo) {
             'my-event-id': id
         },
         success: function (response) {
-            if (response.result === 'success') {
-                console.log(response);
-            } else {
-                console.log(response);
-            }
             btAddedTrainingIds = [];
             budatoll_trainings_calendar.refetchEvents();
             success_msg = $("#budatoll-success-message");
@@ -198,7 +196,7 @@ function btEventClicked(eventInfo) {
 }
 
 function btMyTrainingMouseEnter(eventInfo) {
-    var popupX, popupY;
+
     if ($("#budatoll-trainings-editor").is(":hidden")) {
         const training_info = $("#budatoll-trainings-info");
         let id = eventInfo.event.id;
@@ -209,23 +207,20 @@ function btMyTrainingMouseEnter(eventInfo) {
         }
         let trainings_text = '<h4>' + event.long + '</h4>';
         if (btIsTouchDevice()) {
-            [popupX, popupY] = getPopupPosTouchDevice(training_info);
-            $(function () {
-                training_info.click(function () {
-                    training_info.fadeOut(budatoll_modal_speed);
-                });
-            });
+            popupX = Math.max(btTouchX, 10);
+            popupY = Math.max(btTouchY, 10);
         } else {
             [popupX, popupY] = getPopupPos(training_info);
         }
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += showApplicants(trainings);
-        training_info.html(trainings_text).css({
+        training_info.html(trainings_text);
+        training_info.css({
             left: popupX,
             top: popupY
-        }).fadeIn(budatoll_modal_speed);
-        ;
+        });
+        training_info.fadeIn(budatoll_modal_speed);
     }
 
 }

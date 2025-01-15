@@ -25,13 +25,22 @@ jQuery.ajax({
     }
 });
 
-/*
- $(document).on('mousemove', function (event) {
- budatoll_mouse_x = event.pageX;
- budatoll_mouse_y = event.pageY;
- console.log('X: ' + budatoll_mouse_x + ', Y: ' + budatoll_mouse_y);
- });
- */
+
+$(document).on('touchstart', function (element) {
+    if (btIsTouchDevice()) {
+        const training_info = $("#budatoll-trainings-info");
+        if (training_info) {
+            training_info.fadeOut(budatoll_modal_speed);
+        }
+        var touches = element.originalEvent.touches;
+        if (touches.length > 0) {
+            btTouchX = Math.round(touches[0].clientX);
+            btTouchY = Math.round(touches[0].clientY);
+        }
+    }
+});
+
+
 function budatoll_get_popup_x(width) {
     x = (budatoll_mouse_x > budatoll_center_x) ? budatoll_center_x - width - 50 : budatoll_center_x + 50;
     x = (budatoll_mouse_x > budatoll_center_x) ? 0 : budatoll_center_x * 2 - width;

@@ -42,6 +42,8 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
     element.addEventListener('touchstart', function (event) {
         event.stopPropagation();
         const touch = event.touches[0];
+        btTouchX = Math.round(touch.clientX);
+        btTouchY = Math.round(touch.clientY);
         long_press = false;
 //        console.log('touchstart');
         pressed = true;
@@ -54,7 +56,7 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
     // Clear timer if touch ends/cancels quickly
     element.addEventListener('touchend', function (event) {
         event.stopPropagation();
-//        console.log('touchend');
+        console.log('touchend');
         clearTimeout(bt_timer);
         if (!pressed) {
             return;
@@ -66,7 +68,6 @@ function addLongPressListener(element, onLongPress, onTap, delay = 1800) {
             //           console.log('onLongPress');
             onLongPress(event);
         } else {
-            //           console.log('onTap');
             onTap(event);  // Trigger tap only if long press wasn't triggered
         }
         pressed = false;
@@ -126,12 +127,11 @@ function getPopupPos(popupModal) {
     return [popupX + 'px', popupY + 'px'];
 
 }
-function getPopupPosTouchDevice(popupModal) {
-    var popup_width = popupModal.outerWidth();
-    var popup_height = popupModal.outerHeight();
-    var popupX = popup_width / 2 + 100;
-    var popupY = popup_height / 2 + 150;
-    return [popupX + 'px', popupY + 'px'];
+function getPopupPosTouchDevice(eventInfo) {
+    console.log(eventInfo.target);
+    var popupX = eventInfo.jsEvent.clientX;
+    var popupY = eventInfo.jsEvent.ClientY;
+    return {x: popupX, y: popupY};
 
 }
 

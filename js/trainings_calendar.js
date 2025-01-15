@@ -88,6 +88,11 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {
             btEventClick(eventInfo);
+        } else {
+            if (eventInfo.jsEvent.pointerType === 'touch') {
+                btTouchX = eventInfo.jsEvent.clientX;
+                btTouchY = eventInfo.jsEvent.clientY;
+            }
         }
     },
     eventMouseEnter: function (eventInfo) {
@@ -116,7 +121,9 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
 
 });
 budatoll_trainings_calendar.render();
-
+window.addEventListener('resize', function () {
+    budatoll_trainings_calendar.render();
+}, {passive: true});
 
 
 function btEventClick(eventInfo) {
@@ -152,7 +159,12 @@ function btEventClick(eventInfo) {
 
     training_editor = $("#budatoll-trainings-editor");
     var popupX, popupY;
-    [popupX, popupY] = getPopupPos(training_info);
+    if (btIsTouchDevice()) {
+        popupX = Math.max(btTouchX, 10);
+        popupY = Math.max(btTouchY, 10);
+    } else {
+        [popupX, popupY] = getPopupPos(training_info);
+    }
     $(function () {
         $('#close-editor-popup').click(function () {
             training_editor.fadeOut(budatoll_modal_speed);
@@ -177,28 +189,18 @@ function btTrainingMouseEnter(eventInfo) {
         var popupX, popupY;
         training_info = $("#budatoll-trainings-info");
         if (btIsTouchDevice()) {
-            [popupX, popupY] = getPopupPos(training_info);
-            $(function () {
-                training_info.click(function () {
-                    training_info.fadeOut(budatoll_modal_speed);
-                });
-            });
+            popupX = Math.max(btTouchX, 10);
+            popupY = Math.max(btTouchY, 10);
         } else {
-            [popupX, popupY] = getPopupPosTouchDevice(training_info);
-
+            [popupX, popupY] = getPopupPos(training_info);
         }
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += showApplicants(trainings);
-        training_info.html(trainings_text).fadeIn(budatoll_modal_speed).css({
+        training_info.html(trainings_text).css({
             left: popupX,
             top: popupY
-        });
-        $(function () {
-            $('#close-editor-popup').click(function () {
-                training_info.fadeOut(budatoll_modal_speed);
-            });
-        });
+        }).fadeIn(budatoll_modal_speed);
     }
 }
 
