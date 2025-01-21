@@ -6,13 +6,13 @@ function budatoll_manage_event_types() {
         wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
     }
 
-    $ret = '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on">';
-    $ret .= '<input type="hidden" name="page" value="edzes-tipusok">';
+    $ret = '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on" action="/edzes-tipusok">';
     $edit_id = getPostVariable('budatoll_edit', -1);
     $delete_id = getPostVariable('budatoll_delete', false);
     $save = getPostVariable('budatoll_save', false);
     if (getPostVariable('budatoll_cancel', false)) {
         $edit_id = -1;
+        $save = false;
     }
     if (getPostVariable('budatoll_add', false)) {
         $edit_id = 0;
@@ -21,6 +21,8 @@ function budatoll_manage_event_types() {
     if ($delete_id) {
         bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus törlése: ' . $delete_id);
         $wpdb->delete(BUDATOLL_EVENT_TYPE_TABLE, [BUDATOLL_EVENT_TYPE_ID => $delete_id]);
+        $edit_id = -1;
+        $save = false;
     }
     if ($save) {
         $data = [
@@ -47,12 +49,12 @@ function budatoll_manage_event_types() {
     }
     $ret .= btEventTypeList();
     $ret .= '</form>';
-    echo $ret;
+    return $ret;
 }
 
 function btEventTypeEdit($item_id) {
     global $wpdb;
-    $ret = '<div class="wrap"><div class="budatoll-keret">';
+    $ret = '<div class="budatoll-keret">';
     $short = '';
     $long = '';
     $price = 0;
@@ -70,24 +72,22 @@ function btEventTypeEdit($item_id) {
         $max_players = $results[0]->{BUDATOLL_EVENT_TYPE_MAX_PLAYERS} ?? 0;
         $public = $results[0]->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1;
     }
-    $ret .= '<table class="form-table"><tbody>';
-    $ret .= '<tr><th scope="row"><label>Rövid név:</label></th>'
-            . '<td><input  type="text" id="budatoll-short" name="budatoll-short" value="' . $short . '"></td></tr>';
-    $ret .= '<tr><th scope="row"><label>Hosszú név:</th>'
-            . '<td><input type="text" id="budatoll-long" name="budatoll-long" value="' . $long . '"></td></tr>';
-    $ret .= '<tr><th scope="row"><label>Idősáv:</th>'
-            . '<td><input  type="time" id="budatoll-start" name="budatoll-start" value="' . $start . '">';
-    $ret .= '<input  type="time" id="budatoll-end" name="budatoll-end" value="' . $end . '"></td></tr>';
-    $ret .= '<tr><th scope="row"><label>Ár:</th>'
-            . '<td><input type="number" id="budatoll-price" name="budatoll-price" value="' . $price . '"> Ft</td></tr>';
-    $ret .= '<tr><th scope="row"><label>Max játékos:</th>'
-            . '<td><input type="number" id="budatoll-max" name="budatoll-max" value="' . $max_players . '"></td></tr>';
-    $ret .= '<tr><th scope = "row"><label for = "budatoll-public">Publikus:</label></th>'
-            . '<td><input type = "checkbox" id = "budatoll-public" name = "budatoll-public" value = "1"'
-            . ($public == '1' ? 'checked' : '') . '></td></tr>';
-    $ret .= '</tbody></table>';
-    $ret .= get_submit_button('Mentés', 'primary small', 'budatoll_save');
-    $ret .= '</div></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-short">Rövid név:</label>'
+            . '<input  type="text" id="budatoll-short" name="budatoll-short" value="' . $short . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-long">Hosszú név:</label>'
+            . '<input type="text" id="budatoll-long" name="budatoll-long" value="' . $long . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-start">Idősáv:</label>'
+            . '<input  type="time" id="budatoll-start" name="budatoll-start" value="' . $start . '">';
+    $ret .= '<input  type="time" id="budatoll-end" name="budatoll-end" value="' . $end . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-price">Ár:</label>'
+            . '<input type="number" id="budatoll-price" name="budatoll-price" value="' . $price . '"> Ft</div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-max">Max játékos:</label>'
+            . '<input type="number" id="budatoll-max" name="budatoll-max" value="' . $max_players . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-public">Publikus:</label>'
+            . '<input type = "checkbox" id = "budatoll-public" name = "budatoll-public" value = "1"'
+            . ($public == '1' ? 'checked' : '') . '></div>';
+    $ret .= '<div class="budatoll-form-group">' . bt_save_button(-1) . bt_cancel_button() . '</div>';
+    $ret .= '</div>';
 
     return $ret;
 }
@@ -95,19 +95,17 @@ function btEventTypeEdit($item_id) {
 function btEventTypeList() {
     $ret = '<H3>Edzés típusok listája</H3>';
     $results = btGetEventTypes();
-    $ret .= '<div class="wrap">'
-            . '<button class="button button-primary button-large" name="budatoll_add" id="budatoll_add" value="-1" title="Új hozzáadása">'
-            . '<span class="dashicons dashicons-plus"></span>'
-            . '</button>';
-    $ret .= '<table class="wp-list-table widefat striped">';
+    $ret .= '<div class="wrap">';
+    $ret .= bt_add_button();
+    $ret .= '<table class="budatoll-table budatoll-table-stripped">';
     $ret .= '<thead><tr>'
             . '<th scope="col" id="column1" class="manage-column column-column1" style="width:120px;">Rövid név</th>'
             . '<th scope="col" id="column2" class="manage-column column-column2" style="width:280px;">Hosszú név</th>'
             . '<th scope="col" id="column3" class="manage-column column-column3" style="width:80px;">Ár</th>'
             . '<th scope="col" id="column4" class="manage-column column-column4" style="width:80px;">Idősáv</th>'
-            . '<th scope="col" id="column5" class="manage-column column-column5" style="width:80px;">Max játékos</th>'
-            . '<th scope="col" id="column5" class="manage-column column-column5" style="width:80px;">Publikus</th>'
-            . '<th scope="col" id="column6" class="manage-column column-column6" style="width:80px;">Művelet</th>'
+            . '<th scope="col" id="column5" class="manage-column column-column5" style="width:40px;">Max játékos</th>'
+            . '<th scope="col" id="column5" class="manage-column column-column5" style="width:40px;">Publikus</th>'
+            . '<th scope="col" id="column6" class="manage-column column-column6" style="width:160px;">Művelet</th>'
             . '</tr></thead><tbody>';
 
     foreach ($results as $row) {
@@ -119,20 +117,17 @@ function btEventTypeList() {
         $price = number_format(($row->{BUDATOLL_EVENT_TYPE_PRICE} ?? 0), 0, ',', '.');
         $max = $row->{BUDATOLL_EVENT_TYPE_MAX_PLAYERS} ?? 0;
         $public = $row->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1 ? 'Igen' : 'Nem';
-        $public_class = $row->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1 ? 'style="background:lightgreen";':'';
+        $public_class = $row->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1 ? 'style="background:lightgreen";' : '';
         //        $ret .= '<tr class="clickable-row" id="budatoll-popup_' . $id . '" data-item="' . $id . '">';
-        $ret .= '<tr '.$public_class.'>';
+        $ret .= '<tr ' . $public_class . '>';
         $ret .= '<td class="column-column1">' . $short . '</td>';
         $ret .= '<td class="column-column2">' . $long . '</td>';
         $ret .= '<td class="column-column3">' . $price . ' Ft</td>';
         $ret .= '<td class="column-column4">' . $start . ' - ' . $end . '</td>';
         $ret .= '<td class="column-column5">' . $max . '</td>';
         $ret .= '<td class="column-column5">' . $public . '</td>';
-        $ret .= '<td class="column-column6"><button class="button button-link button-small" name="budatoll_edit" id="budatoll_edit" value="' . $id . '" title="Szerkesztés">'
-                . '<span class="dashicons dashicons-edit"></span></button>'
-                . '<button class="button button-action button-small" name="budatoll_delete" id="budatoll_delete" value="' . $id . '" '
-                . 'onclick="return confirm(\'Biztosan törölni akarod a \"' . $row->{BUDATOLL_EVENT_TYPE_LONG} . '\" nevű edzést?\');" title="Törlés">'
-                . '<span class="dashicons dashicons-trash"></span></button>';
+        $ret .= '<td class="column-column6">' . bt_edit_button($id)
+                . bt_delete_button($id, 'budatoll_delete', 'Törlés', $row->{BUDATOLL_EVENT_TYPE_LONG} . ' nevű edzést?');
         $ret .= '</td></tr>';
     }
     $ret .= '</tbody></table></div>';

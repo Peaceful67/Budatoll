@@ -1,7 +1,66 @@
 @media (max-width: 768px) {
-  #budatoll-edzes-calendar {
-    max-width: 100%;
-    font-size: 0.8em; /* Smaller fonts for smaller screens */
-  }
-}
+    #budatoll-edzes-calendar {
+        max-width: 100%;
+        font-size: 0.8em; /* Smaller fonts for smaller screens */
+    }
+    .budatoll-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto; /* Add horizontal scrolling */
+        white-space: nowrap; /* Prevent text wrapping */
+        border-spacing: 0;
+        border: none;
+    }
 
+    .budatoll-table th, td {
+        white-space: nowrap;
+        font-size: 12px;
+        text-align: left;
+        padding: 8px;
+    }
+
+    .budatoll-form-group {
+        display: flex;
+        flex-direction: column; /* Stack label and input vertically */
+        align-items: flex-start;
+    }
+
+    .budatoll-form-group label {
+        width: 100%; /* Make labels span the full width */
+        margin-bottom: 5px;
+    }
+
+    .budatoll-form-group input,
+    textarea,
+    select,
+    button {
+        font-size: 14px;
+        width: 100%; /* Make inputs take the full width of the parent container */
+        max-width: 100%; /* Prevent overflow */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .budatoll-form-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+    .budatoll-form-group {
+        flex-direction: column; /* Stack label and input vertically */
+        align-items: flex-start;
+    }
+
+    .budatoll-form-group label {
+        width: 100%; /* Make labels span the full width */
+        margin-bottom: 5px;
+        flex:none;
+    }
+
+    .budatoll-button {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    .budatoll-button-icon  {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}

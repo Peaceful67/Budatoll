@@ -24,29 +24,29 @@ define("BT_REPLACE_USER_NAME", "#%#");
 $bt_default_emails = [
     BT_CUSTOM_EMAIL_PAYMENT_CREATE => [
         BUDATOLL_EMAIL_TITLE => 'Befizetés lekönyveléséről',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor a befizetése a rendszerbe bekerül. '
-        . '<p>#1# paraméter a befizetett összeget helyettesíti,</p><p>#2# helyére az új egyenleg fog kerülni.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor a befizetése a rendszerbe bekerül.<br> '
+        . '#1# paraméter a befizetett összeget helyettesíti,<br>#2# helyére az új egyenleg fog kerülni.',
         BUDATOLL_EMAIL_SUBJECT => 'Befizetés lekönyvelése',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>#1# összegű befizetésed az egyenlegeden jóváírásra került.<br>Az új egyenleged: #2#',
     ],
     BT_CUSTOM_EMAIL_PAYMENT_MODIFY => [
         BUDATOLL_EMAIL_TITLE => 'Befizetés módosításáról',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy korábbi befizetése az egyenlegének tételei szerkesztése során módosult.'
-        . '<p>#1# paraméter az új összeget helyettesíti,</p><p>#2# helyére az új egyenleg fog kerülni.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy korábbi befizetése az egyenlegének tételei szerkesztése során módosult.<br>'
+        . '#1# paraméter az új összeget helyettesíti,<br>#2# helyére az új egyenleg fog kerülni.',
         BUDATOLL_EMAIL_SUBJECT => 'Befizetés módosítása',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Egy korábbi befizetésed #1# összegre módosult.<br>Az új egyenleged: #2#',
     ],
     BT_CUSTOM_EMAIL_CHARGE_MODIFY => [
         BUDATOLL_EMAIL_TITLE => 'Terhelés módosításáról',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy korábbi terhelése az egyenlegének tételei szerkesztése során módosult.'
-        . '<p>#1# paraméter az új összeget helyettesíti,</p><p>#2# helyére az új egyenleg fog kerülni.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy korábbi terhelése az egyenlegének tételei szerkesztése során módosult.<br>'
+        . '#1# paraméter az új összeget helyettesíti,<br>#2# helyére az új egyenleg fog kerülni.',
         BUDATOLL_EMAIL_SUBJECT => 'Terhelés módosítása',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Egy korábbi terhelésed #1# összegre módosult.<br>Az új egyenleged: #2#',
     ],
     BT_CUSTOM_EMAIL_WARN_NEGATIV => [
         BUDATOLL_EMAIL_TITLE => 'Negatív egyenlegről',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egyenlege negatívvá válik. <br>Erről csak egy emailt kap.'
-        . '<p>#1# helyére az új egyenleg fog kerülni.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egyenlege negatívvá válik. <br>Erről csak egy emailt kap.<br>'
+        . '#1# helyére az új egyenleg fog kerülni.',
         BUDATOLL_EMAIL_SUBJECT => 'Negatív egyenleg',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Az egyenleged elfogyott. <br>'
         . 'A jelenlegi egyenleged: #1#<br>Kérünk egy befizetéssel töltsd fel!',
@@ -54,8 +54,8 @@ $bt_default_emails = [
     BT_CUSTOM_EMAIL_WAITING => [
         BUDATOLL_EMAIL_TITLE => 'Várólista felszabadult',
         BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy olyan edzésen lett szabad hely, ahova várólistára jelentkezett.<br>'
-        . 'Ha többen is vannak a várólistán, mindenki kap erről értesítést.<p>#1# helyére az edzés hosszú neve fog kerülni.</p>'
-        . '<p>#2# helyére az edzés dátuma fog kerülni.</p><p>#3# helyére az edzés kezdési ideje fog kerülni.</p><p>#4# helyére az edzés vége fog kerülni.</p>',
+        . 'Ha többen is vannak a várólistán, mindenki kap erről értesítést.<br>#1# helyére az edzés hosszú neve fog kerülni.<br>'
+        . '#2# helyére az edzés dátuma fog kerülni.<br>#3# helyére az edzés kezdési ideje fog kerülni.<br>#4# helyére az edzés vége fog kerülni.<br>',
         BUDATOLL_EMAIL_SUBJECT => 'Várólista felszabadult',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A #1#, #2# #3#-#4#'
         . ' edzésről egy játékos törölte a jelentkezését, így lehetőséged van a várólistás jelentkezésedet megerősíteni. '
@@ -63,33 +63,33 @@ $bt_default_emails = [
     ],
     BT_CUSTOM_EMAIL_TRAINING_DELETED => [
         BUDATOLL_EMAIL_TITLE => 'Edzés törölve',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy edzésre jelentkezését egy edző törölte.'
-        . '<p>#1# az edzés hosszú neve fog kerülni.</p>'
-        . '<p>#2# az edzés dátuma fog kerülni.</p>'
-        . '<p>#3# az edzés kezdési ideje fog kerülni.</p>'
-        . '<p>#4# az edzés vége fog kerülni.</p>'
-        . '<p>#5# az edző neve, aki törölte a jelentkezést.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy edzésre jelentkezését egy edző törölte.<br>'
+        . '#1# az edzés hosszú neve fog kerülni.<br>'
+        . '#2# az edzés dátuma fog kerülni.<br>'
+        . '#3# az edzés kezdési ideje fog kerülni.<br>'
+        . '#4# az edzés vége fog kerülni.<br>'
+        . '#5# az edző neve, aki törölte a jelentkezést.',
         BUDATOLL_EMAIL_SUBJECT => 'Edzés törölve',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A #1#, #2# #3#-#4#'
         . ' edzésre jelentkezesédet letöröltük.<br>Amennyiben ezzel kapcsolatban kérdésed van, keresd: #5#!',
     ],
     BT_CUSTOM_EMAIL_TRAINING_SAVED => [
         BUDATOLL_EMAIL_TITLE => 'Edzés rögzítve',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy edzésre jelentkezését egy edző felvette.'
-        . '<p>#1# az edzés hosszú neve fog kerülni.</p>'
-        . '<p>#2# az edzés dátuma fog kerülni.</p>'
-        . '<p>#3# az edzés kezdési ideje fog kerülni.</p>'
-        . '<p>#4# az edzés vége fog kerülni.</p>'
-        . '<p>#5# az edző neve, aki rögzítette a jelentkezést.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy edzésre jelentkezését egy edző felvette.<br>'
+        . '#1# az edzés hosszú neve fog kerülni.<br>'
+        . '#2# az edzés dátuma fog kerülni.<br>'
+        . '#3# az edzés kezdési ideje fog kerülni.<br>'
+        . '#4# az edzés vége fog kerülni.<br>'
+        . '#5# az edző neve, aki rögzítette a jelentkezést.<br>',
         BUDATOLL_EMAIL_SUBJECT => 'Edzés rögzítve',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A #1#, #2# #3#-#4#'
         . ' edzésre jelentkezesédet rögzítettük.<br>Amennyiben ezzel kapcsolatban kérdésed van, keresd: #5#!',
     ],
     BT_CUSTOM_EMAIL_PLAYER_REGISTERED => [
         BUDATOLL_EMAIL_TITLE => 'Játékos regisztráció',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy edző a játékost regisztrálta.'
-        . '<p>#1# a játékos felhasználó nevének felel meg.</p>'
-        . '<p>#2# a játékos megadott email címét helyettesíti.',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor egy edző a játékost regisztrálta.<br>'
+        . '#1# a játékos felhasználó nevének felel meg.<br>'
+        . '#2# a játékos megadott email címét helyettesíti.',
         BUDATOLL_EMAIL_SUBJECT => 'Játékos regisztráció',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br>Üdvözöllek a tollaslabda klubbunk oldalán.<br>'
         . 'A belépéshez tartozó felhasználó neved: #1#<br>'
@@ -97,7 +97,7 @@ $bt_default_emails = [
     ],
     BT_CUSTOM_EMAIL_PLAYER_MODIFIED => [
         BUDATOLL_EMAIL_TITLE => 'Adatok módosultak',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor az adatit egy edző módosította.<p>#1# helyetesíti a modosítások listáját.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor az adatit egy edző módosította.<br>#1# helyetesíti a modosítások listáját.',
         BUDATOLL_EMAIL_SUBJECT => 'Adatok módosultak',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Módosultak az adataid a "' . BUDATOLL_COMPANY_NAME . '" honlapján.<br>'
         . '#1#<br>',
@@ -112,8 +112,8 @@ $bt_default_emails = [
     ],
     BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH => [
         BUDATOLL_EMAIL_TITLE => 'Ismeretlen játékos regisztrált',
-        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt az összes edzőkapja, amikor egy játékos magát regisztrálja az oldalon.'
-        . '<p>#1# helyén a játékos felhasználó neve fog megjelenni.</p>',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt az összes edzőkapja, amikor egy játékos magát regisztrálja az oldalon.<br>'
+        . '#1# helyén a játékos felhasználó neve fog megjelenni.',
         BUDATOLL_EMAIL_SUBJECT => 'Új játékos regisztrált',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Egy új játékos regisztrált a tollasklubban. A felhasználó neve:#1#<br>'
         . 'A vezérlőpulton álltsd be számára a megfelelő játékokat, edzéseket!',
@@ -121,11 +121,10 @@ $bt_default_emails = [
 ];
 
 function budatoll_manage_emails() {
+    $ret = '';
     global $bt_default_emails;
-    echo '<div class="wrap">';
-    echo '<h2>Kimenő emailek szerkesztése</h2>';
-    echo '<form id="BudatollForm" method="post">';
-    echo '<input type="hidden" name="page" value="emailek"/>';
+    $ret .= '<h2>Kimenő emailek szerkesztése</h2>';
+    $ret .= '<form id="BudatollForm" method="POST" action="/emailek">';
     $selected_custom_email = getPostVariable('budatoll_custom_email', 'choose');
     $email_arr = bt_get_custom_email($selected_custom_email);
     if (getPostVariable('email_save')) {
@@ -163,29 +162,32 @@ function budatoll_manage_emails() {
             }
         }
     }
-    echo '<table class="form-table"><tbody>';
-    $sign = get_option(BT_CUSTOM_EMAIL_SIGN, BT_CUSTOM_EMAIL_DEFAULT_SIGN);
-    echo '<tr><th>Email aláírása: </th><td><textarea id="bt_ce_sign" name="bt_ce_sign">' . $sign . '</textarea></td></tr>';
-    echo '<tr><th>Email esemény: </th>';
-    echo '<td><select name="budatoll_custom_email" id="BudatollSelect" onChange="document.getElementById(\'BudatollForm\').submit();">';
-    echo '<option value="choose" ' . selected($selected_custom_email, 'choose', false) . '>Válassz!</option>';
+    $ret .= '';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll_custom_email">Email esemény: </label>';
+    $ret .= '<select name="budatoll_custom_email" id="budatoll_custom_email" onChange="document.getElementById(\'BudatollForm\').submit();">';
+    $ret .= '<option value="choose" ' . selected($selected_custom_email, 'choose', false) . '>Válassz!</option>';
     foreach ($bt_default_emails as $email_id => $email) {
         $email_arr = bt_get_custom_email($email_id);
-        echo '<option value="' . esc_attr($email_id) . '" ' . selected($selected_custom_email, $email_id, false) . '>'
-        . esc_html($email_arr[BUDATOLL_EMAIL_TITLE]) . '</option>';
+        $ret .= '<option value="' . esc_attr($email_id) . '" ' . selected($selected_custom_email, $email_id, false) . '>'
+                . esc_html($email_arr[BUDATOLL_EMAIL_TITLE]) . '</option>';
     }
-    echo '</select></td></tr>';
+    $ret .= '</select></div>';
     if (isset($bt_default_emails[$selected_custom_email])) {
+        $ret .= '<div class="budatoll-keret">';
         $email_arr = bt_get_custom_email($selected_custom_email);
-        echo '<tr><th>Email leírása: </th><td><p>' . $email_arr[BUDATOLL_EMAIL_DESCRIPTION] . '</p><p>A ' . BT_REPLACE_USER_NAME . ' minden esetben a játékos teljes nevére cserélődik le.</p></td></tr>';
-        echo '<tr><th>Email tárgya: </th><td><input type="text" value="' . esc_attr($email_arr[BUDATOLL_EMAIL_SUBJECT]) . '" name="bt_ce_subject"></td></tr>';
-        echo '<tr><th>Email törzse: </th><td><textarea  rows="4" cols="80" name="bt_ce_body" id="bt_ce_body">' . esc_textarea($email_arr[BUDATOLL_EMAIL_BODY]) . '</textarea></td></tr>';
+        $ret .= '<div class="budatoll-form-group"><label>Email leírása: </label><p>'
+                . $email_arr[BUDATOLL_EMAIL_DESCRIPTION] . '<br>A ' . BT_REPLACE_USER_NAME . ' minden esetben a játékos teljes nevére cserélődik le.</p></div>';
+        $ret .= '<div class="budatoll-form-group"><label for="bt_ce_subject">Email tárgya: </label>'
+                . '<input type="text" value="' . esc_attr($email_arr[BUDATOLL_EMAIL_SUBJECT]) . '" name="bt_ce_subject" id="bt_ce_subject"></div>';
+        $ret .= '<div class="budatoll-form-group"><label for="bt_ce_body">Email törzse: </label>'
+                . '<textarea  rows="4" cols="80" name="bt_ce_body" id="bt_ce_body">' . esc_textarea($email_arr[BUDATOLL_EMAIL_BODY]) . '</textarea></div>';
+        $ret .= '</div>';
     }
-    echo '<tr><th>' . get_submit_button('Módosítások mentése', 'primary', 'email_save') . '</th>'
-    . '<td>' . get_submit_button('Eredeti visszaállítása', 'primary', 'email_default') . '</td></tr>';
-    echo '</tbody></table>';
-    echo '</form>';
-    echo '</div>';
+    $sign = get_option(BT_CUSTOM_EMAIL_SIGN, BT_CUSTOM_EMAIL_DEFAULT_SIGN);
+    $ret .= '<div class="budatoll-form-group"><label for="bt_ce_sign">Email aláírása: </label><textarea id="bt_ce_sign" name="bt_ce_sign">' . $sign . '</textarea></div>';
+    $ret .= '<div class="budatoll-form-group">' . bt_text_button('email_save', 'Módosítások mentése') . bt_text_button('email_default', 'Eredeti visszaállítása') . '</div>';
+    $ret .= '</form>';
+    return $ret;
 }
 
 function bt_send_custom_email($user_id, $email_id, $params = []) {

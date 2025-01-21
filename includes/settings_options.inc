@@ -20,6 +20,7 @@ define("BUDATOLL_VERSION_DESCRIPTION", 'desc');
 
 function budatoll_setting_options() {
     budatoll_crontab(true); // Ezt itt lefutattjuk
+    $ret = '';
     $bt_versions = [
         '1.0' => [
             BUDATOLL_VERSION_DATE => '2024-12-17',
@@ -51,7 +52,7 @@ function budatoll_setting_options() {
             BUDATOLL_VERSION_DATE => '2025-01-01',
             BUDATOLL_VERSION_TITLE => 'Apróbb javítások',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
-            . '<li>- Képek cseréje a kezdő oldalon.<li>'
+            . '<li>- Képek cseréje a kezdő oldalon.</li>'
             . '<li>- Az edző a múltat is tudja módosítani, az egyenleg automatikusan módosul.</li>'
             . '<li>- A nem bérletes csak előző nap jelentkezhet egy edzésre.</li>'
             . '<li>- A negatív egyenlegű csak előző nap jelentkezhet egy edzésre.( kapcsolható )</li>'
@@ -64,6 +65,9 @@ function budatoll_setting_options() {
             . '<li>- Egy új játékos regisztrációjáról kap email értesítést az összes edző.</li>'
             . '<li>- Mobil és desktop megjelenítés feljavítása.</li>'
             . '<li>- Belépett játékos egyenlege a neve alatt mindig.</li>'
+            . '<li>- Az összes kimenő levél szerkeszthetősége.</li>'
+            . '<li>- Beállítási odalak áthelyezése a vezérlőpultról a menübe.</li>'
+            . '<li>- Edzői naptárnál szinek bevezetése: kék->még van hely, zöld->megtelt, sárga->vannak várólistán</li>'
             . '</ul>',
         ],
         '1.2' => [
@@ -72,7 +76,6 @@ function budatoll_setting_options() {
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
             . '<li>- Heti beosztás sablon készítés és másolása.</li>'
             . '<li>- Az edzés időpontok beállítása után értesítő levél a játékosoknak, hogy jelentkezhetnek.</li>'
-            . '<li>- Az összes kimenő levél szerkeszthetősége.</li>'
             . '</ul>',
         ],
     ];
@@ -92,39 +95,35 @@ function budatoll_setting_options() {
         ${BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE);
         ${BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE} = btGetCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE);
     }
-    echo '<div class="wrap">';
-    echo '<h2>Budatoll beállítások</h2>';
-    echo '<form id="BudatollForm" method="post">';
-    echo '<input type="hidden" name="' . $hidden_var_name . '" value="options"/>';
-    echo '<input type="hidden" name="page" value="options"/>';
-    echo '<table class="form-table"><tbody>';
-
-    btPutCheckbox(BUDATOLL_OPTION_TRAINING_CANCELABLE, 'Edzés lemondható', 'Az edzés kezdetéig.', 'Csak 24 órával az edzés előtt mondtható le.');
-//    btPutCheckbox(BUDATOLL_OPTION_AUTO_CHARGE, 'Edzés költsége', 'Automatikusan levonódik.', 'Kézzel kell lekönyvelni.');
-    btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Csak előző nap foglalhat.', 'Szabadon foglalhat edzést.');
-    btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
-    btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY, 'Játékos módosításáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
-    btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT, 'A befizetés lekönyveléséről', 'Értesítést kap a játékos.', 'Nincs értesítés.');
-    btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE, 'Az egyenleg elfogyásáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
-    btPutCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE, 'Az előző napi jelentkezés', 'Lemondható a játék kezdetéig.', 'Áltatlános szabály szerint mondható le.');
-    echo '<tr><th scope="row"><label>Utolsó crontab:</label></th>';
-    echo '<td>' . get_option(BUDATOLL_OPTION_LAST_CRONTAB) . '</td></tr>';
-    echo '<tr><th></th><td>' . get_submit_button() . '</td></tr>';
-    echo '<tr><th>Aktuális verzió:</th><td>' . BUDATOLL_CURRENT_VERSION . ', legutóbb frissítve: ' . $bt_versions[BUDATOLL_CURRENT_VERSION][BUDATOLL_VERSION_DATE] . '</td></tr>';
+    $ret .= '<div class="wrap">';
+    $ret .= '<h2>Budatoll beállítások</h2>';
+    $ret .= '<form id="BudatollForm" method="post" action="/beallitasok">';
+    $ret .= '<input type="hidden" name="' . $hidden_var_name . '" value="options"/>';
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_TRAINING_CANCELABLE, 'Edzés lemondható', 'Az edzés kezdetéig.', 'Csak 24 órával az edzés előtt mondtható le.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Csak előző nap foglalhat.', 'Szabadon foglalhat edzést.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY, 'Játékos módosításáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT, 'A befizetés lekönyveléséről', 'Értesítést kap a játékos.', 'Nincs értesítés.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE, 'Az egyenleg elfogyásáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE, 'Az előző napi jelentkezés', 'Lemondható a játék kezdetéig.', 'Áltatlános szabály szerint mondható le.');
+    $ret .= '<div class="budatoll-form-group"><label>Utolsó crontab:</label>';
+    $ret .= get_option(BUDATOLL_OPTION_LAST_CRONTAB) . '</div>';
+    $ret .= '<div class="budatoll-form-actions"><input type="submit" style="display:none;" id="submit" name="submit" /></div>';
+    $ret .= '<div class="budatoll-form-group"><label>Aktuális verzió:</label>' . BUDATOLL_CURRENT_VERSION . ', legutóbb frissítve: ' . $bt_versions[BUDATOLL_CURRENT_VERSION][BUDATOLL_VERSION_DATE] . '</div>';
     $selected_version = getPostVariable('budatoll_versions', BUDATOLL_CURRENT_VERSION);
-    echo '<tr><th>Verziók tartalma: </th>';
-    echo '<td><select name="budatoll_versions" onChange="document.getElementById(\'submit\').click();">';
+    $ret .= '<div class="budatoll-form-group"><label>Verziók tartalma: </label>';
+    $ret .= '<select name="budatoll_versions" onChange="document.getElementById(\'submit\').click();">';
     foreach ($bt_versions as $ver_id => $version) {
-        echo printf('<option value="%s" %s>%s</option>',
+        $ret .= sprintf('<option value="%s" %s>%s</option>',
                 esc_attr($ver_id),
                 selected($selected_version, $ver_id, false),
                 esc_html($ver_id . ' : ' . $version[BUDATOLL_VERSION_DATE] . ' - ' . $version[BUDATOLL_VERSION_TITLE]));
     }
-    echo '</select></td></tr>';
-    echo '<tr><th>Leírás:</th><td>' . $bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION] . '</td></tr>';
-    echo '</tbody></table>';
-    echo '</form>';
-    echo '</div>';
+    $ret .= '</select></div>';
+    $ret .= '<div class="budatoll-keret"><label>Leírás:</label>' . $bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION] . '</div>';
+    $ret .= '</form>';
+    $ret .= '</div>';
+    return $ret;
 }
 
 function btIsCheckboxOn($chk_var) {
@@ -149,14 +148,16 @@ function btGetCheckbox($var_name) {
         update_option($var_name, $var);
         bt_logger(BUDATOLL_LOGGER_TYPE_SETTING_OPTIONS, -1, 'Beállítások, ' . $var_name . ' új érték: ' . $var);
     }
+    return $var;
 }
 
 function btPutCheckbox($var_name, $title, $msg_on, $msg_off) {
     global $$var_name;
     $$var_name = get_option($var_name);
-    echo '<tr><th scope="row"><label for="' . $var_name . '">' . $title . ':</label></th>';
-    echo '<td><input type="checkbox" name="' . $var_name . '" id="' . $var_name . '" '
-    . (btIsCheckboxOn($$var_name) ? 'checked' : '')
-    . ' value="1" onChange="page_changed=true;"> '
-    . (btIsCheckboxOn($$var_name) ? $msg_on : $msg_off ) . '</td></tr>';
+    $ret = '<div class="budatoll-form-group"><label for="' . $var_name . '">' . $title . ':</label>';
+    $ret .= '<input type="checkbox" name="' . $var_name . '" id="' . $var_name . '" '
+            . (btIsCheckboxOn($$var_name) ? 'checked' : '')
+            . ' value="1" onChange="document.getElementById(\'submit\').click();"> '
+            . (btIsCheckboxOn($$var_name) ? $msg_on : $msg_off ) . '</div>';
+    return $ret;
 }

@@ -161,7 +161,7 @@ function list_balance_of_all_users($list = false, $add_new = false) {
         $ret .= '<h4>Egyenlegek</h4>';
         $ret .= '<p>Összesen: ' . bt_currency($res[0]->total) . '</p>';
     }
-      $ret .= '<div class="wrap">';
+    $ret .= '<div class="wrap">';
     $ret .= '<table class="budatoll-table">';
     $ret .= '<thead><tr><th>Felhasználónév</th><th>Egyenleg</th><th>Utolsó változás</th><th>Művelet</th></tr></thead>';
     $ret .= '<tbody>';
@@ -217,7 +217,7 @@ function bt_payment_edit($user_id, $edit_id = -1) {
     $ret .= '</td></tr>';
     $ret .= '<tr><td></td><td>';
     $ret .= bt_save_button($user_id);
-    $ret .= bt_cancel_button(-1);
+    $ret .= bt_cancel_button();
     $ret .= '</td></tr>';
     $ret .= '</table></div></form>';
 

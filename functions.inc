@@ -15,7 +15,8 @@ function budatoll_is_page_allowed() {
     }
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
         BUDATOLL_ROLE_VISITOR => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
-        BUDATOLL_ROLE_COACH => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'],
+        BUDATOLL_ROLE_COACH => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'
+            , '/beallitasok', '/naplok', '/edzes-tipusok', '/emailek', '/jatekosok'],
         BUDATOLL_ROLE_PLAYER => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok',],
     ];
 

@@ -4,7 +4,6 @@ if (!defined('ABSPATH')) {
     die();
 }
 
-define('BUDATOLL_OPTIONS_MENU', "budatoll_options");
 
 require_once plugin_dir_path(__FILE__) . 'setting/event_types.inc';
 require_once plugin_dir_path(__FILE__) . 'setting/options.inc';

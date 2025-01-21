@@ -11,7 +11,6 @@ define("BUDATOLL_LOGGER_TYPE_CHARGE", 8);
 define("BUDATOLL_LOGGER_TYPE_LOGIN", 9);
 define("BUDATOLL_LOGGER_TYPE_EMAIL_MODIFY", 10);
 
-
 define("BUDATOLL_LOGGER_DATA_DELIMITER", '#&@');
 
 $bt_logger_types = [
@@ -43,70 +42,70 @@ function bt_logger_list() {
     if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
         wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
     }
-
+    $ret = '';
     $bt_logger_user = getPostVariable('bt_logger_user', -1);
     $bt_logger_related = getPostVariable('bt_logger_related', -1);
     $bt_logger_cat = getPostVariable('bt_logger_cat', -1);
     $bt_logger_to_date = getPostVariable('bt_logger_to_date', wp_date('Y-m-d'));
     $bt_logger_from_date = getPostVariable('bt_logger_from_date', wp_date('Y-m-d', strtotime($bt_logger_to_date . ' -1 month')));
-    bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
-    bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
+    $ret .= bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
+    $ret .= bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date);
+    return $ret;
 }
 
 function bt_logger_filter($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date) {
     global $bt_logger_types;
+    $ret = '';
     $all_bt_users = get_users([
         'orderby' => 'username',
-//        'role' => BUDATOLL_ROLE_PLAYER,
         'number' => -1,
         'fields' => 'all',]);
-    echo '<div class="wrap"><h1>Naplók listázása</h1></div>';
-    echo '<div  class="container-fluid">';
-    echo '<form id="loggerForm" method="post">
-            <input type="hidden" name="page" value="naplo-lista">';
-    echo '<table class="form-table"><tbody>';
-    echo '<tr><th scope="row"><label for="bt_logger_user">Elkövető</label></th><td>'
-    . '<select class="budatoll-dropdown" id="bt_logger_user" name="bt_logger_user" onchange="submit();">';
-    echo '<option value="-1" ' . ($bt_logger_user == -1 ? 'selected' : '') . '>Összes</option>';
+    $ret .= '<h1>Naplók listázása</h1></div>';
+    $ret .= '<form id="loggerForm" method="post" action="/naplok">';
+    $ret .= '<div class="budatoll-form-group"><label for="bt_logger_user">Elkövető</label>'
+            . '<select class="budatoll-dropdown" id="bt_logger_user" name="bt_logger_user" onchange="submit();">';
+    $ret .= '<option value="-1" ' . ($bt_logger_user == -1 ? 'selected' : '') . '>Összes</option>';
     foreach ($all_bt_users as $user) {
-        echo '<option value="' . $user->ID . '" ' . ($bt_logger_user == $user->ID ? 'selected' : '') . '>' . $user->user_login . '</option>';
+        $ret .= '<option value="' . $user->ID . '" ' . ($bt_logger_user == $user->ID ? 'selected' : '') . '>' . $user->user_login . '</option>';
     }
-    echo '</select></td></tr><tr>';
-    echo '<tr><th scope="row"><label for="bt_logger_related">Érintett</label></th><td>'
-    . '<select class="budatoll-dropdown" id="bt_logger_related" name="bt_logger_related" onchange="submit();">';
-    echo '<option value="-1" ' . ($bt_logger_user == -1 ? 'selected' : '') . '>Összes</option>';
+    $ret .= '</select></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="bt_logger_related">Érintett</label></th><td>'
+            . '<select class="budatoll-dropdown" id="bt_logger_related" name="bt_logger_related" onchange="submit();">';
+    $ret .= '<option value="-1" ' . ($bt_logger_user == -1 ? 'selected' : '') . '>Összes</option>';
     foreach ($all_bt_users as $user) {
-        echo '<option value="' . $user->ID . '" ' . ($bt_logger_related == $user->ID ? 'selected' : '') . '>' . $user->user_login . '</option>';
+        $ret .= '<option value="' . $user->ID . '" ' . ($bt_logger_related == $user->ID ? 'selected' : '') . '>' . $user->user_login . '</option>';
     }
-    echo '</select></td></tr><tr>';
-    echo '<th scope="row"><label for="bt_logger_cat">Kategória</label></th><td>'
-    . '<select id="bt_logger_cat" name="bt_logger_cat" class="budatoll-dropdown" onchange="submit();">';
-    echo '<option value="-1" ' . ($bt_logger_cat == -1 ? 'selected' : '') . '>Összes</option>';
+    $ret .= '</select></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="bt_logger_cat">Kategória</label>'
+            . '<select id="bt_logger_cat" name="bt_logger_cat" class="budatoll-dropdown" onchange="submit();">';
+    $ret .= '<option value="-1" ' . ($bt_logger_cat == -1 ? 'selected' : '') . '>Összes</option>';
     foreach ($bt_logger_types as $type_id => $type_name) {
-        echo '<option value="' . $type_id . '" ' . ($bt_logger_cat == $type_id ? 'selected' : '') . '>' . $type_name . '</option>';
+        $ret .= '<option value="' . $type_id . '" ' . ($bt_logger_cat == $type_id ? 'selected' : '') . '>' . $type_name . '</option>';
     }
-    echo '</select></td></tr>';
-    echo '<tr><th scope="row"><label for="bt_logger_from_date">Időszak:</label></th><td>
+    $ret .= '</select></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="bt_logger_from_date">Időszak:</label>
       <input type="date" name="bt_logger_from_date" id="bt_logger_from_date" value="' . $bt_logger_from_date . '" onchange="submit();"> 
-      <input type="date" name="bt_logger_to_date" id="bt_logger_to_date" value="' . $bt_logger_to_date . '" onchange="submit();"></td><td></td><td></td></tr></tbody></table>';
-    echo '</div></form></div>';
+      <input type="date" name="bt_logger_to_date" id="bt_logger_to_date" value="' . $bt_logger_to_date . '" onchange="submit();"></div>';
+    $ret .= '</form>';
+    return $ret;
 }
 
 function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, $bt_logger_from_date, $bt_logger_to_date) {
     global $wpdb, $bt_logger_types, $bt_logger_colors;
+    $ret = '';
     $sql = 'SELECT * FROM `' . BUDATOLL_LOGGER_TABLE . '` WHERE '
             . ($bt_logger_user > 0 ? ('`' . BUDATOLL_LOGGER_USER . '`=' . $bt_logger_user . ' AND ') : '')
             . ($bt_logger_related > 0 ? ('`' . BUDATOLL_LOGGER_RELATED . '`=' . $bt_logger_related . ' AND ') : '')
             . ($bt_logger_cat > 0 ? ('`' . BUDATOLL_LOGGER_TYPE . '`=' . $bt_logger_cat . ' AND ') : '')
             . ' `' . BUDATOLL_LOGGER_TIME . '` BETWEEN "' . $bt_logger_from_date . ' 00:00:00" AND "' . $bt_logger_to_date . ' 23:59:59" '
-            . 'ORDER BY `' . BUDATOLL_LOGGER_TIME . '` DESC;';
-    echo '<table class="wp-list-table widefat fixed">';
-    echo '<thead><tr><th scope="col" id="column1" class="manage-column column-column1" style="width:80px;">Elkövető</th>'
-    . '<th scope="col" id="column2" class="manage-column column-column2" style="width:80px;">Típus</th>'
-    . '<th scope="col" id="column3" class="manage-column column-column3"  style="width:80px;">Érintett</th>'
-    . '<th scope="col" id="column3" class="manage-column column-column4"  style="width:80px;">Időpont</th>'
-    . '<th scope="col" id="column4" class="manage-column column-colum5">Megjegyzés</th>'
-    . '</tr></thead><tbody id="logger-list">';
+            . 'ORDER BY `' . BUDATOLL_LOGGER_TIME . '` DESC LIMIT 200;';
+    $ret .= '<table class="budatoll-table">';
+    $ret .= '<thead><tr><th scope="col" id="column1" class="manage-column column-column1" style="width:70px;">Elkövető</th>'
+            . '<th scope="col" id="column2" class="manage-column column-column2" style="width:70px;">Típus</th>'
+            . '<th scope="col" id="column3" class="manage-column column-column3"  style="width:70px;">Érintett</th>'
+            . '<th scope="col" id="column3" class="manage-column column-column4"  style="width:150px;">Időpont</th>'
+            . '<th scope="col" id="column4" class="manage-column column-colum5">Megjegyzés</th>'
+            . '</tr></thead><tbody id="logger-list">';
     foreach ($wpdb->get_results($sql) as $row) {
         $user = get_userdata($row->{BUDATOLL_LOGGER_USER});
         $user_name = $user->display_name ?? '---';
@@ -132,18 +131,19 @@ function bt_logger_display($bt_logger_user, $bt_logger_related, $bt_logger_cat, 
                 $related_name = $related->display_name ?? '---';
                 break;
         }
-        echo '<tr style="background:' . $bt_logger_colors[$row->{BUDATOLL_LOGGER_TYPE}] . ';"><td class="column-column1">' . $user_name . '</td>';
-        echo '<td class="column-column2">' . $bt_logger_types[$row->{BUDATOLL_LOGGER_TYPE}] . '</td>';
-        echo '<td class="column-column3">' . $related_name . '</td>';
-        echo '<td class="column-column4">' . $row->{BUDATOLL_LOGGER_TIME} . '</td>';
-        echo '<td class="column-column5">' . $comment . '</td></tr>';
+        $ret .= '<tr style="background:' . $bt_logger_colors[$row->{BUDATOLL_LOGGER_TYPE}] . ';"><td class="column-column1">' . $user_name . '</td>';
+        $ret .= '<td class="column-column2">' . $bt_logger_types[$row->{BUDATOLL_LOGGER_TYPE}] . '</td>';
+        $ret .= '<td class="column-column3">' . $related_name . '</td>';
+        $ret .= '<td class="column-column4">' . $row->{BUDATOLL_LOGGER_TIME} . '</td>';
+        $ret .= '<td class="column-column5">' . $comment . '</td></tr>';
     }
-    echo '</tbody></table>';
+    $ret .= '</tbody></table>';
+    return $ret;
 }
 
 function bt_log_user_login($user_login) {
     $user = get_user_by('login', $user_login);
-    $user_id = ($user && $user->exists()) ? $user->ID:-1;
+    $user_id = ($user && $user->exists()) ? $user->ID : -1;
     bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, $user_login . ' belépett');
 }
 

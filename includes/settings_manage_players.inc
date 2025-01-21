@@ -13,6 +13,7 @@ function budatoll_manage_players() {
     if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
         wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
     }
+    $ret = '';
 //   echo 'Post: ' . print_r($_POST, true);
     $edit_id = getPostVariable('budatoll_player', -1);
     if (getPostVariable('budatoll_cancel', false)) {
@@ -23,30 +24,31 @@ function budatoll_manage_players() {
         wp_delete_user($delete);
     }
     $save = getPostVariable('budatoll_save', false);
-    echo '<div class="wrap">';
-    echo '<form id="BudatollForm" method="post">';
-    echo '<h2>Játékosok listája.</h2>';
+    $ret .= '<div class="wrap">';
+    $ret .= '<form id="BudatollForm" method="POST" action="/jatekosok" >';
+    $ret .= '<h2>Játékosok listája.</h2>';
     if ($save) {
         if (budatoll_manage_players_save($edit_id)) {
-            echo '<div class="budatoll-message budatoll-success" id="budatoll-message">Sikeres</div>';
+            $ret .= '<div class="budatoll-message budatoll-success" id="budatoll-message">Sikeres</div>';
         } else {
-            echo '<div class="budatoll-message budatoll-error" id="error-message">Mentés sikertelen</div>';
+            $ret .= '<div class="budatoll-message budatoll-error" id="error-message">Mentés sikertelen</div>';
         }
         $edit_id = -1;
     }
-    echo '<input type="hidden" name="budatoll_player" id="budatoll_edit" value="' . $edit_id . '">';
+    $ret .= '<input type="hidden" name="budatoll_player" id="budatoll_edit" value="' . $edit_id . '">';
     $new_player = getPostVariable('new_player');
     if ($edit_id < 0 AND !$new_player) {
-        submit_button("Új játékos", 'primary', 'new_player');
+        $ret .= bt_add_button(-1, 'new_player', "Új játékos");
     }
     if ($new_player) {
-        echo budatoll_manage_players_edit(-1);
+        $ret .= budatoll_manage_players_edit(-1);
     }
     if ($edit_id >= 0) {
-        echo budatoll_manage_players_edit($edit_id);
+        $ret .= budatoll_manage_players_edit($edit_id);
     }
-    echo budatoll_manage_players_list();
-    echo '</form></div>';
+    $ret .= budatoll_manage_players_list();
+    $ret .= '</form></div>';
+    return $ret;
 }
 
 function budatoll_manage_players_edit($user_id) {
@@ -75,41 +77,41 @@ function budatoll_manage_players_edit($user_id) {
         $display_name = $user->display_name;
         $user_email = $user->user_email;
     }
-    $ret .= '<table class="form-table"><tbody>';
-    $ret .= '<tr><th scope="row"><label>Felhasználó név:</label></th><td>';
-    $ret .= ($user_id > 0) ? $user_login : '<input type = "text" id = "budatoll-user-login" name = "budatoll-user-login" value = ""/>';
-    $ret .= '</td></tr><tr><th scope = "row"><label>Teljes név:</label></th>'
-            . '<td><input type = "text" id = "budatoll-display-name" name = "budatoll-display-name" value = "' . $display_name . '"/></td></tr>';
-    $ret .= '<tr><th scope = "row"><label>Email cím:</label></th>'
-            . '<td><input type = "email" id = "budatoll-user-email" name = "budatoll-user-email" value = "' . $user_email . '"/></td></tr>';
-    $ret .= '<tr><th scope = "row"><label for = "budatoll-tel">Telefon:</th>'
-            . '<td><input type = "tel" id = "budatoll-tel" name = "budatoll-tel" value = "' . $phone . '"/></td></tr>';
-    $ret .= '<tr><th scope = "row"><label for = "budatoll-active">Aktív:</label></th>'
-            . '<td><input type = "checkbox" id = "budatoll-active" name = "budatoll-active" value = "1"'
-            . ($active == '1' ? 'checked' : '') . '></td></tr>';
-    $ret .= '<tr><th scope = "row"><label for = "budatoll-leased">Bérletes:</label></th>'
-            . '<td><input type = "checkbox" id = "budatoll-leased" name = "budatoll-leased" value = "1"'
-            . ($leased == '1' ? 'checked' : '') . '></td></tr>';
-    $ret .= '</tbody><tbody class = "budatoll-options-group">';
-    $ret .= '<tr><th scope = "row"><label>Választható edzések:</label></th>';
+    $ret .= '<div class="budatoll-keret">';
+    $ret .= '<div class="budatoll-form-group"><label>Felhasználó név:</label>';
+    $ret .= (($user_id > 0) ? $user_login : '<input type = "text" id = "budatoll-user-login" name = "budatoll-user-login" value = ""/>') . '</div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-display-name">Teljes név:</label>'
+            . '<input type = "text" id = "budatoll-display-name" name = "budatoll-display-name" value = "' . $display_name . '"/></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-user-email">Email cím:</label>'
+            . '<input type = "email" id = "budatoll-user-email" name = "budatoll-user-email" value = "' . $user_email . '"/></div>';
+    $ret .= '<div class="budatoll-form-group"><label for = "budatoll-tel">Telefon:</label>'
+            . '<input type = "tel" id = "budatoll-tel" name = "budatoll-tel" value = "' . $phone . '"/></div>';
+    $ret .= '<div class="budatoll-form-group"><label for = "budatoll-active">Aktív:</label>'
+            . '<input type = "checkbox" id = "budatoll-active" name = "budatoll-active" value = "1"'
+            . ($active == '1' ? 'checked' : '') . '></div>';
+    $ret .= '<div class="budatoll-form-group"><label for = "budatoll-leased">Bérletes:</label>'
+            . '<input type = "checkbox" id = "budatoll-leased" name = "budatoll-leased" value = "1"'
+            . ($leased == '1' ? 'checked' : '') . '></div>';
+    $ret .= '<hr><div class = "budatoll-form-group">';
+    $ret .= '<label>Edzések:</label><div class="budatoll-column">';
     $first_row = true;
     foreach (btGetEventTypes() as $event_type) {
-        if ($first_row) {
-            $first_row = false;
-        } else {
-            $ret .= '<tr><th></th>';
-        }
+        /*
+          if ($first_row) {
+          $first_row = false;
+          } else {
+          $ret .= '<tr><th></th>';
+          }
+         * 
+         */
         $event_type_id = $event_type->{BUDATOLL_EVENT_TYPE_ID};
         $checked = in_array($event_type_id, $events) ? 'checked' : '';
-        $ret .= '<td><input type = "checkbox" name = "event_types_chk[]" value = "' . $event_type_id . '" ' . $checked . '>' . $event_type->{BUDATOLL_EVENT_TYPE_LONG} . '</td>';
+        $ret .= '<p><input type = "checkbox" name = "event_types_chk[]"  value = "' . $event_type_id
+                . '" ' . $checked . '>' . $event_type->{BUDATOLL_EVENT_TYPE_LONG} . '</p>';
     }
-    $ret .= '</td></tr>';
-    $ret .= '</tbody></table>';
-    $ret .= get_submit_button('Mentés', 'primary small', 'budatoll_save', false, ['style' => 'margin: 10px;
-    ']);
-    $ret .= get_submit_button('Mégsem', 'primary small', 'budatoll_cancel', false, ['style' => 'margin: 10px;
-    ']);
-    $ret .= '</div></div><hr>';
+    $ret .= '</div></div>';
+    $ret .= '<div class="budatoll-form-group">' . bt_save_button(-1) . bt_cancel_button() . '</div>';
+    $ret .= '</div>';
     return $ret;
 }
 
@@ -130,7 +132,7 @@ function budatoll_manage_players_save($user_id) {
                 bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user_id, $user_login . ' nevű játékos létrehozva');
                 if (btIsOptionEnabled(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY)) {
                     bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_PLAYER_REGISTERED, [$user_login, $user_email]);
-                    }
+                }
             } else {
                 echo '<p style = "color:red;">' . $user_id->get_error_message() . '</p>';
                 return false;
@@ -219,8 +221,8 @@ function budatoll_manage_players_save($user_id) {
 function budatoll_manage_players_list() {
 
     $users = bt_get_active_players(false);
-    $ret = '<div class = "wrap">';
-    $ret .= '<table class = "wp-list-table widefat fixed striped">';
+    $ret = '';
+    $ret .= '<table class = "budatoll-table budatoll-table-strippe budatoll-table-wrapper">';
     $ret .= '<thead><tr>'
             . '<th scope = "col" id = "column1" class = "manage-column column-column1" style = "width:120px;">Felhasználónév</th>'
             . '<th scope = "col" id = "column2" class = "manage-column column-column2" >Teljes név</th>'
@@ -255,15 +257,13 @@ function budatoll_manage_players_list() {
         $ret .= '<td class = "column-column5">' . $events . '</td>';
         $ret .= '<td class = "column-column6"><span class = "dashicons dashicons-' . ($active == '1' ? 'yes' : 'no' ) . '"></span></td>';
         $ret .= '<td class = "column-column7"><span class = "dashicons dashicons-' . ($leased == '1' ? 'yes' : 'no' ) . '"></span></td>';
-        $ret .= '<td class = "column-column8"><button class = "button button-link button-small" name = "budatoll_player" id = "budatoll_player" value = "'
-                . $user_id . '" title = "Szerkesztés">'
-                . '<span class = "dashicons dashicons-edit"></span></button>';
+        $ret .= '<td class = "column-column8">' . bt_edit_button($user_id, 'budatoll_player');
         if (is_player_deletable($user_id)) {
             $ret .= bt_delete_button($user_id);
         }
         $ret .= '</td></tr>';
     }
-    $ret .= '</tbody></table></div>';
+    $ret .= '</tbody></table>';
     return $ret;
 }
 
@@ -321,15 +321,14 @@ function bt_get_full_name($user_id) {
     }
 }
 
-
 function bt_user_register($user_id) {
     bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_SELF_REGISTERED_PLAYER);
     bt_logger(BUDATOLL_LOGGER_TYPE_LOGIN, $user_id, 'Játékos regisztrált a rendszerben. ID: ' . $user_id);
     $coaches = bt_get_coaches();
-    if(!empty($coaches)) {
+    if (!empty($coaches)) {
         foreach ($coaches as $coach) {
             bt_send_custom_email($coach->ID, BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH, [bt_get_user_name($user_id),]);
-            }
+        }
     }
 }
 
