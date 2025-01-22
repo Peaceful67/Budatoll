@@ -77,7 +77,7 @@ add_action('user_register', 'bt_user_register', 10, 1);
 add_action('delete_user', 'bt_user_delete', 10, 1);
 add_action('init', 'bt_init');
 add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem működik a crontab
-
+add_action('after_setup_theme', 'budatoll_remove_admin_bar');
 
 add_action('user_register', 'bt_set_default_role');
 
@@ -112,4 +112,10 @@ function budatoll_scripts() {
     wp_enqueue_script('budatoll-jquery-ui-script', plugins_url('jquery-ui/jquery-ui.js', __FILE__), array('jquery'), false, false);
     wp_enqueue_script('budatoll-end-script', plugins_url('js/budatoll-end-script.js', __FILE__), array('jquery'), null, true);
     wp_localize_script('budatoll-header-script', 'budatoll_ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+}
+
+function budatoll_remove_admin_bar() {
+    if (!current_user_can(BUDATOLL_ROLE_ADMIN)) {
+        show_admin_bar(false);
+    }
 }

@@ -12,6 +12,8 @@ define("BUDATOLL_ACCESS_MANAGE_OPTIONS", 'budatoll-manage-options');
 define("BUDATOLL_ACCESS_MANAGE_COACH", 'budatoll-manage-coach');
 define("BUDATOLL_ACCESS_MANAGE_PLAYER", 'budatoll-manage-player');
 
+define("BUDATOLL_ACCESS_AJAX", 'access_ajax_budatoll');
+
 
 define("BUDATOLL_EVENT_TYPE_TABLE", $wpdb->prefix .'budatoll_event_type');
 define("BUDATOLL_EVENT_TYPE_ID", 'id');

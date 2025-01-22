@@ -15,7 +15,7 @@ add_action('admin_init', 'budatoll_settings_init');
 add_action('admin_menu', 'budatoll_add_settings_pages', 99);
 add_action('after_setup_theme', 'budatoll_remove_admin_bar');
 
-function budatoll_add_settings_pages() {
+function budatoll_add_settings_pagess() {
 
     add_menu_page(
             'Budatoll beállítások',
