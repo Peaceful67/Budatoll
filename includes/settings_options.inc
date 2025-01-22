@@ -67,7 +67,7 @@ function budatoll_setting_options() {
             . '<li>- Belépett játékos egyenlege a neve alatt mindig.</li>'
             . '<li>- Az összes kimenő levél szerkeszthetősége.</li>'
             . '<li>- Beállítási odalak áthelyezése a vezérlőpultról a menübe.</li>'
-            . '<li>- Edzői naptárnál szinek bevezetése: kék->még van hely, zöld->megtelt, sárga->vannak várólistán</li>'
+            . '<li>- Edzői órarendnél szinek bevezetése: kék->még van hely, zöld->megtelt, sárga->vannak várólistán</li>'
             . '</ul>',
         ],
         '1.2' => [

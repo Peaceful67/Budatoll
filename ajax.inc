@@ -153,10 +153,25 @@ function bt_get_trainings_range($from, $to) {
             $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
                     . ' WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=%d ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
             $trainings = bt_get_results($sql, [$event->{BUDATOLL_EVENTS_ID}]);
+            $waiting = false;
+            $num_confirmed = 0;
             foreach ($trainings as $training) {
                 $training->player_name = bt_get_full_name($training->player_id);
+                if ($training->{BUDATOLL_TRAINING_CONFIRMED} == 1) {
+                    $num_confirmed++;
+                } else {
+                    $waiting = true;
+                }
             }
             $event->trainings_of_event = $trainings;
+            $state = 'full';  // Az alapeset, hogy megtelt
+            if($waiting) { // Vannak a várólistán
+                $state = 'waiting';
+            }
+            if ($event->{BUDATOLL_EVENTS_MAX_PLAYERS} == 0 OR $num_confirmed < $event->{BUDATOLL_EVENTS_MAX_PLAYERS}) { // Meg van hely
+                $state = 'available';
+            }
+            $event->state = $state;
             $ret['events'][] = $event;
         }
     }

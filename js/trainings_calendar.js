@@ -2,7 +2,7 @@ var btAddedTrainingIds = [];
 let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
-    datesSet: function (eventInfo) {
+    events: function (eventInfo, successCallback, failureCallback) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
         $.ajax({
@@ -17,20 +17,28 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             },
             success: function (response) {
                 if (response.result === 'success') {
-                    response.events.forEach(function (event) {
-                        if (!btAddedTrainingIds.hasOwnProperty(event.id)) {
+                    if (!Array.isArray(response.events)) {
+                        console.error('Invalid events response:', response.events);
+                        failureCallback();
+                        return;
+                    }
+                    var events = response.events.map(function (event) {
+                        if (event && !btAddedTrainingIds.hasOwnProperty(event.id)) {
                             btAddedTrainingIds[event.id] = event;
-                            budatoll_trainings_calendar.addEvent({
-                                'id': event.id,
-                                'title': event.short,
-                                'start': event.day + 'T' + event.start,
-                                'end': event.day + 'T' + event.end
-                            });
+                            return {
+                                id: event.id,
+                                title: event.short,
+                                start: event.day + 'T' + event.start,
+                                end: event.day + 'T' + event.end,
+                                extendedProps: {
+                                    state: event.state, }
+                            };
                         }
-                    });
+                        return null;
+                    }).filter(Boolean);
+                    successCallback(events);
                 } else {
-                    //                console.log('Wrong action: ' + response.action);
-                    //                console.log('SQL: ' + response.sql);
+                    failureCallback();
                 }
             },
             error: function (response) {
@@ -43,14 +51,17 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         var arrayOfDomNodes = [];
         var title = document.createElement('div');
         title.innerText = day.event.title;
-        if (day.event.extendedProps.booked) {
-            if (day.event.extendedProps.confirmed) {
-                title.classList.add('budatoll-booked-event');
-            } else {
-                title.classList.add('budatoll-waiting-event');
-            }
-        } else {
-            title.classList.add('budatoll-available-event');
+        switch (day.event.extendedProps.state) {
+            case 'full':
+                title.classList.add('budatoll-event-state-full');
+                break;
+            default:
+            case 'available':
+                title.classList.add('budatoll-event-state-available');
+                break;
+            case 'waiting':
+                title.classList.add('budatoll-event-state-waiting');
+                break;
         }
         arrayOfDomNodes.push(title);
         return {domNodes: arrayOfDomNodes};

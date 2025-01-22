@@ -270,6 +270,25 @@
     }
 }
 
+.budatoll-event-state-available {
+    background-color: #0B5394;
+    color:white;
+    border: 1px solid darkred;
+    border-radius: 5px;
+}
+.budatoll-event-state-full {
+    background-color: #0eb439;
+    color:white;
+    border: 1px solid darkgreen;
+    border-radius: 5px;
+}
+.budatoll-event-state-waiting {
+    background-color: #e1b21c;
+    color:white;
+    border: 1px solid darkgoldenrod;
+    border-radius: 5px;
+}
+
 .budatoll-booked-event {
     background-color: #0B5394;
     color:white;

@@ -47,8 +47,6 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                     successCallback(events);
                 } else {
                     failureCallback();
-                    //           console.log('Wrong action: ' + response.action);
-                    //           console.log('SQL: ' + response.sql);
                 }
             },
             error: function (response) {
