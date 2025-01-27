@@ -11,7 +11,7 @@ define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cancel
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
 
-define("BUDATOLL_CURRENT_VERSION", '1.1');
+define("BUDATOLL_CURRENT_VERSION", '1.2');
 
 define("BUDATOLL_VERSION_ID", 'id');
 define("BUDATOLL_VERSION_DATE", 'date');

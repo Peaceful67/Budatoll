@@ -5,8 +5,8 @@ if (!defined('ABSPATH')) {
 }
 
 function budatoll_manage_events_calendar() {
-    $ret = 'Időpontok naptár szerint';
-    $ret = '<div id="calendar-wrap">'
+    $ret = '<h4>Alkalmak naptár szerint</h4>';
+    $ret .= '<div id="calendar-wrap">'
             . '<div id="budatoll-alkalom-calendar">'
             . '</div></div>';
     return $ret;

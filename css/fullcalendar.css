@@ -40,24 +40,32 @@
 
 /* Adjust event container for clarity */
 .fc-event-container {
-  overflow-y: auto; /* Enables scroll if there are too many events */
-  max-height: 100%; /* Restrict height to keep the layout clean */
+    overflow-y: auto; /* Enables scroll if there are too many events */
+    max-height: 100%; /* Restrict height to keep the layout clean */
 }
 
 /* Style individual events */
 .fc-event {
-  font-size: 12px; /* Smaller font for compactness */
-  padding: 2px; /* Adjust padding for compact design */
-  border-radius: 3px; /* Rounded edges for neatness */
+    font-size: 12px; /* Smaller font for compactness */
+    padding: 2px; /* Adjust padding for compact design */
+    border-radius: 3px; /* Rounded edges for neatness */
+    user-select: none; /* Disable text selection */
+    -webkit-user-drag: none; /* Disable dragging in WebKit browsers */
+    -webkit-touch-callout: none; /* Disable context menu on iOS */
 }
 
 /* Style popover for additional events */
 .fc-popover {
-  max-width: 300px; /* Ensure the popover is easy to read */
-  font-size: 12px;
+    max-width: 300px; /* Ensure the popover is easy to read */
+    font-size: 12px;
 }
 
 /* Ensure events are stackable without overlap */
 .fc-day-grid-event {
-  white-space: normal; /* Allows multi-line event titles */
+    white-space: normal; /* Allows multi-line event titles */
+    text-align: center !important;
+    display: flex;
+    justify-content: center;
+    text-align: center;
 }
+

@@ -325,20 +325,6 @@
     width: 16px;
     height: 16px;
 }
-.fc-event {
-    user-select: none; /* Disable text selection */
-    -webkit-user-drag: none; /* Disable dragging in WebKit browsers */
-    -webkit-touch-callout: none; /* Disable context menu on iOS */
-}
-
-.fc-daygrid-event {
-    text-align: center !important;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    white-space: normal;
-}
-
 .budatoll-form-group {
     display: flex; /* Arrange label and input field in the same line */
     flex-direction: row; /* Horizontal alignment */

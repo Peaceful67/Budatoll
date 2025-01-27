@@ -16,6 +16,7 @@ define("BT_CUSTOM_EMAIL_PLAYER_REGISTERED", 'player-registered');
 define("BT_CUSTOM_EMAIL_PLAYER_MODIFIED", 'player-modified');
 define("BT_CUSTOM_EMAIL_SELF_REGISTERED_PLAYER", 'self-registered-player');
 define("BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH", 'self-registered-coach');
+define("BT_CUSTOM_EMAIL_WARN_PLAYERS", 'warn-players');
 
 define("BT_CUSTOM_EMAIL_SIGN", 'email-sign');
 define("BT_CUSTOM_EMAIL_DEFAULT_SIGN", 'Üdvözlettel:<br>Budatoll csapata');
@@ -118,6 +119,14 @@ $bt_default_emails = [
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>Egy új játékos regisztrált a tollasklubban. A felhasználó neve:#1#<br>'
         . 'A vezérlőpulton álltsd be számára a megfelelő játékokat, edzéseket!',
     ],
+    BT_CUSTOM_EMAIL_WARN_PLAYERS => [
+        BUDATOLL_EMAIL_TITLE => 'Felhívás jelentkezésre',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt az összes olyan aktív játékos kapja, aki a mai naptól kezdve bármely beállított alkalomra jelentkezhet.<br>'
+        . '#1# helyén a játékos felhasználó neve fog megjelenni.',
+        BUDATOLL_EMAIL_SUBJECT => 'Edzésalkalmak feltöltve',
+        BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A tollaslabda klubunk honlapján új edzés alkalmak lettek beállítva.<br>'
+        . 'Lépj be az oldalra és jelentkezz, amelyikre szeretnél eljönni!',
+    ],
 ];
 
 function budatoll_manage_emails() {
@@ -202,7 +211,7 @@ function bt_send_custom_email($user_id, $email_id, $params = []) {
             $final_body = str_replace($placeholder, $value, $final_body);
         }
     }
-    bt_send_email($user_id, $subject, $final_body);
+    return bt_send_email($user_id, $subject, $final_body);
 }
 
 function bt_get_custom_email($email_id) {

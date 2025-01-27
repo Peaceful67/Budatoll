@@ -139,9 +139,23 @@ function btGetEventTypes() {
     return $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '`;');
 }
 
-function btGetEventTypeById($id) {
+function get_event_type_by_id($id) {
     global $wpdb;
     $result = $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '` WHERE `' . BUDATOLL_EVENT_TYPE_ID . '`=' . $id . ';');
     $ret = $result[0] ?? [];
+    return $ret;
+}
+
+
+function get_public_event_types() {
+    $ret = [];
+    $types = btGetEventTypes();
+    if(!empty($types)) {
+        foreach ($types as $type) {
+            if($type->{BUDATOLL_EVENT_TYPE_PUBLIC}==1) {
+                $ret[] = $type->{BUDATOLL_EVENT_TYPE_ID};
+            }
+        }
+    }
     return $ret;
 }

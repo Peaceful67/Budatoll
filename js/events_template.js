@@ -1,3 +1,5 @@
+/* global bt_events_not_before */
+
 var btAddedEventIds = [];
 var eventListEl_types = document.getElementById('event-types-list');
 new FullCalendar.Draggable(eventListEl_types, {
@@ -10,35 +12,28 @@ new FullCalendar.Draggable(eventListEl_types, {
         };
     }
 });
-var calendarEl_events = document.getElementById('budatoll-alkalom-calendar');
+var calendarEl_events = document.getElementById('budatoll-events-template');
 const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
-    datesSet: function (info) {
-        btAddedTrainingIds = [];
-    },
     events: function (info, successCallback, failureCallback) {
-        // Convert the visible range into your custom format
-        var active_start = getDateOfEventDate(info.start);
-        var active_end = getDateOfEventDate(info.end);
-        // Perform an AJAX request to fetch events
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
             dataType: 'json',
             data: {
                 action: 'budatoll',
-                'ajax-action': 'get-events-range',
-                'event-start': active_start, // Start date in custom format
-                'event-end': active_end      // End date in custom format
+                'ajax-action': 'get-events-template',
+                start: info.startStr, // Pass start date of visible range
+                end: info.endStr      // Pass end date of visible range
             },
             success: function (response) {
                 if (response.result === 'success') {
-                    // Map response events to FullCalendar's event structure
-                    const events = response.events.map(function (event) {
+                    const events = Object.values(response.events).map(function (event) {
                         return {
-                            id: event.id,
+                            id: event.template_id,
                             title: event.short,
-                            start: event.day + 'T' + event.start, // Combine date and time
-                            end: event.day + 'T' + event.end, // Combine date and time
+                            daysOfWeek: event.day, // Use daysOfWeek for recurring events
+                            startTime: event.start + ':00',
+                            endTime: event.end + ':00',
                             extendedProps: {
                                 long_title: event.long
                             }
@@ -50,7 +45,8 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
                 }
             },
             error: function (response) {
-                console.log('Error fetching events:', response);
+                console.log('error');
+                console.log(response);
                 $('#budatoll-message')
                         .html('Az edzések beolvasása sikertelen')
                         .addClass('budatoll-error')
@@ -61,83 +57,57 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
             }
         });
     },
+
     headerToolbar: {
-        left: 'prev,next today copyTemplate sendEmailWarning',
-        center: 'title',
-        right: 'dayGridMonth timeGridWeek listWeek'
-
+        left: '',
+        center: '',
+        right: 'timeGridWeek, listWeek'
     },
-    customButtons: {
-        copyTemplate: {
-            text: 'Sablon másolás',
-            hint: 'Egy hetet bemásol',
-            click: function () {
-                if (confirm('Biztosan be akarod másolni a sablont az aktuális hétre?')) {
-                    copyTemplateEvents();
-                }
-            }
-        },
-        sendEmailWarning: {
-            text: 'Figyelmeztetés',
-            hint: 'Emaileket küld a játékosoknak, hogy jelentkezhetnek következő időszakra.',
-            click: function () {
-                if (confirm('Biztosan levelet akarsz küldeni az összes érintett játékosnak?')) {
-                    emailToPlayers();
-                }
-            }
-        }
-
-    },
-    viewDidMount: function (info) {
-        const copyTemplateButtonEl = document.querySelector('.fc-copyTemplate-button');
-        if (copyTemplateButtonEl) {
-            if (info.view.type === 'dayGridMonth') {
-                copyTemplateButtonEl.style.display = 'none'; // Hide in dayGridMonth
-            } else {
-                copyTemplateButtonEl.style.display = ''; // Show in other views
-            }
-        }
-    },
-    viewWillUnmount: function (info) {
-        const copyTemplateButtonEl = document.querySelector('.fc-copyTemplate-button');
-        if (copyTemplateButtonEl) {
-            copyTemplateButtonEl.style.display = ''; // Reset visibility on unmount
-        }
-    },
-    initialView: 'dayGridMonth',
+    initialView: 'timeGridWeek',
     height: 'auto', // Adjusts height dynamically
     locale: 'hu',
     firstDay: 1,
-    editable: true,
+    rerenderDelay: 500,
     slotMinTime: bt_events_not_before,
     slotMaxTime: bt_events_not_after,
+    editable: true,
     weekends: false,
     droppable: true,
     forceEventDuration: true,
     defaultAllDay: false,
+    dayHeaders: true,
+    allDaySlot: false,
     dayMaxEvents: true, // allow "more" link when too many events
-
+    dayHeaderContent: function (args) {
+        return args.date.toLocaleDateString('hu', {weekday: 'long'}); // e.g., "Monday"
+    }
+    ,
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {
             btEventRemove(eventInfo);
         }
-    },
+    }
+    ,
     eventReceive: function (eventInfo) {
         btEventReceive(eventInfo);
-    },
+    }
+    ,
     eventMouseEnter: function (eventInfo) {
         if (!btIsTouchDevice()) {
             btEventMouseEnter(eventInfo);
         }
-    },
+    }
+    ,
     eventMouseLeave: function (eventInfo) {
         if (!btIsTouchDevice()) {
             btEventMouseLeave(eventInfo);
         }
-    },
+    }
+    ,
     eventDrop: function (eventInfo) {
         btEventDrop(eventInfo);
-    },
+    }
+    ,
     eventDidMount: function (eventInfo) {
         if (btIsTouchDevice()) {
             addLongPressListener(
@@ -151,7 +121,8 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
         }
     }
 
-});
+}
+);
 budatoll_events_calendar.render();
 function btEventRemove(eventInfo) {
 //       alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
@@ -163,15 +134,16 @@ function btEventRemove(eventInfo) {
         dataType: 'json',
         data: {
             action: 'budatoll',
-            'ajax-action': 'remove-event',
-            'event-id': eventInfo.event.id
+            'ajax-action': 'remove-event-template',
+            'template-id': eventInfo.event.id
         },
         success: function (response) {
             switch (response.result) {
-                case 'deleted':
+                case 'success':
                     eventInfo.event.remove();
                     $('#budatoll-message').html('Törlés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
                     break;
                 case 'error':
                     message = response.message;
@@ -190,37 +162,33 @@ function btEventRemove(eventInfo) {
 function btEventReceive(eventInfo) {
     var droppedDate = getDateOfEventDate(eventInfo.event.start);
     eventInfo.event.setAllDay(false);
+    const event = eventInfo.event;
+    const dayOfWeek = event.start.getDay();
     $.ajax({
         url: budatoll_ajax_object.ajax_url,
         type: 'POST',
         dataType: 'json',
         data: {
             action: 'budatoll',
-            'ajax-action': 'add-event',
+            'ajax-action': 'add-event-template',
             'event_type-id': eventInfo.event.id,
-            'dropped-date': droppedDate
+            'weekday': dayOfWeek,
         },
         success: function (response) {
             switch (response.result) {
-                case 'already':
-                    eventInfo.event.remove();
-                    $('#budatoll-message').html('Ilyen edzés már van ezen a napon, nem történt mentés').removeClass('budatoll-success').addClass('budatoll-error');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
                 case 'success':
                     start_time = droppedDate + 'T' + response.event.start;
                     end_time = droppedDate + 'T' + response.event.end;
                     event_id = response.event_id;
-                    message = response.message;
+                    message = response.event.long;
                     eventInfo.event.setProp('id', event_id);
                     eventInfo.event.setDates(start_time, end_time);
                     eventInfo.event.setAllDay(false);
-                    //                           console.log(eventInfo.event);
                     $('#budatoll-message').html('Mentés sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(2500).hide(1000);
                     setTimeout(function () {
                         window.location.reload(false);
-                    }, 3000);
+                    }, 3500);
                     break;
                 case 'error':
                     eventInfo.event.remove();
@@ -238,13 +206,13 @@ function btEventReceive(eventInfo) {
 }
 
 function btEventMouseEnter(eventInfo) {
-    const event_info = $("#budatoll-event-info");
+    const event_info = $("#budatoll-template-info");
     const event = eventInfo.event;
     const title = event.extendedProps.long_title;
-    const start = event.startStr.substring(11, 16);
-    const end = event.endStr.substring(11, 16);
+    const start = event.start;
+    const end = event.end;
     var event_text = '<h4>' + title + '</h4>';
-    event_text += 'Idősáv: ' + start + ' - ' + end + '<br>';
+    event_text += 'Idősáv: ' + getHourMinutes(start) + ' - ' + getHourMinutes(end) + '<br>';
     const [popupX, popupY] = btIsTouchDevice()
             ? getPopupPosTouchDevice(event_info)
             : getPopupPos(event_info);
@@ -261,7 +229,7 @@ function btEventMouseEnter(eventInfo) {
 
 function btEventMouseLeave(eventInfo)
 {
-    $("#budatoll-event-info").stop(true, true).fadeOut(budatoll_modal_speed);
+    $("#budatoll-template-info").stop(true, true).fadeOut(budatoll_modal_speed);
 }
 
 
@@ -269,69 +237,3 @@ function btEventDrop(eventInfo) {
     console.log('EventDrop: ' + eventInfo.event.start + ' - ' + eventInfo.event.end);
 }
 
-function copyTemplateEvents() {
-    var startOfWeek = budatoll_events_calendar.view.activeStart; // Get the first day of the current week
-    $.ajax({
-        url: budatoll_ajax_object.ajax_url,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            action: 'budatoll',
-            'ajax-action': 'copy-templates',
-            'start-of-week': startOfWeek,
-        },
-        success: function (response) {
-            switch (response.result) {
-                case 'success':
-                    const message = response.copied + ' / ' + response.total + ' alkalom bemásolva';
-                    $('#budatoll-message').html('Másolás sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
-                    $('#budatoll-message').show(1000).delay(2500).hide(1000);
-                    setTimeout(function () {
-                        window.location.reload(false);
-                    }, 3000);
-                    break;
-                case 'error':
-                    $('#budatoll-message').html('A másolás sikeretelen<br>' + response.message).removeClass('budatoll-success').addClass('budatoll-error');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
-            }
-        },
-        error: function (response) {
-            $('#budatoll-message').html('A másolás sikeretelen').addClass('budatoll-error');
-            $('#budatoll-message').show(1000).delay(1500).hide(1000);
-        }
-    });
-    budatoll_events_calendar.refetchEvents();
-}
-
-function emailToPlayers() {
-    $.ajax({
-        url: budatoll_ajax_object.ajax_url,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            action: 'budatoll',
-            'ajax-action': 'email-players'
-        },
-        success: function (response) {
-            switch (response.result) {
-                case 'success':
-                    const message = response.emailed + ' levél kiküldve';
-                    $('#budatoll-message').html('Levélküldés sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
-                    $('#budatoll-message').show(1000).delay(2500).hide(1000);
-                    setTimeout(function () {
-                        window.location.reload(false);
-                    }, 3000);
-                    break;
-                case 'error':
-                    $('#budatoll-message').html('A levélküldés sikeretelen').removeClass('budatoll-success').addClass('budatoll-error');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
-            }
-        },
-        error: function (response) {
-            $('#budatoll-message').html('A levélküldés sikeretelen').addClass('budatoll-error');
-            $('#budatoll-message').show(1000).delay(1500).hide(1000);
-        }
-    });
-} 

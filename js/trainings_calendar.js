@@ -2,6 +2,10 @@ var btAddedTrainingIds = [];
 let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
+    datesSet: function (info) {
+        btAddedTrainingIds = [];
+    },
+
     events: function (eventInfo, successCallback, failureCallback) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
@@ -17,12 +21,14 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             },
             success: function (response) {
                 if (response.result === 'success') {
-                    if (!Array.isArray(response.events)) {
-                        console.error('Invalid events response:', response.events);
+                    //                   console.log(response.events);
+                    arr_events = response.events;
+                    if (!Array.isArray(arr_events)) {
+                        console.error('Invalid events response:', arr_events);
                         failureCallback();
                         return;
                     }
-                    var events = response.events.map(function (event) {
+                    var events = arr_events.map(function (event) {
                         if (event && !btAddedTrainingIds.hasOwnProperty(event.id)) {
                             btAddedTrainingIds[event.id] = event;
                             return {
@@ -69,8 +75,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,listWeek'
-
+        right: 'dayGridMonth, listWeek'
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
@@ -90,6 +95,8 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     firstDay: 1,
     editable: false,
     weekends: false,
+    slotMinTime: bt_events_not_before,
+    slotMaxTime: bt_events_not_after,
     droppable: false,
     expandRows: true,
     forceEventDuration: true,
@@ -139,7 +146,7 @@ window.addEventListener('resize', function () {
 
 function btEventClick(eventInfo) {
     var id = eventInfo.event.id;
-    var event = btAddedTrainingIds[id];
+    var event = btAddedTrainingIds[id].event;
     var trainings = event.trainings_of_event;
     var trainings_text = '<h4>' + event.long + '</h4>';
     trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
@@ -211,12 +218,12 @@ function btTrainingMouseEnter(eventInfo) {
         training_info.html(trainings_text).css({
             left: popupX,
             top: popupY
-        }).fadeIn(budatoll_modal_speed);
+        }).stop(true, true).fadeIn(budatoll_modal_speed);
     }
 }
 
 function btTrainingMouseLeave(eventInfo) {
-    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
+    $("#budatoll-trainings-info").stop(true, true).fadeOut(budatoll_modal_speed);
 }
 
 

@@ -23,14 +23,60 @@ function budatoll_ajax() {
         case 'add-event':
             $date = filter_input(INPUT_POST, 'dropped-date');
             $type_id = filter_input(INPUT_POST, 'event_type-id');
-            $ret = btAddEvent($type_id, $date);
+            $ret = bt_add_event($type_id, $date);
             break;
         case 'remove-event':
             $event_id = filter_input(INPUT_POST, 'event-id');
-            $ret = btRemoveEvent($event_id);
+            $ret = bt_remove_event($event_id);
             break;
         case 'get-all-events':
             $ret = bt_get_events();
+            break;
+        case 'copy-templates':
+            $start_date = filter_input(INPUT_POST, 'start-of-week');
+            if ($start_date) {
+                $template = bt_copy_templates($start_date);
+                $template['result'] = 'success';
+                $ret = json_encode($template);
+            } else {
+                $ret = json_encode(['result' => 'error']);
+            }
+            break;
+        case 'email-players':
+            $emails = bt_warn_players();
+            if ($emails && $emails > 0) {
+                $ret = [
+                    'result' => 'success',
+                    'emailed' => $emails,
+                ];
+            } else {
+                $ret = ['result' => 'error'];
+                $ret['message'] = $emails ? 'Nem történt levél küldés' : 'Belső hiba';
+            }
+            $ret = json_encode($ret);
+            break;
+        case 'get-events-template':
+            $ret = bt_get_events_template();
+            break;
+        case 'add-event-template':
+            $type_id = filter_input(INPUT_POST, 'event_type-id');
+            $weekday = filter_input(INPUT_POST, 'weekday');
+            $template = bt_event_template_insert($type_id, $weekday);
+            $template['result'] = 'success';
+            $ret = json_encode($template);
+            break;
+        case 'remove-event-template':
+            $template_id = filter_input(INPUT_POST, 'template-id');
+            $template = bt_event_template_delete($template_id);
+            $ret = json_encode(['result' => ($template ? 'success' : 'error')]);
+            break;
+        case 'move-event-template':
+            $template_id = filter_input(INPUT_POST, 'template-id');
+            $weekday = filter_input(INPUT_POST, 'weekday');
+            $start = filter_input(INPUT_POST, 'start');
+            $end = filter_input(INPUT_POST, 'end');
+            $template = bt_event_template_move($template_id, $weekday, $start, $end);
+            $ret = json_encode(['result' => ($template ? 'success' : 'error')]);
             break;
         case 'get-events-range':
             $start = filter_input(INPUT_POST, 'event-start');
@@ -138,7 +184,6 @@ function bt_get_events_range($from, $to) {
     $ret = [
         'result' => 'success',
         'events' => $res,
-        'sql' => $sql,
     ];
     return json_encode($ret);
 }
@@ -165,7 +210,7 @@ function bt_get_trainings_range($from, $to) {
             }
             $event->trainings_of_event = $trainings;
             $state = 'full';  // Az alapeset, hogy megtelt
-            if($waiting) { // Vannak a várólistán
+            if ($waiting) { // Vannak a várólistán
                 $state = 'waiting';
             }
             if ($event->{BUDATOLL_EVENTS_MAX_PLAYERS} == 0 OR $num_confirmed < $event->{BUDATOLL_EVENTS_MAX_PLAYERS}) { // Meg van hely
@@ -209,10 +254,10 @@ function bt_get_trainings_of_events($events, $user_id = -1) {
     return $ret;
 }
 
-function btAddEvent($type_id, $date) {
+function bt_add_event($type_id, $date) {
     global $wpdb;
     $ret = json_encode(['result' => 'error']);
-    $event = btGetEventTypeById($type_id);
+    $event = get_event_type_by_id($type_id);
     if (empty($event->{BUDATOLL_EVENT_TYPE_ID}) OR $event->{BUDATOLL_EVENT_TYPE_ID} != $type_id) {
         return $ret;
     }
@@ -247,7 +292,7 @@ function btAddEvent($type_id, $date) {
     return $ret;
 }
 
-function btRemoveEvent($event_id) {
+function bt_remove_event($event_id) {
     $event = bt_get_event_by_id($event_id);
     if (!$event) {
         bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'Edzés törlése sikertelen, mert nem találtuk!');

@@ -4,6 +4,10 @@ var btBookingAllowed = false;
 let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
+    datesSet: function (info) {
+        btAddedTrainingIds = [];
+    },
+
     events: function (eventInfo, successCallback, failureCallback) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
@@ -98,6 +102,8 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     weekends: false,
     droppable: false,
     expandRows: true,
+    slotMinTime: bt_events_not_before,
+    slotMaxTime: bt_events_not_after,
     forceEventDuration: true,
     height: 'auto', // Adjusts height dynamically
     defaultAllDay: false,
@@ -218,12 +224,12 @@ function btMyTrainingMouseEnter(eventInfo) {
             left: popupX,
             top: popupY
         });
-        training_info.fadeIn(budatoll_modal_speed);
+        training_info.stop(true, true).fadeIn(budatoll_modal_speed);
     }
 
 }
 function btMyTrainingMouseLeave(eventInfo) {
-    $("#budatoll-trainings-info").fadeOut(budatoll_modal_speed);
+    $("#budatoll-trainings-info").stop(true, true).fadeOut(budatoll_modal_speed);
 }
 
 

@@ -23,6 +23,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/manage_payments.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/payment_accounts.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/events_list.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/events_calendar.inc';
+require_once plugin_dir_path(__FILE__) . 'includes/events_template.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_functions.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_calendar.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_list.inc';
@@ -38,6 +39,7 @@ add_shortcode('budatoll-list-event-types', 'budatoll_list_event_types');
 add_shortcode('budatoll-event-types', 'budatoll_manage_event_types');
 add_shortcode('budatoll-events-list', 'budatoll_manage_events_list');
 add_shortcode('budatoll-events-calendar', 'budatoll_manage_events_calendar');
+add_shortcode('budatoll-events-template', 'budatoll_events_template');
 add_shortcode('budatoll-my-trainings-list', 'budatoll_my_trainings_list');
 add_shortcode('budatoll-my-trainings-calendar', 'budatoll_my_trainings_calendar');
 add_shortcode('budatoll-trainings-list', 'budatoll_trainings_list');
@@ -99,6 +101,9 @@ function budatoll_scripts() {
     wp_enqueue_script('budatoll-header-script', plugins_url('js/budatoll-header-script.js', __FILE__), array('jquery'), '2.5', false);
 
     switch ($post->post_name) {
+        case 'sablon-naptar':
+            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_template.js', __FILE__), array('jquery'), '1.0', true);
+            break;
         case 'alkalom-naptar':
             wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '2.4', true);
             break;

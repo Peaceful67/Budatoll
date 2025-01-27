@@ -16,7 +16,7 @@ function budatoll_is_page_allowed() {
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
         BUDATOLL_ROLE_VISITOR => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
         BUDATOLL_ROLE_COACH => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'
-            , '/beallitasok', '/naplok', '/edzes-tipusok', '/emailek', '/jatekosok'],
+            , '/beallitasok', '/naplok', '/edzes-tipusok', '/emailek', '/jatekosok', '/sablon-naptar'],
         BUDATOLL_ROLE_PLAYER => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok',],
     ];
 
@@ -109,7 +109,7 @@ function bt_send_email($user_id, $subject, $message) {
     ];
     $message .= '<br><br>' . get_option(BT_CUSTOM_EMAIL_SIGN, 'Üdvözlettel:<br>Budatoll csapata');
     bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
-    wp_mail($user_email, $subject, $message, $headers);
+    return wp_mail($user_email, $subject, $message, $headers);
 }
 
 function budatoll_menu_based_on_role($args) {
@@ -129,17 +129,6 @@ function budatoll_menu_based_on_role($args) {
     }
 
     return $args;
-}
-
-function budatoll_test_page() {
-    $ret = 'Teszteljük az oldalt';
-    $menus = wp_get_nav_menus();
-    foreach ($menus as $menu) {
-        $ret .= 'Menu Name: ' . $menu->name . '<br>';
-    }
-    $user = wp_get_current_user();
-    $ret .= ' Current user: ' . $user->display_name . '<br>';
-    return $ret;
 }
 
 function budatoll_redirect_after_login() {
@@ -394,4 +383,51 @@ function bt_get_coaches() {
         $ret[] = $coach->data;
     }
     return $ret;
+}
+
+function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete, akik érintettek mától az utolsó feltöltött alkalomig
+    $players = bt_get_active_players();
+    $num = false;
+    $sql = 'SELECT * WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE();';
+    $events = bt_get_results($sql);
+    if (!$events) {  // Valami hiba van
+        return false;
+    }
+    if (empty($events)) { // Nincs ilyen alakalom.
+        return 0;
+    }
+    $event_types = [];
+    $public_events = get_public_event_types();
+    $is_public = false;
+    foreach ($events as $event) {
+        $type_id = $event->{BUDATOLL_EVENTS_EVENT_TYPE_ID};
+        $event_types[$type_id] = true;
+        if(in_array($type_id, $public_events)) { // hav van publikus
+            $is_public = true;
+        }
+    }
+    foreach ($players as $player) {
+        $user_id = $player->ID ?? -1;
+        $user_allowed = false;
+        $events_arr = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS, false);
+        if($is_public){ // Ha van az időszakban publikus, akkor nem keresünk tovább
+            $user_allowed = true;
+        } elseif (!empty($events_arr)) {
+            foreach ($events_arr[0] as $event_type_id) {
+               if(isset($event_types[$event_type_id])) {
+                   $user_allowed = true;
+               } 
+            }
+        }
+        if ($user_allowed) {
+            if (bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_WARN_PLAYERS)) {
+                if ($num) {
+                    $num++;
+                } else {
+                    $num = 1;
+                }
+            }
+        }
+    }
+    return $num;
 }

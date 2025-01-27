@@ -2,8 +2,12 @@ var budatoll_modal_speed = 300;
 var btMouseX = -1, btMouseY = -1;
 var btTouchX = btTouchY = -1;
 
+var bt_events_not_before = '16:00:00';
+var bt_events_not_after = '22:00:00';
+
 function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat töltsük be
     const calendarTypes = {
+        'sablon-naptar': 'template',
         'alkalom-naptar': 'events',
         'edzesek-naptar': 'trainings',
         'edzeseim-naptar': 'my-trainings'
@@ -143,4 +147,11 @@ function isBeforeTomorrow(dateInput) {
     let inputDate = new Date(dateInput);
     inputDate.setHours(0, 0, 0, 0); // Consider only the date part for comparison
     return inputDate <= tomorrow;
+}
+
+function getHourMinutes(fullCalendarTimeString) {
+    const date = new Date(fullCalendarTimeString);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
 }

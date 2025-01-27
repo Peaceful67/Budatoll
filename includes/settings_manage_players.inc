@@ -244,7 +244,7 @@ function budatoll_manage_players_list() {
         } else {
             $events = '';
             foreach ($events_arr[0] as $event_type_id) {
-                $events .= btGetEventTypeById($event_type_id)->{BUDATOLL_EVENT_TYPE_LONG} . ', ';
+                $events .= get_event_type_by_id($event_type_id)->{BUDATOLL_EVENT_TYPE_LONG} . ', ';
             }
             $events = substr($events, 0, -2);
         }
