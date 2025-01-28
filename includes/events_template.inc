@@ -103,7 +103,7 @@ function bt_copy_templates($start_date) {
             $current_day = clone $monday;
             $current_day->modify('+' . $day . ' days');
             $event = json_decode(bt_add_event($template[BUDATOLL_EVENTS_TEMPLATE_TYPE_ID], $current_day->format('Y-m-d')));
-            error_log('Copied event:' . print_r($event, true));
+//            error_log('Copied event:' . print_r($event, true));
             if ($event->result == 'success') {
                 $copied_templates++;
             }
@@ -112,6 +112,6 @@ function bt_copy_templates($start_date) {
     } else {
         $ret = ['total' => 0, 'copied' => 0];
     }
-    error_log('copy: ' . print_r($ret, true));
+//    error_log('copy: ' . print_r($ret, true));
     return $ret;
 }

@@ -109,7 +109,8 @@ function bt_send_email($user_id, $subject, $message) {
     ];
     $message .= '<br><br>' . get_option(BT_CUSTOM_EMAIL_SIGN, 'Üdvözlettel:<br>Budatoll csapata');
     bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ', ' . substr($message, 0, 128));
-    return wp_mail($user_email, $subject, $message, $headers);
+    $ret = wp_mail($user_email, $subject, $message, $headers);
+    return $ret;
 }
 
 function budatoll_menu_based_on_role($args) {
@@ -388,7 +389,7 @@ function bt_get_coaches() {
 function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete, akik érintettek mától az utolsó feltöltött alkalomig
     $players = bt_get_active_players();
     $num = false;
-    $sql = 'SELECT * WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE();';
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE();';
     $events = bt_get_results($sql);
     if (!$events) {  // Valami hiba van
         return false;
@@ -402,7 +403,7 @@ function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete
     foreach ($events as $event) {
         $type_id = $event->{BUDATOLL_EVENTS_EVENT_TYPE_ID};
         $event_types[$type_id] = true;
-        if(in_array($type_id, $public_events)) { // hav van publikus
+        if (in_array($type_id, $public_events)) { // hav van publikus
             $is_public = true;
         }
     }
@@ -410,13 +411,13 @@ function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete
         $user_id = $player->ID ?? -1;
         $user_allowed = false;
         $events_arr = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS, false);
-        if($is_public){ // Ha van az időszakban publikus, akkor nem keresünk tovább
+        if ($is_public) { // Ha van az időszakban publikus, akkor nem keresünk tovább
             $user_allowed = true;
         } elseif (!empty($events_arr)) {
             foreach ($events_arr[0] as $event_type_id) {
-               if(isset($event_types[$event_type_id])) {
-                   $user_allowed = true;
-               } 
+                if (isset($event_types[$event_type_id])) {
+                    $user_allowed = true;
+                }
             }
         }
         if ($user_allowed) {

@@ -108,7 +108,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
     height: 'auto', // Adjusts height dynamically
     locale: 'hu',
     firstDay: 1,
-    editable: true,
+    editable: false,
     slotMinTime: bt_events_not_before,
     slotMaxTime: bt_events_not_after,
     weekends: false,
@@ -286,9 +286,6 @@ function copyTemplateEvents() {
                     const message = response.copied + ' / ' + response.total + ' alkalom bemásolva';
                     $('#budatoll-message').html('Másolás sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(2500).hide(1000);
-                    setTimeout(function () {
-                        window.location.reload(false);
-                    }, 3000);
                     break;
                 case 'error':
                     $('#budatoll-message').html('A másolás sikeretelen<br>' + response.message).removeClass('budatoll-success').addClass('budatoll-error');
