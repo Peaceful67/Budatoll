@@ -115,6 +115,7 @@ function budatoll_ajax() {
             ]);
             break;
     }
+//    error_log($ret);
     echo $ret;
     wp_die();
 }

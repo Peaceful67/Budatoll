@@ -35,6 +35,7 @@ function bt_event_template_insert($type_id, $weekday) {
             $max_id = max($max_id, $event[BUDATOLL_EVENTS_TEMPLATE_ID]);
             if ($event[BUDATOLL_EVENTS_TEMPLATE_TYPE_ID] == $type_id AND $event[BUDATOLL_EVENTS_TEMPLATE_DAY] == $weekday) {
                 $found = $key;
+                error_log('Found: ' . $key);
             }
         }
     }

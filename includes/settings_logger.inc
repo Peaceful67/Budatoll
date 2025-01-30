@@ -175,8 +175,9 @@ function bt_logger($type, $related, $comment, $log_data = null) {
         BUDATOLL_LOGGER_USER => $user_id,
         BUDATOLL_LOGGER_RELATED => $related,
         BUDATOLL_LOGGER_TYPE => $type,
-        BUDATOLL_LOGGER_COMMENT => sanitize_textarea_field($comment),
+        BUDATOLL_LOGGER_COMMENT => $comment,
     ];
+//    error_log('Logger: ' . print_r($data, true) . ', comment:' . $comment);
     $wpdb->insert(BUDATOLL_LOGGER_TABLE, $data, ['%d', '%d', '%d', '%s']);
 }
 

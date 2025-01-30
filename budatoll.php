@@ -83,6 +83,7 @@ add_action('after_setup_theme', 'budatoll_remove_admin_bar');
 
 add_action('user_register', 'bt_set_default_role');
 
+
 function bt_enqueue_dashicons() {
     wp_enqueue_style('dashicons');
 }

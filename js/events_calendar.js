@@ -169,9 +169,9 @@ function btEventRemove(eventInfo) {
         success: function (response) {
             switch (response.result) {
                 case 'deleted':
-                    eventInfo.event.remove();
                     $('#budatoll-message').html('Törlés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    reloadCalendar(budatoll_events_calendar);
                     break;
                 case 'error':
                     message = response.message;
@@ -208,19 +208,10 @@ function btEventReceive(eventInfo) {
                     $('#budatoll-message').show(1000).delay(1500).hide(1000);
                     break;
                 case 'success':
-                    start_time = droppedDate + 'T' + response.event.start;
-                    end_time = droppedDate + 'T' + response.event.end;
-                    event_id = response.event_id;
                     message = response.message;
-                    eventInfo.event.setProp('id', event_id);
-                    eventInfo.event.setDates(start_time, end_time);
-                    eventInfo.event.setAllDay(false);
-                    //                           console.log(eventInfo.event);
                     $('#budatoll-message').html('Mentés sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(2500).hide(1000);
-                    setTimeout(function () {
-                        window.location.reload(false);
-                    }, 3000);
+                    reloadCalendar(budatoll_events_calendar);
                     break;
                 case 'error':
                     eventInfo.event.remove();
@@ -235,6 +226,7 @@ function btEventReceive(eventInfo) {
             $('#budatoll-message').show(1000).delay(1500).hide(1000);
         }
     });
+    reloadCalendar(budatoll_events_calendar);
 }
 
 function btEventMouseEnter(eventInfo) {
@@ -286,6 +278,7 @@ function copyTemplateEvents() {
                     const message = response.copied + ' / ' + response.total + ' alkalom bemásolva';
                     $('#budatoll-message').html('Másolás sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(2500).hide(1000);
+                    reloadCalendar(budatoll_events_calendar);
                     break;
                 case 'error':
                     $('#budatoll-message').html('A másolás sikeretelen<br>' + response.message).removeClass('budatoll-success').addClass('budatoll-error');
@@ -298,7 +291,6 @@ function copyTemplateEvents() {
             $('#budatoll-message').show(1000).delay(1500).hide(1000);
         }
     });
-    budatoll_events_calendar.refetchEvents();
 }
 
 function emailToPlayers() {

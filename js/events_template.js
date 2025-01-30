@@ -106,8 +106,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
     ,
     eventDrop: function (eventInfo) {
         btEventDrop(eventInfo);
-    }
-    ,
+    },
     eventDidMount: function (eventInfo) {
         if (btIsTouchDevice()) {
             addLongPressListener(
@@ -125,7 +124,6 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
 );
 budatoll_events_calendar.render();
 function btEventRemove(eventInfo) {
-//       alert('Event info: ' + eventInfo.event.id + ' / ' + eventInfo.event.title + ' / ' + eventInfo.event.start);
     if (!confirm('Biztosan törölni akarod az edzés alkalmat?'))
         return;
     $.ajax({
@@ -140,24 +138,22 @@ function btEventRemove(eventInfo) {
         success: function (response) {
             switch (response.result) {
                 case 'success':
-                    eventInfo.event.remove();
                     $('#budatoll-message').html('Törlés sikeres').removeClass('budatoll-error').addClass('budatoll-success');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
-                    break;
+                    $('#budatoll-message').show(budatoll_message_speed).delay(1500).hide(budatoll_message_speed);
+                    reloadCalendar(budatoll_events_calendar);
                     break;
                 case 'error':
                     message = response.message;
                     $('#budatoll-message').html('A törlés sikeretelen. ' + message).removeClass('budatoll-success').addClass('budatoll-error');
-                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    $('#budatoll-message').show(budatoll_message_speed).delay(1500).hide(budatoll_message_speed);
                     break;
             }
         },
         error: function (response) {
             $('#budatoll-message').html('A törlés hibás').addClass('budatoll-error');
-            $('#budatoll-message').show(1000).delay(2500).hide(1000);
+            $('#budatoll-message').show(budatoll_message_speed).delay(2500).hide(budatoll_message_speed);
         }
     });
-    budatoll_events_calendar.refetchEvents();
 
 }
 
@@ -173,21 +169,16 @@ function btEventReceive(eventInfo) {
         data: {
             action: 'budatoll',
             'ajax-action': 'add-event-template',
-            'event_type-id': eventInfo.event.id,
-            'weekday': dayOfWeek,
+            'event_type-id': event.id,
+            'weekday': dayOfWeek
         },
         success: function (response) {
             switch (response.result) {
                 case 'success':
-                    start_time = droppedDate + 'T' + response.event.start;
-                    end_time = droppedDate + 'T' + response.event.end;
-                    event_id = response.event_id;
                     message = response.event.long;
-                    eventInfo.event.setProp('id', event_id);
-                    eventInfo.event.setDates(start_time, end_time);
-                    eventInfo.event.setAllDay(false);
                     $('#budatoll-message').html('Mentés sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
                     $('#budatoll-message').show(1000).delay(2500).hide(1000);
+                    reloadCalendar(budatoll_events_calendar);
                     break;
                 case 'error':
                     eventInfo.event.remove();
@@ -202,7 +193,6 @@ function btEventReceive(eventInfo) {
             $('#budatoll-message').show(1000).delay(1500).hide(1000);
         }
     });
-    budatoll_events_calendar.refetchEvents();
 
 }
 

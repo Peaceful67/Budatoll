@@ -1,4 +1,5 @@
 var budatoll_modal_speed = 300;
+var budatoll_message_speed = 500;
 var btMouseX = -1, btMouseY = -1;
 var btTouchX = btTouchY = -1;
 
@@ -154,4 +155,10 @@ function getHourMinutes(fullCalendarTimeString) {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${hours}:${minutes}`;
+}
+
+function reloadCalendar(calendar) {
+    calendar.removeAllEvents();
+    calendar.refetchEvents();
+
 }
