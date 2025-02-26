@@ -81,7 +81,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,listWeek'
+        right: 'dayGridMonth listWeek'
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
@@ -166,16 +166,16 @@ function btEventClicked(eventInfo) {
             error_msg = $("#budatoll-error-message");
             switch (response.status) { // done, deleted, deleted-waiting, waiting, confirmed, confirmed-waiting
                 case 'done':
-                    error_msg.html('Az edzés már lezajlott, nem lehet változtatni.').show(1000).delay(2500).hide(1000);
+                    error_msg.html('Ez már elmúlt, nem lehet változtatni.').show(1000).delay(2500).hide(1000);
                     break;
                 case 'not-leased':
                     error_msg.html('Nem vagy bérletes, csak egy napon belüli edzésekre jelentkezhetsz.').show(1000).delay(2500).hide(1000);
                     break;
                 case 'deleted':
-                    success_msg.html('Jelentkezésed az edzésre sikeresen törölted.').show(1000).delay(2500).hide(1000);
+                    success_msg.html('Jelentkezésed sikeresen törölted.').show(1000).delay(2500).hide(1000);
                     break;
                 case 'deleted-waiting':
-                    success_msg.html('Jelentkezésed az edzés várólistájáról sikeresen törölted.').show(1000).delay(2500).hide(1000);
+                    success_msg.html('Jelentkezésed a várólistájáról sikeresen törölted.').show(1000).delay(2500).hide(1000);
                     break;
                 case 'waiting':
                     success_msg.html('Az edzés betelt, jelentkezésed várólistára került.').show(1000).delay(2500).hide(1000);
@@ -184,7 +184,7 @@ function btEventClicked(eventInfo) {
                     success_msg.html('Jelentkezésed várólistáról érvényesre váltott.').show(1000).delay(2500).hide(1000);
                     break;
                 case 'confirmed':
-                    success_msg.html('Jelentkezésed az edzésre érvényes.').show(1000).delay(2500).hide(1000);
+                    success_msg.html('Jelentkezésed érvényes.').show(1000).delay(2500).hide(1000);
                     break;
                 default:
                     error_msg.html('Belső ismeretlen hiba: ' + response.status + ', nem történt változtatás').show(1000).delay(2500).hide(1000);

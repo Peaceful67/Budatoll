@@ -83,7 +83,6 @@ add_action('after_setup_theme', 'budatoll_remove_admin_bar');
 
 add_action('user_register', 'bt_set_default_role');
 
-
 function bt_enqueue_dashicons() {
     wp_enqueue_style('dashicons');
 }
@@ -94,6 +93,7 @@ function budatoll_scripts() {
     global $post;
     wp_enqueue_style('budatoll-jquery-style', plugins_url('jquery-ui/jquery-ui.css', __FILE__));
     wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__));
+    wp_enqueue_style('budatoll-bootstrap-style', plugins_url('css/bootstrap.css', __FILE__));
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__), [], '1.1.1', false);
     wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__));
 

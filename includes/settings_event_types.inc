@@ -25,6 +25,7 @@ function budatoll_manage_event_types() {
         $save = false;
     }
     if ($save) {
+        $errors = [];
         $data = [
             BUDATOLL_EVENT_TYPE_SHORT => getPostVariable('budatoll-short', ''),
             BUDATOLL_EVENT_TYPE_LONG => getPostVariable('budatoll-long', ''),
@@ -34,7 +35,15 @@ function budatoll_manage_event_types() {
             BUDATOLL_EVENT_TYPE_MAX_PLAYERS => getPostVariable('budatoll-max', 0),
             BUDATOLL_EVENT_TYPE_PUBLIC => getPostVariable('budatoll-public', 0),
         ];
-
+        if (strlen($data[BUDATOLL_EVENT_TYPE_SHORT]) < 3) {
+            $errors[] = 'A rövid név túl rövid';
+        }
+        if (strlen($data[BUDATOLL_EVENT_TYPE_LONG]) < 3) {
+            $errors[] = 'A hosszú név túl rövid';
+        }
+        if ($data[BUDATOLL_EVENT_TYPE_START] > $data[BUDATOLL_EVENT_TYPE_END]) {
+            $errors[] = 'A kezdetnek előbb kell lennie a végénél.';
+        }
         if ($edit_id > 0) {
             $wpdb->update(BUDATOLL_EVENT_TYPE_TABLE, $data, [BUDATOLL_EVENT_TYPE_ID => $edit_id]);
             bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus módosítása:' . $edit_id, $data);
@@ -42,7 +51,13 @@ function budatoll_manage_event_types() {
             $edit_id = $wpdb->insert(BUDATOLL_EVENT_TYPE_TABLE, $data);
             bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus létrehozása:' . $edit_id, $data);
         }
-        $edit_id = -1;
+        if (empty($errors)) {
+            $edit_id = -1;
+        } else {
+            foreach ($errors as $err) {
+                $ret .= bt_warning($err);
+            }
+        }
     }
     if ($edit_id >= 0) {
         $ret .= btEventTypeEdit($edit_id);
@@ -146,13 +161,12 @@ function get_event_type_by_id($id) {
     return $ret;
 }
 
-
 function get_public_event_types() {
     $ret = [];
     $types = btGetEventTypes();
-    if(!empty($types)) {
+    if (!empty($types)) {
         foreach ($types as $type) {
-            if($type->{BUDATOLL_EVENT_TYPE_PUBLIC}==1) {
+            if ($type->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1) {
                 $ret[] = $type->{BUDATOLL_EVENT_TYPE_ID};
             }
         }
