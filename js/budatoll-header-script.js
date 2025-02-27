@@ -27,6 +27,11 @@ function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat
     return false;
 }
 
+function getCalendarHeight() {
+    let headerHeight = 50; // Approximate height of the headerToolbar
+    let availableHeight = window.innerHeight - headerHeight;
+    return Math.max(400, availableHeight); // Ensure a minimum height
+}
 
 function getDateOfEventDate(event_date) {
     var date = new Date(event_date);

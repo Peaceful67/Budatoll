@@ -46,8 +46,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                                 }
                             };
                         }
-                        return null;
-                    }).filter(Boolean);
+                    });
                     successCallback(events);
                 } else {
                     failureCallback();
@@ -78,6 +77,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         arrayOfDomNodes.push(title);
         return {domNodes: arrayOfDomNodes};
     },
+        
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -105,7 +105,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     slotMinTime: bt_events_not_before,
     slotMaxTime: bt_events_not_after,
     forceEventDuration: true,
-    height: 'auto', // Adjusts height dynamically
+    height: 'auto',
     defaultAllDay: false,
     dayMaxEvents: true, // allow "more" link when too many events
     showNonCurrentDates: false,

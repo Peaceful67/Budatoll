@@ -16,10 +16,10 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
         btAddedTrainingIds = [];
     },
     events: function (info, successCallback, failureCallback) {
-        // Convert the visible range into your custom format
+ 
         var active_start = getDateOfEventDate(info.start);
         var active_end = getDateOfEventDate(info.end);
-        // Perform an AJAX request to fetch events
+   
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',

@@ -61,7 +61,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
     headerToolbar: {
         left: '',
         center: '',
-        right: 'timeGridWeek, listWeek'
+        right: 'timeGridWeek listWeek'
     },
     initialView: 'timeGridWeek',
     height: 'auto', // Adjusts height dynamically

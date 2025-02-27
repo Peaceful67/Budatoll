@@ -13,6 +13,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
             dataType: 'json',
+            cache: false,
             data: {
                 action: 'budatoll',
                 'ajax-action': 'get-trainings-range',
@@ -31,6 +32,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                     var events = arr_events.map(function (event) {
                         if (event && !btAddedTrainingIds.hasOwnProperty(event.id)) {
                             btAddedTrainingIds[event.id] = event;
+                            console.log(event);
                             return {
                                 id: event.id,
                                 title: event.short,
@@ -40,16 +42,14 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                                     state: event.state, }
                             };
                         }
-                        return null;
-                    }).filter(Boolean);
+                    });
                     successCallback(events);
                 } else {
                     failureCallback();
                 }
             },
             error: function (response) {
-                console.logy('training AJAX not succeed');
-                //              console.log(response);
+                console.log('training AJAX not succeed');
             }
         });
     },
@@ -72,6 +72,9 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         arrayOfDomNodes.push(title);
         return {domNodes: arrayOfDomNodes};
     },
+    viewDidMount: function (info) {
+        budatoll_trainings_calendar.setOption('height', getCalendarHeight());
+    },
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -81,6 +84,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     windowResize: function (view) {
         const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);
+        budatoll_trainings_calendar.setOption('height', getCalendarHeight());
         if (widthDifference > 10) {
             if (window.innerWidth < 768) {
                 budatoll_trainings_calendar.changeView('listWeek');
@@ -91,7 +95,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         }
     },
     locale: 'hu',
-    height: 'auto', // Adjusts height dynamically
+    height: getCalendarHeight(), // Adjusts height dynamically
     firstDay: 1,
     editable: false,
     weekends: false,
@@ -146,7 +150,7 @@ window.addEventListener('resize', function () {
 
 function btEventClick(eventInfo) {
     var id = eventInfo.event.id;
-    var event = btAddedTrainingIds[id].event;
+    var event = btAddedTrainingIds[id];
     var trainings = event.trainings_of_event;
     var trainings_text = '<h4>' + event.long + '</h4>';
     trainings_text += '<input type="hidden" name="event_id" value="' + id + '">';
