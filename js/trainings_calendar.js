@@ -160,7 +160,7 @@ function btEventClick(eventInfo) {
     }
     trainings_text += '<div class="budatoll-row">Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</div>';
     trainings_text += '<div class="budatoll-row">Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '</div>';
-    trainings_text += '<div class="budatoll-row">';
+    trainings_text += '<div class="budatoll-popup-row">';
     trainings_text += '<select name="select_players" id="select_players"><option value="-1" selected>Válassz!!!</option>';
     budatoll_players.forEach(function (player) {
         if (!trainings.some(obj => obj['player_id'] === player.ID)) {
@@ -172,8 +172,8 @@ function btEventClick(eventInfo) {
     trainings_text += '</div>';
 
     trainings.forEach(function (training) {
-        trainings_text += '<div class="budatoll-row">';
-        trainings_text += training.player_name + '<button class="button budatoll-button" name="training_delete" ';
+        trainings_text += '<div class="budatoll-popup-row">';
+        trainings_text += '<div>'+training.player_name+ '</div>' + '<button class="button budatoll-button" name="training_delete" ';
         trainings_text += ' value="' + training.id + '" title="Törlés" >';
         trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
         trainings_text += '</div>';

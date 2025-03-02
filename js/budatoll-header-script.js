@@ -163,7 +163,9 @@ function getHourMinutes(fullCalendarTimeString) {
 }
 
 function reloadCalendar(calendar) {
+    let currentDate = calendar.getDate(); 
     calendar.removeAllEvents();
     calendar.refetchEvents();
+    calendar.gotoDate(currentDate);
 
 }
