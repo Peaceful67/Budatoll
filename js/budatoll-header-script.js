@@ -169,3 +169,53 @@ function reloadCalendar(calendar) {
     calendar.gotoDate(currentDate);
 
 }
+
+function btRequestFullScreenAndLockOrientation() {
+    if (btIsTouchDevice()) {
+        const elem = document.documentElement;
+        // Try to enter fullscreen
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().then(btLockOrientation).catch(console.error);
+        } else if (elem.mozRequestFullScreen) { // Firefox
+            elem.mozRequestFullScreen();
+            btLockOrientation();
+        } else if (elem.webkitRequestFullscreen) { // Safari
+            elem.webkitRequestFullscreen();
+            btLockOrientation();
+        } else if (elem.msRequestFullscreen) { // IE11
+            elem.msRequestFullscreen();
+            btLockOrientation();
+        } else {
+            alert("A böngésződ nem támogatja az elforgatás rögzítését. Forgasd el a telefonod!");
+        }
+    }
+}
+
+function btLockOrientation() {
+    if (btIsTouchDevice()) {
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(() => {
+                alert("Fordítsd el a telefonod a jobb megjelnítés érdekében.");
+            });
+        } else {
+            alert("A böngésződ nem támogatja az elforgatás rögzítését. Forgasd el a telefonod!");
+        }
+    }
+}
+
+function btUnlockOrientation() {
+    if (btIsTouchDevice()) {
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        } else {
+            alert("Nem sikerült a telefon elforgatásának rögzítését megszüntetni.");
+        }
+    }
+}
+
+// Detect if in portrait mode and warn the user
+function btCheckOrientation() {
+    if (window.innerHeight > window.innerWidth) {
+        alert("Fordítsd el a telefonod a jobb megjelnítés érdekében.");
+    }
+}

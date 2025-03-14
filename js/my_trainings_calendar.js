@@ -5,7 +5,11 @@ let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (info) {
-        btAddedTrainingIds = [];
+        if ((info.view.type === 'timeGridWeek'  || info.view.type==='dayGridMonth') && btIsTouchDevice()) {
+            btRequestFullScreenAndLockOrientation();
+        } else {
+            btUnlockOrientation();
+        }
     },
 
     events: function (eventInfo, successCallback, failureCallback) {
@@ -81,9 +85,9 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth listWeek'
+        right: 'dayGridMonth timeGridWeek listWeek'
     },
-    initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
+    initialView: ((window.innerWidth < 768) ? 'timeGridWeek' : 'dayGridMonth'),
     windowResize: function (view) {
         const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);
@@ -107,6 +111,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     forceEventDuration: true,
     height: 'auto',
     defaultAllDay: false,
+    allDaySlot: false,
     dayMaxEvents: true, // allow "more" link when too many events
     showNonCurrentDates: false,
     eventClick: function (eventInfo) {

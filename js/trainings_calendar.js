@@ -3,12 +3,17 @@ let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (info) {
-        btAddedTrainingIds = [];
+        if ((info.view.type === 'timeGridWeek' || info.view.type==='dayGridMonth') && btIsTouchDevice()) {
+            btRequestFullScreenAndLockOrientation();
+        } else {
+            btUnlockOrientation();
+        }
     },
 
     events: function (eventInfo, successCallback, failureCallback) {
         var active_start = getDateOfEventDate(eventInfo.start);
         var active_end = getDateOfEventDate(eventInfo.end);
+        btAddedTrainingIds = [];
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -32,7 +37,6 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
                     var events = arr_events.map(function (event) {
                         if (event && !btAddedTrainingIds.hasOwnProperty(event.id)) {
                             btAddedTrainingIds[event.id] = event;
-                            console.log(event);
                             return {
                                 id: event.id,
                                 title: event.short,
@@ -80,7 +84,8 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         center: 'title',
         right: 'dayGridMonth timeGridWeek listWeek'
     },
-    initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
+    initialView: ((window.innerWidth < 768) ? 'timeGridWeek' : 'dayGridMonth'),
+
     windowResize: function (view) {
         const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);
@@ -104,6 +109,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     droppable: false,
     expandRows: true,
     forceEventDuration: true,
+    allDaySlot: false,
     defaultAllDay: false,
     dayMaxEvents: false, // allow "more" link when too many events
     showNonCurrentDates: false,
@@ -173,7 +179,7 @@ function btEventClick(eventInfo) {
 
     trainings.forEach(function (training) {
         trainings_text += '<div class="budatoll-popup-row">';
-        trainings_text += '<div>'+training.player_name+ '</div>' + '<button class="button budatoll-button" name="training_delete" ';
+        trainings_text += '<div>' + training.player_name + '</div>' + '<button class="button budatoll-button" name="training_delete" ';
         trainings_text += ' value="' + training.id + '" title="Törlés" >';
         trainings_text += '<span class="dashicons dashicons-trash"></span></button>';
         trainings_text += '</div>';
