@@ -171,11 +171,13 @@ function reloadCalendar(calendar) {
 }
 
 function btRequestFullScreenAndLockOrientation() {
+
     if (btIsTouchDevice()) {
         const elem = document.documentElement;
         // Try to enter fullscreen
+      
         if (elem.requestFullscreen) {
-            elem.requestFullscreen().then(btLockOrientation).catch(console.error);
+            elem.requestFullscreen().then(btLockOrientation());
         } else if (elem.mozRequestFullScreen) { // Firefox
             elem.mozRequestFullScreen();
             btLockOrientation();
