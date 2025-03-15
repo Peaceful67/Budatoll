@@ -16,10 +16,10 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
         btAddedTrainingIds = [];
     },
     events: function (info, successCallback, failureCallback) {
- 
+
         var active_start = getDateOfEventDate(info.start);
         var active_end = getDateOfEventDate(info.end);
-   
+
         $.ajax({
             url: budatoll_ajax_object.ajax_url,
             type: 'POST',
@@ -39,6 +39,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
                             title: event.short,
                             start: event.day + 'T' + event.start, // Combine date and time
                             end: event.day + 'T' + event.end, // Combine date and time
+                            classNames: ['budatoll-event-state-available'],
                             extendedProps: {
                                 long_title: event.long
                             }
@@ -88,6 +89,13 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
         }
 
     },
+     eventContent: function (day) {
+        var arrayOfDomNodes = [];
+        var title = document.createElement('div');
+        title.innerText = day.event.title;
+        arrayOfDomNodes.push(title);
+        return {domNodes: arrayOfDomNodes};
+    },
     viewDidMount: function (info) {
         const copyTemplateButtonEl = document.querySelector('.fc-copyTemplate-button');
         if (copyTemplateButtonEl) {
@@ -115,7 +123,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
     droppable: true,
     forceEventDuration: true,
     defaultAllDay: false,
-    dayMaxEvents: true, // allow "more" link when too many events
+    dayMaxEvents: false, // allow "more" link when too many events
 
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {

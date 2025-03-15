@@ -5,7 +5,7 @@ let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (info) {
-        if ((info.view.type === 'timeGridWeek'  || info.view.type==='dayGridMonth') && btIsTouchDevice()) {
+        if ((info.view.type === 'timeGridWeek' || info.view.type === 'dayGridMonth')) {
             btRequestFullScreenAndLockOrientation();
         } else {
             btUnlockOrientation();
@@ -87,7 +87,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         center: 'title',
         right: 'dayGridMonth timeGridWeek listWeek'
     },
-    initialView: ((window.innerWidth < 768) ? 'timeGridWeek' : 'dayGridMonth'),
+    initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
         const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);

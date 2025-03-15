@@ -163,7 +163,7 @@ function getHourMinutes(fullCalendarTimeString) {
 }
 
 function reloadCalendar(calendar) {
-    let currentDate = calendar.getDate(); 
+    let currentDate = calendar.getDate();
     calendar.removeAllEvents();
     calendar.refetchEvents();
     calendar.gotoDate(currentDate);
@@ -174,10 +174,8 @@ function btRequestFullScreenAndLockOrientation() {
 
     if (btIsTouchDevice()) {
         const elem = document.documentElement;
-        // Try to enter fullscreen
-      
         if (elem.requestFullscreen) {
-            elem.requestFullscreen().then(btLockOrientation());
+            elem.requestFullscreen().then(btLockOrientation).catch(console.error);
         } else if (elem.mozRequestFullScreen) { // Firefox
             elem.mozRequestFullScreen();
             btLockOrientation();
@@ -218,6 +216,8 @@ function btUnlockOrientation() {
 // Detect if in portrait mode and warn the user
 function btCheckOrientation() {
     if (window.innerHeight > window.innerWidth) {
-        alert("Fordítsd el a telefonod a jobb megjelnítés érdekében.");
+        btRequestFullScreenAndLockOrientation();
+//        alert("Fordítsd el a telefonod a jobb megjelnítés érdekében.");
     }
 }
+

@@ -23,7 +23,7 @@
 
 #external-events p {
     margin: 1.5em 0;
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
 }
 
@@ -34,7 +34,7 @@
 
 
 #calendar {
-    max-width: 1100px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -48,12 +48,14 @@
 .fc-event {
     font-size: 12px; /* Smaller font for compactness */
     padding: 2px; /* Adjust padding for compact design */
-    border-radius: 3px; /* Rounded edges for neatness */
+    border-radius: 2px; /* Rounded edges for neatness */
     user-select: none; /* Disable text selection */
     -webkit-user-drag: none; /* Disable dragging in WebKit browsers */
     -webkit-touch-callout: none; /* Disable context menu on iOS */
 }
-
+.fc-event:hover {
+    opacity: 0.8;
+}
 /* Style popover for additional events */
 .fc-popover {
     max-width: 300px; /* Ensure the popover is easy to read */
@@ -61,11 +63,19 @@
 }
 
 /* Ensure events are stackable without overlap */
-.fc-day-grid-event {
+.fc-daygrid-event {
     white-space: normal; /* Allows multi-line event titles */
     text-align: center !important;
-    display: flex;
+    display: contents !important;
     justify-content: center;
     text-align: center;
+}
+.fc-daygrid-event > .fc-event-main {
+    display: inline-block !important;
+    margin-right: 5px;  /* Adds spacing between events */
+}
+.fc-daygrid-day {
+    width: auto !important;
+    min-width: 50px; /* Adjust as needed */
 }
 

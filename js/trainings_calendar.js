@@ -3,7 +3,7 @@ let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (info) {
-        if ((info.view.type === 'timeGridWeek' || info.view.type==='dayGridMonth') && btIsTouchDevice()) {
+        if ((info.view.type === 'timeGridWeek' || info.view.type === 'dayGridMonth')) {
             btRequestFullScreenAndLockOrientation();
         } else {
             btUnlockOrientation();
@@ -61,6 +61,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         var arrayOfDomNodes = [];
         var title = document.createElement('div');
         title.innerText = day.event.title;
+//        title.classList.add('fc-event-inline');
         switch (day.event.extendedProps.state) {
             case 'full':
                 title.classList.add('budatoll-event-state-full');
@@ -79,12 +80,18 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     viewDidMount: function (info) {
         budatoll_trainings_calendar.setOption('height', getCalendarHeight());
     },
+    dayCellDidMount: function (info) {
+        if (info.view.type === 'dayGridMonth' || info.view.type === 'timeGridWeek') {
+            let eventsInCell = info.el.querySelectorAll('.fc-event').length;
+            info.el.style.flexGrow = eventsInCell > 0 ? 2 : 1;
+        }
+    },
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
         right: 'dayGridMonth timeGridWeek listWeek'
     },
-    initialView: ((window.innerWidth < 768) ? 'timeGridWeek' : 'dayGridMonth'),
+    initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
 
     windowResize: function (view) {
         const currentWidth = window.innerWidth;

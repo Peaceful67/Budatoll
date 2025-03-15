@@ -285,13 +285,13 @@
 .budatoll-event-state-available {
     background-color: #0B5394;
     color:white;
-    border: 1px solid darkred;
+    border: 1px solid darkblue;
     border-radius: 5px;
 }
 .budatoll-event-state-full {
-    background-color: #0eb439;
+    background-color: #ff686b;
     color:white;
-    border: 1px solid darkgreen;
+    border: 1px solid darkred;
     border-radius: 5px;
 }
 .budatoll-event-state-waiting {
