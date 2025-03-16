@@ -101,6 +101,7 @@ function budatoll_my_trainings_calendar() {
 function budatoll_trainings_calendar() {
 
     global $wpdb;
+    $goto_date = false;
     $ret = '<form id="BudatollForm" method="post">';
     $ret .= '<div id="budatoll-trainings-info" class="budatoll-popup">'
             . '<div class="budatoll-popup-content">'
@@ -110,6 +111,9 @@ function budatoll_trainings_calendar() {
             . '</div></div>';
     $training_delete = getPostVariable('training_delete');
     if ($training_delete AND $training_delete > 0) {
+        $training= bt_get_training_by_id($training_delete);
+        $event = get_event_by_id($training->{BUDATOLL_TRAINING_EVENT_ID});
+        $goto_date = $event->{BUDATOLL_EVENTS_DAY} ?? false;
         bt_delete_training($training_delete);
     }
     $add_player_id = getPostVariable('select_players');
@@ -123,6 +127,7 @@ function budatoll_trainings_calendar() {
                 BUDATOLL_TRAINING_CONFIRMED => 1,
             ];
             if ($wpdb->insert(BUDATOLL_TRAINING_TABLE, $data)) {
+                $goto_date = $event->{BUDATOLL_EVENTS_DAY} ?? false;
                 bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $add_player_id, 'Jelentkezés felvéve: '
                         . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START})
                         . '-' . bt_time($event->{BUDATOLL_EVENTS_END}));
@@ -141,7 +146,7 @@ function budatoll_trainings_calendar() {
     }
     $ret .= '<div class="budatoll-message budatoll-success" id="budatoll-message"></div>';
     $ret .= '<div class="budatoll-message budatoll-error" id="error-message"></div>';
-    $ret .= '<div id="budatoll-edzes-calendar"></div>';
+    $ret .= '<div id="budatoll-edzes-calendar" '.($goto_date ? 'data-goto-date="'.$goto_date.'"':'').'></div>';
     $ret .= '</form>';
     return $ret;
 }

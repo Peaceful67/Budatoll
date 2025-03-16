@@ -28,7 +28,7 @@ function budatoll_list_event_types() {
         $end = $event->{BUDATOLL_EVENT_TYPE_END};
         $ret .= '<div class="fc-event  fc-h-event fc-daygrid-event fc-daygrid-block-event" '
                 . 'data-type=\'{"start":"' . $start . '", "end":"' . $end . '" , "type_id":"' . $id . '"}\'>'
-                . '<div class="fc-event-main" id="type-' . $id . '">' . $short
+                . '<div class="fc-event-main" id="type-' . $id . '"><a title="'.$long.'">' . $short.'</a>'
                 . '</div></div>';
     }
     $ret .= '</div></div>';

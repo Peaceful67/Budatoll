@@ -92,7 +92,7 @@ add_action('wp_enqueue_scripts', 'bt_enqueue_dashicons');
 function budatoll_scripts() {
     global $post;
     wp_enqueue_style('budatoll-jquery-style', plugins_url('jquery-ui/jquery-ui.css', __FILE__));
-    wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__), [], '1.1.2', false);
+    wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__), [], '1.1.3', false);
     wp_enqueue_style('budatoll-bootstrap-style', plugins_url('css/bootstrap.css', __FILE__));
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__), [], '1.1.5', false);
     wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__, [], '1.1.3'));
@@ -103,16 +103,16 @@ function budatoll_scripts() {
 
     switch ($post->post_name) {
         case 'sablon-naptar':
-            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_template.js', __FILE__), array('jquery'), '1.1', true);
+            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_template.js', __FILE__), array('jquery'), '1.2', true);
             break;
         case 'alkalom-naptar':
-            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '2.5', true);
+            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '2.6', true);
             break;
         case 'edzesek-naptar':
-            wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '2.81', true);
+            wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '2.82', true);
             break;
         case 'edzeseim-naptar':
-            wp_enqueue_script('budatoll-my-trainings-script', plugins_url('js/my_trainings_calendar.js', __FILE__), array('jquery'), '2.75', true);
+            wp_enqueue_script('budatoll-my-trainings-script', plugins_url('js/my_trainings_calendar.js', __FILE__), array('jquery'), '2.76', true);
             break;
     }
     wp_enqueue_script('budatoll-jquery-ui-script', plugins_url('jquery-ui/jquery-ui.js', __FILE__), array('jquery'), '1.3', false);

@@ -62,20 +62,9 @@
     font-size: 12px;
 }
 
-/* Ensure events are stackable without overlap */
-.fc-daygrid-event {
-    white-space: normal; /* Allows multi-line event titles */
-    text-align: center !important;
-    display: contents !important;
-    justify-content: center;
-    text-align: center;
+.fc-daygrid-day-events {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
-.fc-daygrid-event > .fc-event-main {
-    display: inline-block !important;
-    margin-right: 5px;  /* Adds spacing between events */
-}
-.fc-daygrid-day {
-    width: auto !important;
-    min-width: 50px; /* Adjust as needed */
-}
-

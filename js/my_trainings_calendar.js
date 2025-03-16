@@ -64,24 +64,30 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         });
     },
     eventContent: function (day) {
-        var arrayOfDomNodes = [];
-        var title = document.createElement('div');
-        title.innerText = day.event.title;
+        var event_content = '<div class="';
+        let start = new Date(day.event.start);
+        let time = start.getHours() + ':' + start.getMinutes();
         if (day.event.extendedProps.booked) {
             if (day.event.extendedProps.confirmed) {
-                title.classList.add('budatoll-booked-event');
+                event_content += 'budatoll-booked-event';
             } else {
-                title.classList.add('budatoll-waiting-event');
+                event_content += 'budatoll-waiting-event';
             }
         } else if (day.event.extendedProps.full) {
-            title.classList.add('budatoll-full-event');
+            event_content += 'budatoll-full-event';
         } else {
-            title.classList.add('budatoll-available-event');
+            event_content += 'budatoll-available-event';
         }
-        arrayOfDomNodes.push(title);
-        return {domNodes: arrayOfDomNodes};
+        event_content += '" data-time="' + time + '"><span>' + day.event.title + '</span></div>';
+        return {
+            html: event_content
+        };
     },
-        
+    viewDidMount: function (info) {
+        budatoll_trainings_calendar.setOption('height', getCalendarHeight());
+    },
+    dayCellDidMount: function (info) {
+    },
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -89,6 +95,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
     windowResize: function (view) {
+        budatoll_trainings_calendar.setOption('height', getCalendarHeight());
         const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);
         if (widthDifference > 10) {
@@ -106,13 +113,14 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     weekends: false,
     droppable: false,
     expandRows: true,
+    eventOverlap: true,
     slotMinTime: bt_events_not_before,
     slotMaxTime: bt_events_not_after,
     forceEventDuration: true,
-    height: 'auto',
+    height: getCalendarHeight(),
     defaultAllDay: false,
     allDaySlot: false,
-    dayMaxEvents: true, // allow "more" link when too many events
+    dayMaxEvents: false, // allow "more" link when too many events
     showNonCurrentDates: false,
     eventClick: function (eventInfo) {
         if (!btIsTouchDevice()) {
@@ -148,9 +156,11 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     }
 });
 budatoll_trainings_calendar.render();
+
 window.addEventListener('resize', function () {
     budatoll_trainings_calendar.render();
 }, {passive: true});
+
 function btEventClicked(eventInfo) {
     var id = eventInfo.event.id;
     var event = btAddedTrainingIds[id];

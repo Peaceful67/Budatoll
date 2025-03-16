@@ -28,7 +28,7 @@ function getCalendarType() { // Megmondja az URL alapján,melyik fajta naptárat
 }
 
 function getCalendarHeight() {
-    let headerHeight = 50; // Approximate height of the headerToolbar
+    let headerHeight = document.querySelector('.fc-toolbar')?.offsetHeight || 50;
     let availableHeight = window.innerHeight - headerHeight;
     return Math.max(400, availableHeight); // Ensure a minimum height
 }

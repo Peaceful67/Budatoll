@@ -11,7 +11,7 @@ define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cancel
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
 
-define("BUDATOLL_CURRENT_VERSION", '1.2');
+define("BUDATOLL_CURRENT_VERSION", '1.3');
 
 define("BUDATOLL_VERSION_ID", 'id');
 define("BUDATOLL_VERSION_DATE", 'date');
@@ -71,11 +71,22 @@ function budatoll_setting_options() {
             . '</ul>',
         ],
         '1.2' => [
-            BUDATOLL_VERSION_DATE => '2025--',
+            BUDATOLL_VERSION_DATE => '2025-2',
             BUDATOLL_VERSION_TITLE => 'További fejlesztések',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
             . '<li>- Heti beosztás sablon készítés és másolása.</li>'
             . '<li>- Az edzés időpontok beállítása után értesítő levél a játékosoknak, hogy jelentkezhetnek.</li>'
+            . '</ul>',
+        ],
+        '1.3' => [
+            BUDATOLL_VERSION_DATE => '2025-03',
+            BUDATOLL_VERSION_TITLE => 'Westendes megbeszélés',
+            BUDATOLL_VERSION_DESCRIPTION => '<ul>'
+            . '<li>- A naptár teljes képernyő széles.</li>'
+            . '<li>- A betelt edzés piros az edzői nézetben is.</li>'
+            . '<li>- Mobilon a heti és havi naptár nézet elforítja a képernyőt.</li>'
+            . '<li>- Az edzés naptárakban az edzések egymás mellett, nem egymás alatt.</li>'
+            . '<li>- Módosítás után nem megy vissza a mai napra.</li>'
             . '</ul>',
         ],
     ];
