@@ -1,6 +1,8 @@
 var btAddedTrainingIds = [];
 let previousWidth = window.innerWidth;
 var calendarEl_trainings = document.getElementById('budatoll-edzes-calendar');
+var goto_date = calendarEl_trainings.getAttribute('data-goto-date');
+
 budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     datesSet: function (info) {
         if ((info.view.type === 'timeGridWeek' || info.view.type === 'dayGridMonth')) {
@@ -57,34 +59,33 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
             }
         });
     },
+    eventSourceSuccess: function (content) {  // Ez van, amikor minden betoltodott.
+    },
     eventContent: function (day) {
-        var arrayOfDomNodes = [];
-        var title = document.createElement('div');
-        title.innerText = day.event.title;
-//        title.classList.add('fc-event-inline');
+        var event_content = '<div class="';
+        let start = new Date(day.event.start);
+        let time = start.getHours() + ':' + start.getMinutes();
         switch (day.event.extendedProps.state) {
             case 'full':
-                title.classList.add('budatoll-event-state-full');
+                event_content += 'budatoll-event-state-full';
                 break;
             default:
             case 'available':
-                title.classList.add('budatoll-event-state-available');
+                event_content += 'budatoll-event-state-available';
                 break;
             case 'waiting':
-                title.classList.add('budatoll-event-state-waiting');
+                event_content += 'budatoll-event-state-waiting';
                 break;
         }
-        arrayOfDomNodes.push(title);
-        return {domNodes: arrayOfDomNodes};
+        event_content += '" data-time="' + time + '"><span>' + day.event.title + '</span></div>';
+        return {
+            html: event_content
+        };
     },
     viewDidMount: function (info) {
         budatoll_trainings_calendar.setOption('height', getCalendarHeight());
     },
     dayCellDidMount: function (info) {
-        if (info.view.type === 'dayGridMonth' || info.view.type === 'timeGridWeek') {
-            let eventsInCell = info.el.querySelectorAll('.fc-event').length;
-            info.el.style.flexGrow = eventsInCell > 0 ? 2 : 1;
-        }
     },
     headerToolbar: {
         left: 'prev,next today',
@@ -92,7 +93,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
         right: 'dayGridMonth timeGridWeek listWeek'
     },
     initialView: ((window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth'),
-
+    initialDate: (goto_date == null) ? new Date() : goto_date,
     windowResize: function (view) {
         const currentWidth = window.innerWidth;
         const widthDifference = Math.abs(currentWidth - previousWidth);
@@ -117,6 +118,7 @@ budatoll_trainings_calendar = new FullCalendar.Calendar(calendarEl_trainings, {
     expandRows: true,
     forceEventDuration: true,
     allDaySlot: false,
+    eventOverlap: true,
     defaultAllDay: false,
     dayMaxEvents: false, // allow "more" link when too many events
     showNonCurrentDates: false,
