@@ -1,0 +1,61 @@
+budatoll_players = false;
+budatoll_center_x = window.innerWidth / 2;
+budatoll_center_y = window.innerHeight / 2;
+budatoll_mouse_x = budatoll_center_x;
+budatoll_mouse_y = budatoll_center_y;
+
+jQuery.ajax({
+    url: budatoll_ajax_object.ajax_url,
+    type: 'POST',
+    dataType: 'json',
+    data: {
+        action: 'budatoll',
+        'ajax-action': 'get-players',
+    },
+    success: function (response) {
+        if (response.result === 'success') {
+            budatoll_players = response.players;
+        } else {
+            console.log('Wrong action: get-players: '.response);
+        }
+    },
+    error: function (response) {
+        console.log('AJAX not succed');
+        console.log(response);
+    }
+});
+
+
+$(document).on('touchstart', function (element) {
+    if (btIsTouchDevice()) {
+        const training_info = $("#budatoll-trainings-info");
+        if (training_info) {
+            training_info.fadeOut(budatoll_modal_speed);
+        }
+        var touches = element.originalEvent.touches;
+        if (touches.length > 0) {
+            btTouchX = Math.round(touches[0].clientX);
+            btTouchY = Math.round(touches[0].clientY);
+        }
+    }
+});
+
+
+function budatoll_get_popup_x(width) {
+    x = (budatoll_mouse_x > budatoll_center_x) ? budatoll_center_x - width - 50 : budatoll_center_x + 50;
+    x = (budatoll_mouse_x > budatoll_center_x) ? 0 : budatoll_center_x * 2 - width;
+//    x = budatoll_mouse_x;
+    return x;
+}
+
+function budatoll_get_popup_y(height) {
+    y = (budatoll_mouse_y > budatoll_center_y) ? budatoll_center_y - height - 50 : budatoll_center_y + 50;
+    y = budatoll_mouse_y;
+    return y;
+}
+
+jQuery(document).on('mousemove', function (event) {
+    btMouseX = event.pageX;
+    btMouseY = event.pageY;
+});
+

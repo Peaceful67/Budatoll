@@ -1,0 +1,502 @@
+:root {
+    --primary-color: #6496ff;
+    --primary-hover: #5078cc;
+    --primary-focus: #365ea6;
+    --secondary-color: #f3f3f3;
+    --text-color: #333;
+    --border-color: #ddd;
+    --keret-color:#a1a1a1;
+}
+
+
+.budatoll-keret {
+    position: relative;
+    border: 2px solid var(--keret-color);
+    border-radius: 25px;
+    background: lightgrey;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.budatoll-keret hr {
+    width: 100%;
+    border:2px solid var(--keret-color);
+}
+
+.budatoll-editor-group {
+    display:flex;
+    flex-direction: column;
+}
+
+
+.budatoll-editor {
+    margin: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    line-height: 200%;
+}
+.budatoll-editor-group label {
+    margin-bottom: 5px;
+}
+
+.budatoll-editor-group input, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.budatoll-search {
+    margin: 10px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    background: lightsteelblue;
+}
+
+.budatoll-search-group {
+    display: flex;
+    flex-direction: row;
+}
+.budatoll-search-group input, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.budatoll-search-group label {
+    margin-bottom: 5px;
+    vertical-align: central;
+}
+.budatoll-button-warning {
+    background-color: #d4af37;
+
+}
+.budatoll-button-warning:hover {
+    background-color: #b29a00;
+}
+
+.budatoll-warning {
+    color: red;
+}
+.budatoll-label {
+    display: flex;
+    font-weight: bold;
+    justify-content: left;
+    width: 120px;
+}
+.budatoll-column {
+    flex: 1;
+    padding: 5px;
+    flex-direction: column;
+}
+.budatoll-table thead {
+    background-color: lightgray;
+}
+
+.budatoll-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+
+.budatoll-table {
+    border-spacing: 0; /* Ensure no gaps between cells */
+    width: 100%;
+    border-collapse: collapse; /* Remove default spacing between cells */
+    border-radius: 8px; /* Rounded corners for the table */
+    overflow: hidden; /* Ensures the border-radius works */
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow around the table */
+}
+.budatoll-table th {
+    background-color: #6496ff;
+    color: #fff;
+    text-align: left; /* Align text to the left */
+    padding: 12px 15px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Table Row and Cell Styling */
+.budatoll-table td {
+    padding: 12px 15px;
+    color: #333;
+    font-size: 15px;
+    border-bottom: 1px solid #ddd; /* Add a light border between rows */
+}
+
+/* Alternate Row Coloring */
+.budatoll-table-stripped  tr:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+.budatoll-table-stripped  tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+/* Hover Effect for Rows */
+.budatoll-table tr:hover {
+    background-color: #e8f0ff;
+}
+
+/* Add Focus for Rows (Optional, e.g., when selected via JS) */
+.budatoll-table tr:focus {
+    background-color: #cce1ff;
+    outline: 2px solid #6496ff;
+}
+
+/* First Cell Alignment (For numeric data like IDs or indexes) */
+.budatoll-table td:first-child {
+    text-align: center;
+}
+
+/* Styling for Empty Table Cells */
+.budatoll-table td:empty {
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+}
+
+.budatoll-table-row:hover {
+    background-color: lightgray;
+}
+
+.budatoll-popup {
+    display:none;
+    position:  fixed;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: auto;
+    height: auto;
+    background-color: lightgray;
+    box-shadow: 0 8px 16px rgba(0,0,0, 0.3);
+    padding: 10px;
+    overflow: auto;
+    max-width: 90vw;
+    max-height: 60vh;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+    opacity: 0;
+}
+.budatoll-popup.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;       /* set to auto only if interactive */
+}
+
+.budatoll-popup-content {
+    background: #fefefe;
+    position: fixed;
+    padding: 10px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    font-size: 5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+}
+.budatoll-popup-content  p {
+    line-height: 1.2;
+    margin: 0 0 10px;
+}
+.budatoll-popup-row {
+    display: flex;
+    flex-direction:row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+.budatoll-popup-close {
+    color: #555;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.budatoll-popup-close:hover, .budatoll-popup-close:focus {
+    color: black;
+    text-decoration: navajowhite ;
+    cursor: pointer;
+}
+
+.budatoll-row {
+    display: block;
+    justify-content: left;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    overflow: hidden;
+}
+
+.budatoll-message {
+    display: none;
+    color: black;
+    margin:10px;
+    align-content: center;
+    padding: 10px;
+    position: relative;
+    border: 2px solid #a1a1a1;
+    border-radius: 5px;
+}
+
+.budatoll-success {
+    background: lightgreen;
+}
+.budatoll-error {
+    background: lightpink;
+}
+
+
+.budatoll-dropdown {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.budatoll-dropdown option {
+    padding: 5px;
+}
+
+.form-table th {
+    width:20%;
+}
+
+
+.budatoll-no-border {
+    border: none !important;
+    th {
+        border: none !important;
+    }
+    td {
+        border: none !important;
+    }
+}
+
+.budatoll-event-state-available {
+    background-color: #0B5394;
+    color:white;
+    border: 1px solid darkblue;
+    border-radius: 5px;
+}
+.budatoll-event-state-full {
+    background-color: #ff686b;
+    color:white;
+    border: 1px solid darkred;
+    border-radius: 5px;
+}
+.budatoll-event-state-waiting {
+    background-color: #e1b21c;
+    color:white;
+    border: 1px solid darkgoldenrod;
+    border-radius: 5px;
+}
+
+.budatoll-booked-event {
+    background-color: #0B5394;
+    color:white;
+    border: 1px solid darkred;
+    border-radius: 5px;
+}
+
+.budatoll-available-event {
+    background-color: #0eb439;
+    color:white;
+    border: 1px solid darkgreen;
+    border-radius: 5px;
+}
+
+.budatoll-waiting-event {
+    background-color: #e1b21c;
+    color:white;
+    border: 1px solid darkgoldenrod;
+    border-radius: 5px;
+}
+
+.budatoll-full-event {
+    background-color: #ff686b;
+    color:white;
+    border: 1px solid darkred;
+    border-radius: 5px;
+}
+
+.et_pb_login form label {
+    font-size: 14px;
+    color: #333; /* Adjust to match your site’s color scheme */
+}
+.et_pb_login form input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+.budatoll-form-group {
+    display: flex; /* Arrange label and input field in the same line */
+    flex-direction: row; /* Horizontal alignment */
+    margin-bottom: 15px; /* Spacing between form groups */
+    gap: 10px; /* Space between label and input */
+    align-items: center; /* Vertically align label and input */
+    justify-content: flex-start;
+}
+
+.budatoll-form-group label {
+    flex: 0 0 150px;
+    flex-shrink: 0; /* Prevent label from shrinking */
+    font-weight: bold; /* Make label text less bold */
+    font-size: 14px; /* Adjust font size for a subtle look */
+    color: var(--text-color); /* Use a neutral text color */
+    background-color: transparent;
+    margin: 0; /* Remove unnecessary margin */
+}
+.budatoll-form-group input[type="text"],
+.budatoll-form-group input[type="number"],
+.budatoll-form-group input[type="date"],
+.budatoll-form-group input[type="email"],
+.budatoll-form-group input[type="tel"],
+.budatoll-form-group input[type="time"],
+.budatoll-form-group textarea,
+.budatoll-form-group select  {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+    background-color:  var(--secondary-color);
+    outline: none;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.budatoll-form-group input[type="text"]:hover,
+.budatoll-form-group input[type="number"]:hover,
+.budatoll-form-group input[type="email"]:hover,
+.budatoll-form-group input[type="tel"]:hover,
+.budatoll-form-group input[type="date"]:hover,
+.budatoll-form-group input[type="time"]:hover,
+.budatoll-form-group textarea:hover,
+.budatoll-form-group select:hover  {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    border-color: #ccc;
+}
+
+.budatoll-form-group input[type="text"]:focus,
+.budatoll-form-group input[type="number"]:focus,
+.budatoll-form-group input[type="email"]:focus,
+.budatoll-form-group input[type="tel"]:focus,
+.budatoll-form-group input[type="date"]:focus,
+.budatoll-form-group input[type="time"]:focus,
+.budatoll-form-group textarea:focus,
+.budatoll-form-group select:focus   {
+    background-color: #fff;
+    border-color:  var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.5);
+}
+
+.budatoll-form-group input[type="checkbox"] {
+    width: 24px; /* Increase size for touch-friendly behavior */
+    height: 24px;
+    margin-right: 20px;
+}
+
+/* General Button Styling */
+.budatoll-button {
+    display: inline-flex; /* For alignment of text and icon */
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    background-color:  var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    outline: none;
+    margin: 10px;
+}
+
+/* Hover Effect for Buttons */
+.budatoll-button:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Focus Effect for Buttons */
+.budatoll-button:focus {
+    box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.5);
+}
+
+/* Active/Pressed State */
+.budatoll-button:active {
+    transform: scale(0.95);
+    background-color:var(--primary-focus);
+}
+
+/* Disabled State */
+.budatoll-button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Icon-Only Button */
+.budatoll-button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Square shape for icon-only button */
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    font-size: 18px; /* Icon size */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    margin: 10px;
+}
+
+/* Icon-Only Button Hover */
+.budatoll-button-icon:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Icon-Only Button Focus */
+.budatoll-button-icon:focus {
+    box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.5);
+}
+
+/* Active State for Icon-Only Button */
+.budatoll-button-icon:active {
+    transform: scale(0.95);
+    background-color: var(--primary-focus);
+}
+
+/* Dashicons Styling */
+.budatoll-button .dashicons {
+    font-size: 20px; /* Adjust icon size */
+    margin-right: 8px; /* Add spacing between icon and text */
+}
+
+/* Icon-Only Button Dashicon */
+.budatoll-button-icon .dashicons {
+    margin-right: 0; /* Center icon for icon-only buttons */
+}
+.budatoll-button:focus-visible,
+.budatoll-button-icon:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}

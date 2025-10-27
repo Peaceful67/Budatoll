@@ -1,0 +1,175 @@
+<?php
+
+function budatoll_manage_event_types() {
+    global $wpdb;
+    if (!current_user_can(BUDATOLL_ACCESS_MANAGE_COACH)) {
+        wp_die(__('Nincs megfelelő jogosultságod az oldal megtekintéséhez!'));
+    }
+
+    $ret = '<form id="BudatollForm" method="post" enctype="multipart/form-data" autocomplete="on" action="/edzes-tipusok">';
+    $edit_id = getPostVariable('budatoll_edit', -1);
+    $delete_id = getPostVariable('budatoll_delete', false);
+    $save = getPostVariable('budatoll_save', false);
+    if (getPostVariable('budatoll_cancel', false)) {
+        $edit_id = -1;
+        $save = false;
+    }
+    if (getPostVariable('budatoll_add', false)) {
+        $edit_id = 0;
+    }
+    $ret .= '<input type="hidden" name="budatoll_edit" id="budatoll_edit" value="' . $edit_id . '">';
+    if ($delete_id) {
+        bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus törlése: ' . $delete_id);
+        $wpdb->delete(BUDATOLL_EVENT_TYPE_TABLE, [BUDATOLL_EVENT_TYPE_ID => $delete_id]);
+        $edit_id = -1;
+        $save = false;
+    }
+    if ($save) {
+        $errors = [];
+        $data = [
+            BUDATOLL_EVENT_TYPE_SHORT => getPostVariable('budatoll-short', ''),
+            BUDATOLL_EVENT_TYPE_LONG => getPostVariable('budatoll-long', ''),
+            BUDATOLL_EVENT_TYPE_PRICE => getPostVariable('budatoll-price', 0),
+            BUDATOLL_EVENT_TYPE_START => getPostVariable('budatoll-start', '00:00'),
+            BUDATOLL_EVENT_TYPE_END => getPostVariable('budatoll-end', '00:00'),
+            BUDATOLL_EVENT_TYPE_MAX_PLAYERS => getPostVariable('budatoll-max', 0),
+            BUDATOLL_EVENT_TYPE_PUBLIC => getPostVariable('budatoll-public', 0),
+        ];
+        if (strlen($data[BUDATOLL_EVENT_TYPE_SHORT]) < 3) {
+            $errors[] = 'A rövid név túl rövid';
+        }
+        if (strlen($data[BUDATOLL_EVENT_TYPE_LONG]) < 3) {
+            $errors[] = 'A hosszú név túl rövid';
+        }
+        if ($data[BUDATOLL_EVENT_TYPE_START] > $data[BUDATOLL_EVENT_TYPE_END]) {
+            $errors[] = 'A kezdetnek előbb kell lennie a végénél.';
+        }
+        if ($edit_id > 0) {
+            $wpdb->update(BUDATOLL_EVENT_TYPE_TABLE, $data, [BUDATOLL_EVENT_TYPE_ID => $edit_id]);
+            bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus módosítása:' . $edit_id, $data);
+        } else {
+            $edit_id = $wpdb->insert(BUDATOLL_EVENT_TYPE_TABLE, $data);
+            bt_logger(BUDATOLL_LOGGER_TYPE_EVENT_TYPE, -1, 'Edzés típus létrehozása:' . $edit_id, $data);
+        }
+        if (empty($errors)) {
+            $edit_id = -1;
+        } else {
+            foreach ($errors as $err) {
+                $ret .= bt_warning($err);
+            }
+        }
+    }
+    if ($edit_id >= 0) {
+        $ret .= btEventTypeEdit($edit_id);
+    }
+    $ret .= btEventTypeList();
+    $ret .= '</form>';
+    return $ret;
+}
+
+function btEventTypeEdit($item_id) {
+    global $wpdb;
+    $ret = '<div class="budatoll-keret">';
+    $short = '';
+    $long = '';
+    $price = 0;
+    $start = '00:00';
+    $end = '00:00';
+    $max_players = 0;
+    $public = false;
+    if ($item_id > 0) {
+        $results = $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '` WHERE `' . BUDATOLL_EVENT_TYPE_ID . '`=' . $item_id . ';');
+        $short = $results[0]->{BUDATOLL_EVENT_TYPE_SHORT} ?? '';
+        $long = $results[0]->{BUDATOLL_EVENT_TYPE_LONG} ?? '';
+        $start = $results[0]->{BUDATOLL_EVENT_TYPE_START} ?? '00:00';
+        $end = $results[0]->{BUDATOLL_EVENT_TYPE_END} ?? '00:00';
+        $price = $results[0]->{BUDATOLL_EVENT_TYPE_PRICE} ?? 0;
+        $max_players = $results[0]->{BUDATOLL_EVENT_TYPE_MAX_PLAYERS} ?? 0;
+        $public = $results[0]->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1;
+    }
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-short">Rövid név:</label>'
+            . '<input  type="text" id="budatoll-short" name="budatoll-short" value="' . $short . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-long">Hosszú név:</label>'
+            . '<input type="text" id="budatoll-long" name="budatoll-long" value="' . $long . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-start">Idősáv:</label>'
+            . '<input  type="time" id="budatoll-start" name="budatoll-start" value="' . $start . '">';
+    $ret .= '<input  type="time" id="budatoll-end" name="budatoll-end" value="' . $end . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-price">Ár:</label>'
+            . '<input type="number" id="budatoll-price" name="budatoll-price" value="' . $price . '"> Ft</div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-max">Max játékos:</label>'
+            . '<input type="number" id="budatoll-max" name="budatoll-max" value="' . $max_players . '"></div>';
+    $ret .= '<div class="budatoll-form-group"><label for="budatoll-public">Publikus:</label>'
+            . '<input type = "checkbox" id = "budatoll-public" name = "budatoll-public" value = "1"'
+            . ($public == '1' ? 'checked' : '') . '></div>';
+    $ret .= '<div class="budatoll-form-group">' . bt_save_button(-1) . bt_cancel_button() . '</div>';
+    $ret .= '</div>';
+
+    return $ret;
+}
+
+function btEventTypeList() {
+    $ret = '<H3>Edzés típusok listája</H3>';
+    $results = btGetEventTypes();
+    $ret .= '<div class="wrap">';
+    $ret .= bt_add_button();
+    $ret .= '<table class="budatoll-table budatoll-table-stripped">';
+    $ret .= '<thead><tr>'
+            . '<th scope="col" id="column1" class="manage-column column-column1" style="width:120px;">Rövid név</th>'
+            . '<th scope="col" id="column2" class="manage-column column-column2" style="width:280px;">Hosszú név</th>'
+            . '<th scope="col" id="column3" class="manage-column column-column3" style="width:80px;">Ár</th>'
+            . '<th scope="col" id="column4" class="manage-column column-column4" style="width:80px;">Idősáv</th>'
+            . '<th scope="col" id="column5" class="manage-column column-column5" style="width:40px;">Max játékos</th>'
+            . '<th scope="col" id="column5" class="manage-column column-column5" style="width:40px;">Publikus</th>'
+            . '<th scope="col" id="column6" class="manage-column column-column6" style="width:160px;">Művelet</th>'
+            . '</tr></thead><tbody>';
+
+    foreach ($results as $row) {
+        $id = $row->{BUDATOLL_EVENT_TYPE_ID};
+        $short = $row->{BUDATOLL_EVENT_TYPE_SHORT} ?? '';
+        $long = $row->{BUDATOLL_EVENT_TYPE_LONG} ?? '';
+        $start = substr(($row->{BUDATOLL_EVENT_TYPE_START} ?? '00:00'), 0, 5);
+        $end = substr(($row->{BUDATOLL_EVENT_TYPE_END} ?? '00:00'), 0, 5);
+        $price = number_format(($row->{BUDATOLL_EVENT_TYPE_PRICE} ?? 0), 0, ',', '.');
+        $max = $row->{BUDATOLL_EVENT_TYPE_MAX_PLAYERS} ?? 0;
+        $public = $row->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1 ? 'Igen' : 'Nem';
+        $public_class = $row->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1 ? 'style="background:lightgreen";' : '';
+        //        $ret .= '<tr class="clickable-row" id="budatoll-popup_' . $id . '" data-item="' . $id . '">';
+        $ret .= '<tr ' . $public_class . '>';
+        $ret .= '<td class="column-column1">' . $short . '</td>';
+        $ret .= '<td class="column-column2">' . $long . '</td>';
+        $ret .= '<td class="column-column3">' . $price . ' Ft</td>';
+        $ret .= '<td class="column-column4">' . $start . ' - ' . $end . '</td>';
+        $ret .= '<td class="column-column5">' . $max . '</td>';
+        $ret .= '<td class="column-column5">' . $public . '</td>';
+        $ret .= '<td class="column-column6">' . bt_edit_button($id)
+                . bt_delete_button($id, 'budatoll_delete', 'Törlés', $row->{BUDATOLL_EVENT_TYPE_LONG} . ' nevű edzést?');
+        $ret .= '</td></tr>';
+    }
+    $ret .= '</tbody></table></div>';
+    return $ret;
+}
+
+function btGetEventTypes() {
+    global $wpdb;
+    return $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '`;');
+}
+
+function get_event_type_by_id($id) {
+    global $wpdb;
+    $result = $wpdb->get_results('SELECT * FROM `' . BUDATOLL_EVENT_TYPE_TABLE . '` WHERE `' . BUDATOLL_EVENT_TYPE_ID . '`=' . $id . ';');
+    $ret = $result[0] ?? [];
+    return $ret;
+}
+
+function get_public_event_types() {
+    $ret = [];
+    $types = btGetEventTypes();
+    if (!empty($types)) {
+        foreach ($types as $type) {
+            if ($type->{BUDATOLL_EVENT_TYPE_PUBLIC} == 1) {
+                $ret[] = $type->{BUDATOLL_EVENT_TYPE_ID};
+            }
+        }
+    }
+    return $ret;
+}

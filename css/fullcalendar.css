@@ -1,0 +1,70 @@
+#external-events {
+    position: sticky;
+    left: 20px;
+    top: 120px;
+    width: 150px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #eee;
+    text-align: left;
+}
+
+#external-events h4 {
+    font-size: 16px;
+    margin-top: 0;
+    padding-top: 1em;
+}
+
+#external-events .fc-event {
+    margin: 3px 0;
+    cursor: move;
+}
+
+#external-events p {
+    margin: 1.5em 0;
+    font-size: 10px;
+    color: #666;
+}
+
+#external-events p input {
+    margin: 0;
+    vertical-align: middle;
+}
+
+
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Adjust event container for clarity */
+.fc-event-container {
+    overflow-y: auto; /* Enables scroll if there are too many events */
+    max-height: 100%; /* Restrict height to keep the layout clean */
+}
+
+/* Style individual events */
+.fc-event {
+    font-size: 12px; /* Smaller font for compactness */
+    padding: 2px; /* Adjust padding for compact design */
+    border-radius: 2px; /* Rounded edges for neatness */
+    user-select: none; /* Disable text selection */
+    -webkit-user-drag: none; /* Disable dragging in WebKit browsers */
+    -webkit-touch-callout: none; /* Disable context menu on iOS */
+}
+.fc-event:hover {
+    opacity: 0.8;
+}
+/* Style popover for additional events */
+.fc-popover {
+    max-width: 300px; /* Ensure the popover is easy to read */
+    font-size: 12px;
+}
+
+.fc-daygrid-day-events {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}

@@ -1,0 +1,78 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    die();
+}
+define("BUDATOLL_ROLE_COACH", 'coach');
+define("BUDATOLL_ROLE_PLAYER", 'player');
+define("BUDATOLL_ROLE_ADMIN", 'administrator');
+define("BUDATOLL_ROLE_VISITOR", 'anybody');
+
+define("BUDATOLL_ACCESS_MANAGE_OPTIONS", 'budatoll-manage-options');
+define("BUDATOLL_ACCESS_MANAGE_COACH", 'budatoll-manage-coach');
+define("BUDATOLL_ACCESS_MANAGE_PLAYER", 'budatoll-manage-player');
+
+define("BUDATOLL_ACCESS_AJAX", 'access_ajax_budatoll');
+
+define("BUDATOLL_EVENT_TYPE_TABLE", $wpdb->prefix . 'budatoll_event_type');
+define("BUDATOLL_EVENT_TYPE_ID", 'id');
+define("BUDATOLL_EVENT_TYPE_SHORT", 'short');
+define("BUDATOLL_EVENT_TYPE_LONG", 'long');
+define("BUDATOLL_EVENT_TYPE_PRICE", 'price');
+define("BUDATOLL_EVENT_TYPE_MAX_PLAYERS", 'max_players');
+define("BUDATOLL_EVENT_TYPE_PUBLIC", 'public');
+define("BUDATOLL_EVENT_TYPE_START", 'start');
+define("BUDATOLL_EVENT_TYPE_END", 'end');
+
+define("BUDATOLL_EVENTS_TABLE", $wpdb->prefix . 'budatoll_events');
+define("BUDATOLL_EVENTS_ID", 'id');
+define("BUDATOLL_EVENTS_EVENT_TYPE_ID", 'type_id');
+define("BUDATOLL_EVENTS_SHORT", 'short');
+define("BUDATOLL_EVENTS_LONG", 'long');
+define("BUDATOLL_EVENTS_PRICE", 'price');
+define("BUDATOLL_EVENTS_MAX_PLAYERS", 'max_players');
+define("BUDATOLL_EVENTS_DAY", 'day');
+define("BUDATOLL_EVENTS_START", 'start');
+define("BUDATOLL_EVENTS_END", 'end');
+define("BUDATOLL_EVENTS_DONE", 'done');
+define("BUDATOLL_EVENTS_COMMENT", 'comment');
+
+// define("BUDATOLL_EVENTS_TEMPLATE_ID", 'id');
+define("BUDATOLL_EVENTS_TEMPLATE_ID", 'template_id');
+define("BUDATOLL_EVENTS_TEMPLATE_TYPE_ID", 'type_id');
+define("BUDATOLL_EVENTS_TEMPLATE_DAY", 'day');
+define("BUDATOLL_EVENTS_TEMPLATE_START", 'start');
+define("BUDATOLL_EVENTS_TEMPLATE_END", 'end');
+define("BUDATOLL_EVENTS_TEMPLATE_SHORT", 'short');
+define("BUDATOLL_EVENTS_TEMPLATE_LONG", 'long');
+
+define("BUDATOLL_LOGGER_TABLE", $wpdb->prefix . 'budatoll_logger');
+define("BUDATOLL_LOGGER_ID", 'id');
+define("BUDATOLL_LOGGER_TYPE", 'type');
+define("BUDATOLL_LOGGER_USER", 'user');
+define("BUDATOLL_LOGGER_RELATED", 'related');
+define("BUDATOLL_LOGGER_COMMENT", 'comment');
+define("BUDATOLL_LOGGER_TIME", 'time');
+
+define("BUDATOLL_TRAINING_TABLE", $wpdb->prefix . 'budatoll_trainings');
+define("BUDATOLL_TRAINING_ID", 'id');
+define("BUDATOLL_TRAINING_PLAYER_ID", 'player_id');
+define("BUDATOLL_TRAINING_EVENT_ID", 'event_id');
+define("BUDATOLL_TRAINING_CREATED", 'created');
+define("BUDATOLL_TRAINING_DONE", 'done');
+define("BUDATOLL_TRAINING_PAID", 'paid');
+define("BUDATOLL_TRAINING_CONFIRMED", 'confirmed');
+define("BUDATOLL_TRAINING_DELETABLE", 'deletable');
+define("BUDATOLL_TRAINING_COMMENT", 'comment');
+
+define("BUDATOLL_ACCOUNT_TABLE", $wpdb->prefix . 'budatoll_account');
+define("BUDATOLL_ACCOUNT_ID", 'id');
+define("BUDATOLL_ACCOUNT_PLAYER_ID", 'player_id');
+define("BUDATOLL_ACCOUNT_EVENT_ID", 'event_id');
+define("BUDATOLL_ACCOUNT_AMOUNT", 'amount');
+define("BUDATOLL_ACCOUNT_TIME", 'time');
+define("BUDATOLL_ACCOUNT_COMMENT", 'comment');
+
+define("BUDATOLL_COMPANY_NAME", 'Budatoll egyesület');
+
+define("BUDATOLL_NEGATIV_BALANCE_ALREADY_WARNED", 'email-negativ-balance');
