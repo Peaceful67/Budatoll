@@ -190,7 +190,7 @@
 
 .budatoll-popup-content {
     background: #fefefe;
-    position: fixed;
+    position: static;
     padding: 10px;
     border: 1px solid #888;
     border-radius: 5px;

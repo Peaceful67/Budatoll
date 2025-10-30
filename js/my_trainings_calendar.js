@@ -229,12 +229,12 @@ function btMyTrainingMouseEnter(eventInfo) {
         }
         let trainings_text = '<h4>' + event.long + '</h4>';
         var popupX, popupY;
-        [popupX, popupY] = getPopupPos(training_info);
+        
         trainings_text += 'Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '<br>';
         trainings_text += 'Max játékos: ' + (event.max_players > 0 ? event.max_players : 'Korlátlan') + '<br>';
         trainings_text += showApplicants(trainings);
         training_info.html(trainings_text);
-
+        [popupX, popupY] = getPopupPos(training_info);
         training_info.css({
             left: popupX,
             top: popupY

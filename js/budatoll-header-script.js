@@ -107,32 +107,39 @@ function btIsTouchDevice() {
 }
 
 function getPopupPos(popupModal) {
+    let popupX, popupY;
     popup_width = Math.max(80, popupModal.outerWidth());
     popup_height = Math.max(50, popupModal.outerHeight());
     screenX = window.innerWidth;// $(window).width();
     screenY = window.innerHeight; // $(window).height();
+ //   console.log('Window: X: ' + screenX + ', Y: ' + screenY);
+ //   const $parent = $(popupModal).parent();
+ //   const parent_width = $parent.outerWidth();   // includes padding + border
+ //   const parent_height = $parent.outerHeight();
+ //   console.log('Parent: X: ' + parent_width + ', Y: ' + parent_height);
+ //   console.log('Mouse: X: ' + btMouseX + ', Y: ' + btMouseY);
     if (btMouseX < 0) {
         btMouseX = screenX / 2;
     }
     if (btMouseY < 0) {
         btMouseY = screenY / 2;
     }
-    // Adjust horizontal position
-    let popupX = btMouseX + offsetModalX;
-    if (btMouseX > screenX / 2) {
-        popupX = btMouseX - (popup_width) - offsetModalX;
+ 
+    if (btMouseX > (screenX / 2)) { // Ha nagyon jobbra van már
+        popupX = (screenX / 2) - offsetModalX - popup_width;
+    } else {
+        popupX = btMouseX + offsetModalX;
     }
-    // Ensure the modal stays within the screen horizontally
-    popupX = Math.max(10, Math.min(popupX, screenX - popup_width - offsetModalX));
+    popupX = Math.max(offsetModalX, popupX);
 
-    // Adjust vertical position
-    let popupY = btMouseY + offsetModalY;
-    if (btMouseY > screenY / 2) {
-        popupY = btMouseY - (popup_height) - offsetModalY;
+    if (btMouseY > (screenY / 2)) { // Ha nagyon lent van már
+        popupY = (screenY / 2) - offsetModalY - popup_height;
+//        console.log('Lent van: ' + popupY);
+    } else {
+        popupY = btMouseY + offsetModalY;
     }
-    // Ensure the modal stays within the screen vertically
-    popupY = Math.max(10, Math.min(popupY, screenY - popup_height - offsetModalY));
-//    console.log('Y/X, Size: ' + popup_height + ' / ' + popup_width + ', pos: ' + popupY + ' / ' + popupX);
+    popupY = Math.max(offsetModalY, popupY);
+//    console.log('X/Y, Size: ' + popup_width + ' / ' + popup_height + ', pos: ' + popupX + ' / ' + popupY);
     return [popupX + 'px', popupY + 'px'];
 
 }
