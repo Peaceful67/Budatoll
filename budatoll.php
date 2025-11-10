@@ -28,6 +28,8 @@ require_once plugin_dir_path(__FILE__) . 'includes/trainings_functions.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_calendar.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_list.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/scheduler.inc';
+require_once plugin_dir_path(__FILE__). '/includes/password_change.inc';
+
 require_once plugin_dir_path(__FILE__) . 'ajax.inc';
 // require_once plugin_dir_path(__FILE__) . 'settings.inc';
 
@@ -50,6 +52,7 @@ add_shortcode('budatoll-balance-of-user', 'bt_balance_of_user');
 add_shortcode('budatoll-my-balance', 'bt_my_balance');
 add_shortcode('budatoll-rules', 'bt_rule_options');
 add_shortcode('budatoll-welcome-message', 'bt_welcome_message');
+//add_shortcode('budatoll_password_change', 'bt_change_password');
 
 add_shortcode('budatoll-settings-options', 'budatoll_setting_options');
 add_shortcode('budatoll-settings-logger', 'bt_logger_list');
@@ -82,6 +85,15 @@ add_action('shutdown', 'budatoll_crontab'); // Meghívjuk innen is, hátha nem m
 add_action('after_setup_theme', 'budatoll_remove_admin_bar');
 
 add_action('user_register', 'bt_set_default_role');
+
+/**
+ * Disable admin notification on user password change.
+ */
+if ( ! function_exists( 'wp_password_change_notification' ) ) {
+	function wp_password_change_notification( $user ) {
+		// do nothing
+	}
+}
 
 function bt_enqueue_dashicons() {
     wp_enqueue_style('dashicons');

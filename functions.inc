@@ -16,8 +16,8 @@ function budatoll_is_page_allowed() {
     $page_acccess = [// Ezeket az oldalakat csak a megadott szerepkörrel érhetjük el
         BUDATOLL_ROLE_VISITOR => ['', '/nincs-jogosultsag', '/belepes', '/gyik', '/rolunk'],
         BUDATOLL_ROLE_COACH => ['/alkalom-naptar', '/alkalom-lista', '/edzesek-naptar', '/edzesek-lista', '/egyenlegek', '/egyenleg', '/edzeseim-naptar', '/szabalyok'
-            , '/beallitasok', '/naplok', '/edzes-tipusok', '/emailek', '/jatekosok', '/sablon-naptar'],
-        BUDATOLL_ROLE_PLAYER => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok',],
+            , '/beallitasok', '/naplok', '/edzes-tipusok', '/emailek', '/jatekosok', '/sablon-naptar', '/jelszo',],
+        BUDATOLL_ROLE_PLAYER => ['/edzeseim-lista', '/edzeseim-naptar', '/egyenlegem', '/szabalyok', '/jelszo',],
     ];
 
     if (is_user_logged_in() && bt_is_user_active(get_current_user_id())) {
@@ -27,7 +27,6 @@ function budatoll_is_page_allowed() {
         $roles = [];
     }
     $roles[] = BUDATOLL_ROLE_VISITOR;
-//   error_log('Roles: ' . print_r($roles, true) . ', permalink:' . $permalink);
     foreach ($roles as $role) {  // Vesszük az összes szerepet 
         if (in_array($permalink, $page_acccess[$role])) { // Ha benne van az aktuális, örülünk
             return;
