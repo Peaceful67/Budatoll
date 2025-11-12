@@ -252,11 +252,12 @@ function btMyTrainingMouseLeave(eventInfo) {
 
 
 function showApplicants(trainings) {
-    trainings_text = 'Jelentkeztek: ';
+
     waiting_list = '';
     if (trainings.length === 0) {
         trainings_text += 'Senki';
     } else {
+        trainings_text = 'Jelentkezett ' + trainings.length + ' játékos: ';
         trainings.forEach(function (training) {
             if (training.confirmed === '1') {
                 trainings_text += training.player_name + ', ';
