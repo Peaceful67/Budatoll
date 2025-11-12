@@ -99,12 +99,11 @@ function bt_inactive_players() {
 }
 
 function bt_search_waiting_list() { // Átnézzük a  még nem lezajlott edzések várólistáját
-    $sql = 'SEELECT * FROM  `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DONE . '`=0;';
+    $sql = 'SELECT * FROM  `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DONE . '`=0;';
     $events = bt_get_results($sql);
     if ($events) {
         foreach ($events as $event) {
             bt_confirm_waitinglist_of_event( $event->{BUDATOLL_EVENTS_ID} ?? -1);
         }
     }
-    error_log('Wainting lists checked');
 }
