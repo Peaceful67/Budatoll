@@ -19,6 +19,8 @@ function budatoll_my_trainings_calendar() {
     $training_delete = getPostVariable('training_delete');
     if ($training_delete AND $training_delete > 0) {
         bt_delete_training($training_delete);
+        $training = bt_get_training_by_id($training_delete);
+        bt_confirm_waitinglist_of_event($training->{BUDATOLL_TRAINING_EVENT_ID} ?? -1);
     }
     $event_id = getPostVariable('event_id');
     if (getPostVariable('training_remove') AND $event_id) {
@@ -28,6 +30,7 @@ function budatoll_my_trainings_calendar() {
                 bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
                         . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-'
                         . bt_time($event->{BUDATOLL_EVENTS_END}));
+                bt_confirm_waitinglist_of_event($event_id);
                 if (btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL)) {
                     $waiting_list = bt_get_waiting_list($event_id);
                     foreach ($waiting_list as $waiting_id) {
@@ -115,15 +118,17 @@ function budatoll_trainings_calendar() {
         if ($max_players >= 1 AND $max_players <= 20) {
             if ($wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_MAX_PLAYERS => $max_players], [BUDATOLL_EVENTS_ID => $set_max_players]) > 0) {
                 bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'A ' . $set_max_players . ' azonositójú edzés módositott max játékos száma: ' . $max_players);
+                bt_confirm_waitinglist_of_event($set_max_players);
             }
         }
     }
     $training_delete = getPostVariable('training_delete');
     if ($training_delete AND $training_delete > 0) {
         $training = bt_get_training_by_id($training_delete);
-        $event = get_event_by_id($training->{BUDATOLL_TRAINING_EVENT_ID});
+        $event = get_event_by_id($training->{BUDATOLL_TRAINING_EVENT_ID} ?? -1);
         $goto_date = $event->{BUDATOLL_EVENTS_DAY} ?? false;
         bt_delete_training($training_delete);
+        bt_confirm_waitinglist_of_event($training->{BUDATOLL_TRAINING_EVENT_ID} ?? -1);
     }
     $add_player_id = getPostVariable('select_players');
     $event_id = getPostVariable('event_id');

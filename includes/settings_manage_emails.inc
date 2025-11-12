@@ -10,6 +10,7 @@ define("BT_CUSTOM_EMAIL_PAYMENT_MODIFY", 'payment_modify');
 define("BT_CUSTOM_EMAIL_CHARGE_MODIFY", 'charge_modify');
 define("BT_CUSTOM_EMAIL_WARN_NEGATIV", 'warn_negativ');
 define("BT_CUSTOM_EMAIL_WAITING", 'waiting');
+define("BT_CUSTOM_EMAIL_CONFIRM_WAITING", 'confirm_waiting');
 define("BT_CUSTOM_EMAIL_TRAINING_DELETED", 'training-deleted');
 define("BT_CUSTOM_EMAIL_TRAINING_SAVED", 'training-saved');
 define("BT_CUSTOM_EMAIL_PLAYER_REGISTERED", 'player-registered');
@@ -61,6 +62,15 @@ $bt_default_emails = [
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A #1#, #2# #3#-#4#'
         . ' edzésről egy játékos törölte a jelentkezését, így lehetőséged van a várólistás jelentkezésedet megerősíteni. '
         . '<br>Siess, mert más várólistások is hasonló értesítést kaphattak!.<br>',
+    ],
+     BT_CUSTOM_EMAIL_CONFIRM_WAITING => [
+        BUDATOLL_EMAIL_TITLE => 'Várólistáról bekerült az edzésre',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor bekererül a várólistáról az edzésre .<br>'
+        . '#1# helyére az edzés hosszú neve fog kerülni.<br>'
+        . '#2# helyére az edzés dátuma fog kerülni.<br>#3# helyére az edzés kezdési ideje fog kerülni.<br>#4# helyére az edzés vége fog kerülni.<br>',
+        BUDATOLL_EMAIL_SUBJECT => 'Bekerülés várólistáról',
+        BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A #1#, #2# #3#-#4#'
+        . ' edzésen felszabadult egy hely, amiről így bekerültél a várólistáról. Várunk az edzésen.<br>',
     ],
     BT_CUSTOM_EMAIL_TRAINING_DELETED => [
         BUDATOLL_EMAIL_TITLE => 'Edzés törölve',

@@ -67,7 +67,7 @@ class Budatoll_Password_Change {
                 </div>
 
                 <div class="bt-pass-field">
-                    <label for="new_password_2"><?php esc_html_e( 'Mégegyszer', 'budatoll' ); ?></label>
+                    <label for="new_password_2"><?php esc_html_e( 'Még egyszer', 'budatoll' ); ?></label>
                     <input type="password" id="new_password_2" name="new_password_2" required minlength="8">
                 </div>
 
@@ -128,7 +128,7 @@ class Budatoll_Password_Change {
 
         // 3) jelszó beállítása (ez érvényteleníti a sessziókat)
         wp_set_password( $new1, $user->ID );
-
+        bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $user->ID, 'Sikeres jelszó módosítás');
         // 4) kényelmi re-login (ne dobja ki a felhasználót)
         $creds = [
             'user_login'    => $user->user_login,

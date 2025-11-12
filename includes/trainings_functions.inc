@@ -4,6 +4,27 @@ if (!defined('ABSPATH')) {
     die();
 }
 
+function bt_confirm_waitinglist_of_event($event_id) {
+    if (!btIsOptionEnabled(BUDATOLL_OPTION_CONFIRM_WAITINGLIST)) {
+        return;
+    }
+    $event = bt_get_event_by_id($event_id);
+    $max_players = $event->{BUDATOLL_EVENTS_MAX_PLAYERS} ?? -1;
+    $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` '
+            . 'WHERE `' . BUDATOLL_TRAINING_CONFIRMED . '`=0 AND `' . BUDATOLL_TRAINING_DONE . '`=0 AND `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id
+            . ' ORDER BY `' . BUDATOLL_TRAINING_CREATED . '`;';
+    $result = bt_get_results($sql);  // Vesszuk a várólistás elemeket
+    if (!$result || count($result) == 0) {
+        return;
+    }
+    foreach ($result as $item) {
+        if (count(get_confirmed_trainings_by_event($event_id)) >= $max_players) { // Betelt, kilépünk.
+            return;
+        }
+        bt_training_confirm($item->{BUDATOLL_TRAINING_ID});
+    }
+}
+
 function bt_get_training_by_id($id) {
     $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_ID . '`=' . $id . ';';
     $results = bt_get_results($sql);
@@ -63,13 +84,19 @@ function bt_is_event_full($event_id) {
 function bt_training_confirm($id) {
     global $wpdb;
     $training = bt_get_training_by_id($id);
-    if (!$training) {  // Nem is jó az id, nincs ilyen
+    if (!$training || $training->{BUDATOLL_TRAINING_CONFIRMED} == 1) {  // Nem is jó az id, nincs ilyen
         return false;
     }
+    $event_id = $training->{BUDATOLL_TRAINING_EVENT_ID} ?? -1;
+    $event = bt_get_event_by_id($event_id);
     $player_id = $training->{BUDATOLL_TRAINING_PLAYER_ID} ?? -1;
-    $sql = 'UPDATE `' . BUDATOLL_TRAINING_TABLE . '` SET ';
-    if ($wpdb->get_results($sql)) {
-        bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés visszaigazolva.');
+    if ($wpdb->update(BUDATOLL_TRAINING_TABLE,
+                    [BUDATOLL_TRAINING_CONFIRMED => 1, BUDATOLL_TRAINING_DELETABLE => 1,],
+                    [BUDATOLL_TRAINING_EVENT_ID => $event_id, BUDATOLL_TRAINING_PLAYER_ID => $player_id]) > 0) {
+        bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS,
+                $player_id, 'Jelentkezés visszaigazolva.');
+        bt_send_custom_email($player_id, BT_CUSTOM_EMAIL_CONFIRM_WAITING,
+                [$event->{BUDATOLL_EVENTS_LONG}, $event->{BUDATOLL_EVENTS_DAY}, bt_time($event->{BUDATOLL_EVENTS_START}), bt_time($event->{BUDATOLL_EVENTS_END})]);
         return true;
     }
     return false;
@@ -135,6 +162,11 @@ function get_trainings_by_event($event_id) {
     return bt_get_results($sql);
 }
 
+function get_confirmed_trainings_by_event($event_id) {
+    $sql = 'SELECT * FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id . ' AND `' . BUDATOLL_TRAINING_CONFIRMED . '`=1;';
+    return bt_get_results($sql);
+}
+
 function bt_count_trainings($event_id) {
     $sql = 'SELECT COUNT(*) as `NUM` FROM `' . BUDATOLL_TRAINING_TABLE . '` WHERE `' . BUDATOLL_TRAINING_EVENT_ID . '`=' . $event_id;
     $res = bt_get_results($sql);
@@ -189,6 +221,7 @@ function bt_my_event_clicked($event_id) {
                 bt_logger(BUDATOLL_LOGGER_TYPE_TRAININGS, $player_id, 'Jelentkezés törölve: '
                         . $event->{BUDATOLL_EVENTS_SHORT} . ', ' . $event->{BUDATOLL_EVENTS_DAY} . ' ' . bt_time($event->{BUDATOLL_EVENTS_START}) . '-'
                         . bt_time($event->{BUDATOLL_EVENTS_END}));
+                bt_confirm_waitinglist_of_event($event_id);
             }
             if (btIsOptionEnabled(BUDATOLL_OPTION_WAITINGLIST_EMAIL)) {
                 $waiting_list = bt_get_waiting_list($event_id);

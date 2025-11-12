@@ -4,6 +4,7 @@ define("BUDATOLL_OPTION_TRAINING_CANCELABLE", 'event-cancelable');
 define("BUDATOLL_OPTION_AUTO_CHARGE", 'auto-charge');
 define("BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT", 'negativ-account');
 define("BUDATOLL_OPTION_WAITINGLIST_EMAIL", 'waiting-list');
+define("BUDATOLL_OPTION_CONFIRM_WAITINGLIST", 'confirm-waitinglist');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY", 'email-user-modify');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT", 'email-user-payment');
 define("BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE", 'warning-negativ-balance');
@@ -89,13 +90,14 @@ function budatoll_setting_options() {
             . '<li>- Módosítás után nem megy vissza a mai napra.</li>'
             . '</ul>',
         ],
-         '1.4' => [
+        '1.4' => [
             BUDATOLL_VERSION_DATE => '2025-10',
             BUDATOLL_VERSION_TITLE => 'Első visszajelzések',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
             . '<li>- Pálya lemondhatósággal kapcsolatos hiba javítása.</li>'
             . '<li>- Az info ablak poziciójának javítása.</li>'
             . '<li>- Szerkeszthető egy edzés max. játékos száma 1-20.</li>'
+            . '<li>- Jelszó módosítási lehetőség</li>'
             . '</ul>',
         ],
     ];
@@ -110,6 +112,7 @@ function budatoll_setting_options() {
         ${BUDATOLL_OPTION_AUTO_CHARGE} = btGetCheckbox(BUDATOLL_OPTION_AUTO_CHARGE);
         ${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT} = btGetCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT);
         ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = btGetCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
+         ${BUDATOLL_OPTION_CONFIRM_WAITINGLIST} = btGetCheckbox(BUDATOLL_OPTION_CONFIRM_WAITINGLIST);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE);
@@ -123,6 +126,7 @@ function budatoll_setting_options() {
     $ret .= btPutCheckbox(BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE, 'Az előző napi jelentkezés', 'Lemondható a játék kezdetéig.', 'Áltatlános szabály szerint mondható le.');
     $ret .= btPutCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT, 'Negatív egyenleg esetén', 'Csak előző nap foglalhat.', 'Szabadon foglalhat edzést.');
     $ret .= btPutCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL, 'Email lemondáskor', 'Értesítést kapnak a várólistán szereplők.', 'Nincs értesítés.');
+    $ret .= btPutCheckbox(BUDATOLL_OPTION_CONFIRM_WAITINGLIST, 'Várólistáról feltöltés', 'Automatikusan bekerülnek a várólistán szereplők.', 'Nincs automatizmus.');
     $ret .= btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY, 'Játékos módosításáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     $ret .= btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT, 'A befizetés lekönyveléséről', 'Értesítést kap a játékos.', 'Nincs értesítés.');
     $ret .= btPutCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE, 'Az egyenleg elfogyásáról', 'Értesítést kap a játékos.', 'Nincs értesítés.');
@@ -178,6 +182,6 @@ function btPutCheckbox($var_name, $title, $msg_on, $msg_off) {
     $ret .= '<input type="checkbox" name="' . $var_name . '" id="' . $var_name . '" '
             . (btIsCheckboxOn($$var_name) ? 'checked' : '')
             . ' value="1" onChange="document.getElementById(\'submit\').click();"> '
-            . (btIsCheckboxOn($$var_name) ? $msg_on : $msg_off ) . '</div>';
+            . (btIsCheckboxOn($$var_name) ? $msg_on : $msg_off) . '</div>';
     return $ret;
 }

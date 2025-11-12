@@ -244,7 +244,10 @@ function budatoll_manage_players_list() {
         } else {
             $events = '';
             foreach ($events_arr[0] as $event_type_id) {
-                $events .= get_event_type_by_id($event_type_id)->{BUDATOLL_EVENT_TYPE_LONG} . ', ';
+                $event_type = get_event_type_by_id($event_type_id);
+                if (!empty($event_type)) {
+                    $events .= $event_type->{BUDATOLL_EVENT_TYPE_LONG} . ', ';
+                }
             }
             $events = substr($events, 0, -2);
         }
@@ -255,8 +258,8 @@ function budatoll_manage_players_list() {
         $ret .= '<td class = "column-column3">' . $user->user_email . '</td>';
         $ret .= '<td class = "column-column4">' . $phone . '</td>';
         $ret .= '<td class = "column-column5">' . $events . '</td>';
-        $ret .= '<td class = "column-column6"><span class = "dashicons dashicons-' . ($active == '1' ? 'yes' : 'no' ) . '"></span></td>';
-        $ret .= '<td class = "column-column7"><span class = "dashicons dashicons-' . ($leased == '1' ? 'yes' : 'no' ) . '"></span></td>';
+        $ret .= '<td class = "column-column6"><span class = "dashicons dashicons-' . ($active == '1' ? 'yes' : 'no') . '"></span></td>';
+        $ret .= '<td class = "column-column7"><span class = "dashicons dashicons-' . ($leased == '1' ? 'yes' : 'no') . '"></span></td>';
         $ret .= '<td class = "column-column8">' . bt_edit_button($user_id, 'budatoll_player');
         if (is_player_deletable($user_id)) {
             $ret .= bt_delete_button($user_id);

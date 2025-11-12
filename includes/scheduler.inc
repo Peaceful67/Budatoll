@@ -47,6 +47,7 @@ function budatoll_crontab($instant = false) {
             bt_trainings_make_done();
             bt_charge_passed_trainings();
             bt_inactive_players();
+            bt_search_waiting_list();
         } finally {
             if (ob_get_length()) {
                 ob_end_flush();
@@ -92,7 +93,18 @@ function bt_inactive_players() {
         $wpdb->query($sql);
         if ($wpdb->num_rows > 0 AND $last == 0) { // Ha régen volt, de az utóbbi időben semmi.
             update_user_meta($player_id, BUDATOLL_USER_META_ACTIVE, 0);
-            logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $player_id, $month . ' hónapja nem jelentkezett, inaktiváltuk');
+            bt_logger(BUDATOLL_LOGGER_TYPE_USER_DATA, $player_id, $month . ' hónapja nem jelentkezett, inaktiváltuk');
         }
     }
+}
+
+function bt_search_waiting_list() { // Átnézzük a  még nem lezajlott edzések várólistáját
+    $sql = 'SEELECT * FROM  `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DONE . '`=0;';
+    $events = bt_get_results($sql);
+    if ($events) {
+        foreach ($events as $event) {
+            bt_confirm_waitinglist_of_event( $event->{BUDATOLL_EVENTS_ID} ?? -1);
+        }
+    }
+    error_log('Wainting lists checked');
 }

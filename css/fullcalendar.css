@@ -46,9 +46,10 @@
 
 /* Style individual events */
 .fc-event {
-    font-size: 12px; /* Smaller font for compactness */
-    padding: 2px; /* Adjust padding for compact design */
-    border-radius: 2px; /* Rounded edges for neatness */
+    margin: 0px;
+    font-size: 20px; /* Smaller font for compactness */
+    padding: 1px; /* Adjust padding for compact design */
+    border-radius: 3px; /* Rounded edges for neatness */
     user-select: none; /* Disable text selection */
     -webkit-user-drag: none; /* Disable dragging in WebKit browsers */
     -webkit-touch-callout: none; /* Disable context menu on iOS */
@@ -59,7 +60,7 @@
 /* Style popover for additional events */
 .fc-popover {
     max-width: 300px; /* Ensure the popover is easy to read */
-    font-size: 12px;
+    font-size: 20px;
 }
 
 .fc-daygrid-day-events {

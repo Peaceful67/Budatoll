@@ -104,7 +104,7 @@ add_action('wp_enqueue_scripts', 'bt_enqueue_dashicons');
 function budatoll_scripts() {
     global $post;
     wp_enqueue_style('budatoll-jquery-style', plugins_url('jquery-ui/jquery-ui.css', __FILE__));
-    wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__), [], '1.1.3', false);
+    wp_enqueue_style('budatoll-fc-style', plugins_url('css/fullcalendar.css', __FILE__), [], '1.1.6', false);
     wp_enqueue_style('budatoll-bootstrap-style', plugins_url('css/bootstrap.css', __FILE__));
     wp_enqueue_style('budatoll-style', plugins_url('css/budatoll.css', __FILE__), [], '1.2.21', false);
     wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__, [], '1.1.6'));
