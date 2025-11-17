@@ -100,7 +100,7 @@ function budatoll_setting_options() {
             . '<li>- Jelszó módosítási lehetőség</li>'
             . '</ul>',
         ],
-             '1.4' => [
+             '1.5' => [
             BUDATOLL_VERSION_DATE => '2025-11',
             BUDATOLL_VERSION_TITLE => 'Önök kérték',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
@@ -154,7 +154,7 @@ function budatoll_setting_options() {
                 esc_html($ver_id . ' : ' . $version[BUDATOLL_VERSION_DATE] . ' - ' . $version[BUDATOLL_VERSION_TITLE]));
     }
     $ret .= '</select></div>';
-    $ret .= '<div class="budatoll-keret"><label>Leírás:</label>' . $bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION] . '</div>';
+    $ret .= '<div class="budatoll-keret"><label>A verzió fejlesztései:</label>' . $bt_versions[$selected_version][BUDATOLL_VERSION_DESCRIPTION] . '</div>';
     $ret .= '</form>';
     $ret .= '</div>';
     return $ret;
