@@ -12,7 +12,7 @@ define("BUDATOLL_OPTION_SHORT_APPLICATION_CANCELABLE", 'short-application-cancel
 
 define("BUDATOLL_OPTION_LAST_CRONTAB", 'bt_last_crontab');
 
-define("BUDATOLL_CURRENT_VERSION", '1.4');
+define("BUDATOLL_CURRENT_VERSION", '1.5');
 
 define("BUDATOLL_VERSION_ID", 'id');
 define("BUDATOLL_VERSION_DATE", 'date');
@@ -98,6 +98,16 @@ function budatoll_setting_options() {
             . '<li>- Az info ablak poziciójának javítása.</li>'
             . '<li>- Szerkeszthető egy edzés max. játékos száma 1-20.</li>'
             . '<li>- Jelszó módosítási lehetőség</li>'
+            . '</ul>',
+        ],
+             '1.4' => [
+            BUDATOLL_VERSION_DATE => '2025-11',
+            BUDATOLL_VERSION_TITLE => 'Önök kérték',
+            BUDATOLL_VERSION_DESCRIPTION => '<ul>'
+            . '<li>- Jelszó módosítási menüpont.</li>'
+            . '<li>- Az edzések gombjai nagyobbak a naptárban.</li>'
+            . '<li>- Minden nézetben látszik a jelentkezettek száma az info ablakban.</li>'
+            . '<li>- Kapcsolható a várólistáról automatikus feliratkozás email értesítéssel.</li>'
             . '</ul>',
         ],
     ];
