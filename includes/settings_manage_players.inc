@@ -253,7 +253,7 @@ function budatoll_manage_players_list() {
         }
 //     $events = print_r($events_arr, true);
         $ret .= '<tr>';
-        $ret .= '<td class = "column-column1">' . $user->user_login . '</td>';
+        $ret .= '<td class = "column-column1"><a title="'.$user->ID.'">' . $user->user_login . '</a></td>';
         $ret .= '<td class = "column-column2">' . $user->display_name . '</td>';
         $ret .= '<td class = "column-column3">' . $user->user_email . '</td>';
         $ret .= '<td class = "column-column4">' . $phone . '</td>';
