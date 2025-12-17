@@ -156,7 +156,7 @@ function budatoll_manage_emails() {
     if (getPostVariable('email_test')) {
         foreach (bt_get_coaches() as $coach) {
             $ret = bt_send_custom_email($coach->ID, BT_CUSTOM_EMAIL_TEST_COACHES);
-            bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $coach->ID, ($ret ? 'A kornyezet tiltja' : 'PHP mail funkció halott'));
+//            bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $coach->ID, ($ret ? 'A kornyezet tiltja' : 'PHP mail funkció halott'));
         }
     }
     if (getPostVariable('email_save')) {
