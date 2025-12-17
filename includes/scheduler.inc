@@ -77,7 +77,7 @@ function bt_trainings_make_done() {
 
 function bt_inactive_players() {
     global $wpdb;
-    $month = 6;
+    $month = 12;
     $players = bt_get_active_players();
     if (empty($players)) {
         return;

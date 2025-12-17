@@ -18,6 +18,7 @@ define("BT_CUSTOM_EMAIL_PLAYER_MODIFIED", 'player-modified');
 define("BT_CUSTOM_EMAIL_SELF_REGISTERED_PLAYER", 'self-registered-player');
 define("BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH", 'self-registered-coach');
 define("BT_CUSTOM_EMAIL_WARN_PLAYERS", 'warn-players');
+define("BT_CUSTOM_EMAIL_TEST_COACHES", 'test-coaches');
 
 define("BT_CUSTOM_EMAIL_SIGN", 'email-sign');
 define("BT_CUSTOM_EMAIL_DEFAULT_SIGN", 'Üdvözlettel:<br>Budatoll csapata');
@@ -63,7 +64,7 @@ $bt_default_emails = [
         . ' edzésről egy játékos törölte a jelentkezését, így lehetőséged van a várólistás jelentkezésedet megerősíteni. '
         . '<br>Siess, mert más várólistások is hasonló értesítést kaphattak!.<br>',
     ],
-     BT_CUSTOM_EMAIL_CONFIRM_WAITING => [
+    BT_CUSTOM_EMAIL_CONFIRM_WAITING => [
         BUDATOLL_EMAIL_TITLE => 'Várólistáról bekerült az edzésre',
         BUDATOLL_EMAIL_DESCRIPTION => 'Ezt akkor kapja a játékos, amikor bekererül a várólistáról az edzésre .<br>'
         . '#1# helyére az edzés hosszú neve fog kerülni.<br>'
@@ -137,6 +138,12 @@ $bt_default_emails = [
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A tollaslabda klubunk honlapján új edzés alkalmak lettek beállítva.<br>'
         . 'Lépj be az oldalra és jelentkezz, amelyikre szeretnél eljönni!',
     ],
+    BT_CUSTOM_EMAIL_TEST_COACHES => [
+        BUDATOLL_EMAIL_TITLE => 'Teszt email küldése',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt az összes Edzőnek küld egy teszt emailt. Arra való, hogy ellenőrizni lehessen a levelezőrendszer működőképességét.',
+        BUDATOLL_EMAIL_SUBJECT => 'Teszt email',
+        BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A tollaslabda klub levelező rendszerét teszteltük. Nincs tenni valód, örülj, hogy ez a rész rendben működik.',
+    ],
 ];
 
 function budatoll_manage_emails() {
@@ -146,6 +153,12 @@ function budatoll_manage_emails() {
     $ret .= '<form id="BudatollForm" method="POST" action="/emailek">';
     $selected_custom_email = getPostVariable('budatoll_custom_email', 'choose');
     $email_arr = bt_get_custom_email($selected_custom_email);
+    if (getPostVariable('email_test')) {
+        foreach (bt_get_coaches() as $coach) {
+            $ret = bt_send_custom_email($coach->ID, BT_CUSTOM_EMAIL_TEST_COACHES);
+            bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $coach->ID, ($ret ? 'A kornyezet tiltja' : 'PHP mail funkció halott'));
+        }
+    }
     if (getPostVariable('email_save')) {
         $sign = getPostVariable('bt_ce_sign', BT_CUSTOM_EMAIL_DEFAULT_SIGN);
         if (strcmp($sign, get_option(BT_CUSTOM_EMAIL_SIGN)) != 0) {
@@ -204,7 +217,8 @@ function budatoll_manage_emails() {
     }
     $sign = get_option(BT_CUSTOM_EMAIL_SIGN, BT_CUSTOM_EMAIL_DEFAULT_SIGN);
     $ret .= '<div class="budatoll-form-group"><label for="bt_ce_sign">Email aláírása: </label><textarea id="bt_ce_sign" name="bt_ce_sign">' . $sign . '</textarea></div>';
-    $ret .= '<div class="budatoll-form-group">' . bt_text_button('email_save', 'Módosítások mentése') . bt_text_button('email_default', 'Eredeti visszaállítása') . '</div>';
+    $ret .= '<div class="budatoll-form-group">' . bt_text_button('email_save', 'Módosítások mentése')
+            . bt_text_button('email_default', 'Eredeti visszaállítása') . bt_text_button('email_test', 'Teszt email küldése') . '</div>';
     $ret .= '</form>';
     return $ret;
 }

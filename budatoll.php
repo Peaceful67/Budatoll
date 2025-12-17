@@ -28,12 +28,12 @@ require_once plugin_dir_path(__FILE__) . 'includes/trainings_functions.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_calendar.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/trainings_list.inc';
 require_once plugin_dir_path(__FILE__) . 'includes/scheduler.inc';
-require_once plugin_dir_path(__FILE__). '/includes/password_change.inc';
+require_once plugin_dir_path(__FILE__) . '/includes/password_change.inc';
 
 require_once plugin_dir_path(__FILE__) . 'ajax.inc';
 // require_once plugin_dir_path(__FILE__) . 'settings.inc';
 
-require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 add_shortcode('list_balances', 'list_balance_of_users');
 add_shortcode('budatoll-players', 'budatoll_manage_players');
@@ -89,10 +89,12 @@ add_action('user_register', 'bt_set_default_role');
 /**
  * Disable admin notification on user password change.
  */
-if ( ! function_exists( 'wp_password_change_notification' ) ) {
-	function wp_password_change_notification( $user ) {
-		// do nothing
-	}
+if (!function_exists('wp_password_change_notification')) {
+
+    function wp_password_change_notification($user) {
+        // do nothing
+    }
+
 }
 
 function bt_enqueue_dashicons() {
@@ -110,22 +112,23 @@ function budatoll_scripts() {
     wp_enqueue_style('budatoll-mobile-style', plugins_url('css/mobile.css', __FILE__, [], '1.1.6'));
 
     wp_enqueue_script('budatoll-fc', plugins_url('fullcalendar/index.global.min.js', __FILE__), array('jquery'), false, false);
-    wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'),false, false);
+    wp_enqueue_script('budatoll-fc-lc-hu', plugins_url('fullcalendar/locales/hu.global.min.js', __FILE__), array('jquery'), false, false);
     wp_enqueue_script('budatoll-header-script', plugins_url('js/budatoll-header-script.js', __FILE__), array('jquery'), '2.94', false);
-
-    switch ($post->post_name) {
-        case 'sablon-naptar':
-            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_template.js', __FILE__), array('jquery'), '1.2', true);
-            break;
-        case 'alkalom-naptar':
-            wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '2.6', true);
-            break;
-        case 'edzesek-naptar':
-            wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '2.95', true);
-            break;
-        case 'edzeseim-naptar':
-            wp_enqueue_script('budatoll-my-trainings-script', plugins_url('js/my_trainings_calendar.js', __FILE__), array('jquery'), '2.96', true);
-            break;
+    if (!is_null($post->post_name)) {
+        switch ($post->post_name) {
+            case 'sablon-naptar':
+                wp_enqueue_script('budatoll-events-script', plugins_url('js/events_template.js', __FILE__), array('jquery'), '1.2', true);
+                break;
+            case 'alkalom-naptar':
+                wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '2.6', true);
+                break;
+            case 'edzesek-naptar':
+                wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '2.95', true);
+                break;
+            case 'edzeseim-naptar':
+                wp_enqueue_script('budatoll-my-trainings-script', plugins_url('js/my_trainings_calendar.js', __FILE__), array('jquery'), '2.96', true);
+                break;
+        }
     }
     wp_enqueue_script('budatoll-jquery-ui-script', plugins_url('jquery-ui/jquery-ui.js', __FILE__), array('jquery'), '1.3', false);
     wp_enqueue_script('budatoll-end-script', plugins_url('js/budatoll-end-script.js', __FILE__), array('jquery'), '1.5', true);
