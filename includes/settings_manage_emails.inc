@@ -18,6 +18,7 @@ define("BT_CUSTOM_EMAIL_PLAYER_MODIFIED", 'player-modified');
 define("BT_CUSTOM_EMAIL_SELF_REGISTERED_PLAYER", 'self-registered-player');
 define("BT_CUSTOM_EMAIL_SELF_REGISTERED_COACH", 'self-registered-coach');
 define("BT_CUSTOM_EMAIL_WARN_PLAYERS", 'warn-players');
+define("BT_CUSTOM_EMAIL_WARN_RENTERS", 'warn-renters');
 define("BT_CUSTOM_EMAIL_TEST_COACHES", 'test-coaches');
 
 define("BT_CUSTOM_EMAIL_SIGN", 'email-sign');
@@ -131,12 +132,21 @@ $bt_default_emails = [
         . 'A vezérlőpulton álltsd be számára a megfelelő játékokat, edzéseket!',
     ],
     BT_CUSTOM_EMAIL_WARN_PLAYERS => [
-        BUDATOLL_EMAIL_TITLE => 'Felhívás jelentkezésre',
+        BUDATOLL_EMAIL_TITLE => 'Felhívás játékosok jelentkezésére',
         BUDATOLL_EMAIL_DESCRIPTION => 'Ezt az összes olyan aktív játékos kapja, aki a mai naptól kezdve bármely beállított alkalomra jelentkezhet.<br>'
         . '#1# helyén a játékos felhasználó neve fog megjelenni.',
         BUDATOLL_EMAIL_SUBJECT => 'Edzésalkalmak feltöltve',
         BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A tollaslabda klubunk honlapján új edzés alkalmak lettek beállítva.<br>'
         . 'Lépj be az oldalra és jelentkezz, amelyikre szeretnél eljönni!',
+    ],
+    BT_CUSTOM_EMAIL_WARN_RENTERS => [
+        BUDATOLL_EMAIL_TITLE => 'Felhívás pályabérlők jelentkezésre',
+        BUDATOLL_EMAIL_DESCRIPTION => 'Ezt az összes olyan aktív játékos kapja, aki a mai naptól kezdve bármely beállított pályabérletre jelentkezhet. '
+        . 'Azt tekintjük pályabérlésnek, amikor csak egy játékos jelentkezését fogadjuk el.<br>'
+        . '#1# helyén a játékos felhasználó neve fog megjelenni.',
+        BUDATOLL_EMAIL_SUBJECT => 'Edzésalkalmak feltöltve',
+        BUDATOLL_EMAIL_BODY => 'Tisztelt ' . BT_REPLACE_USER_NAME . '!<br><br>A tollaslabda klubunk honlapján új pályabérési lehetőségek lettek beállítva.<br>'
+        . 'Lépj be az oldalra és foglald le, amelyiket szeretnéd!',
     ],
     BT_CUSTOM_EMAIL_TEST_COACHES => [
         BUDATOLL_EMAIL_TITLE => 'Teszt email küldése',
@@ -154,8 +164,9 @@ function budatoll_manage_emails() {
     $selected_custom_email = getPostVariable('budatoll_custom_email', 'choose');
     $email_arr = bt_get_custom_email($selected_custom_email);
     if (getPostVariable('email_test')) {
+        $ret .= 'Cimek: ';
         foreach (bt_get_coaches() as $coach) {
-            $ret = bt_send_custom_email($coach->ID, BT_CUSTOM_EMAIL_TEST_COACHES);
+            $ret .= bt_send_custom_email($coach->ID, BT_CUSTOM_EMAIL_TEST_COACHES) . ', ';
 //            bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $coach->ID, ($ret ? 'A kornyezet tiltja' : 'PHP mail funkció halott'));
         }
     }

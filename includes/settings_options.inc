@@ -100,14 +100,15 @@ function budatoll_setting_options() {
             . '<li>- Jelszó módosítási lehetőség</li>'
             . '</ul>',
         ],
-             '1.5' => [
-            BUDATOLL_VERSION_DATE => '2025-11',
+        '1.5' => [
+            BUDATOLL_VERSION_DATE => '2025-12',
             BUDATOLL_VERSION_TITLE => 'Önök kérték',
             BUDATOLL_VERSION_DESCRIPTION => '<ul>'
             . '<li>- Jelszó módosítási menüpont.</li>'
             . '<li>- Az edzések gombjai nagyobbak a naptárban.</li>'
             . '<li>- Minden nézetben látszik a jelentkezettek száma az info ablakban.</li>'
             . '<li>- Kapcsolható a várólistáról automatikus feliratkozás email értesítéssel.</li>'
+            . '<li>- A játékosoknak és a pályabérlőknek külön emailküldési lehetőség.</li>'
             . '</ul>',
         ],
     ];
@@ -122,7 +123,7 @@ function budatoll_setting_options() {
         ${BUDATOLL_OPTION_AUTO_CHARGE} = btGetCheckbox(BUDATOLL_OPTION_AUTO_CHARGE);
         ${BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT} = btGetCheckbox(BUDATOLL_OPTION_DISABLE_NAGATIV_ACCOUNT);
         ${BUDATOLL_OPTION_WAITINGLIST_EMAIL} = btGetCheckbox(BUDATOLL_OPTION_WAITINGLIST_EMAIL);
-         ${BUDATOLL_OPTION_CONFIRM_WAITINGLIST} = btGetCheckbox(BUDATOLL_OPTION_CONFIRM_WAITINGLIST);
+        ${BUDATOLL_OPTION_CONFIRM_WAITINGLIST} = btGetCheckbox(BUDATOLL_OPTION_CONFIRM_WAITINGLIST);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_USER_MODIFY);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_PAYMENT);
         ${BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE} = btGetCheckbox(BUDATOLL_OPTION_EMAIL_NOTICE_NEGATIV_BALANCE);

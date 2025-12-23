@@ -55,6 +55,19 @@ function budatoll_ajax() {
             }
             $ret = json_encode($ret);
             break;
+        case 'email-renters':
+            $emails = bt_warn_renters();
+            if ($emails && $emails > 0) {
+                $ret = [
+                    'result' => 'success',
+                    'emailed' => $emails,
+                ];
+            } else {
+                $ret = ['result' => 'error'];
+                $ret['message'] = $emails ? 'Nem történt levél küldés' : 'Belső hiba';
+            }
+            $ret = json_encode($ret);
+            break;
         case 'get-events-template':
             $ret = bt_get_events_template();
             break;

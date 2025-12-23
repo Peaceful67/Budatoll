@@ -63,7 +63,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
         });
     },
     headerToolbar: {
-        left: 'prev,next today copyTemplate sendEmailWarning',
+        left: 'prev,next today copyTemplate sendEmailWarningPlayers sendEmailWarningRenters',
         center: 'title',
         right: 'dayGridMonth timeGridWeek listWeek'
 
@@ -78,18 +78,27 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
                 }
             }
         },
-        sendEmailWarning: {
-            text: 'Figyelmeztetés',
+        sendEmailWarningPlayers: {
+            text: 'Email játékosoknak',
             hint: 'Emaileket küld a játékosoknak, hogy jelentkezhetnek következő időszakra.',
             click: function () {
                 if (confirm('Biztosan levelet akarsz küldeni az összes érintett játékosnak?')) {
                     emailToPlayers();
                 }
             }
-        }
+        },
+        sendEmailWarningRenters: {
+            text: 'Email pályabérlőknek',
+            hint: 'Emaileket küld a pályabérlőknek, hogy jelentkezhetnek következő időszakra.',
+            click: function () {
+                if (confirm('Biztosan levelet akarsz küldeni az összes érintett játékosnak?')) {
+                    emailToRenters();
+                }
+            }
+        },
 
     },
-     eventContent: function (day) {
+    eventContent: function (day) {
         var arrayOfDomNodes = [];
         var title = document.createElement('div');
         title.innerText = day.event.title;
@@ -309,6 +318,38 @@ function emailToPlayers() {
         data: {
             action: 'budatoll',
             'ajax-action': 'email-players'
+        },
+        success: function (response) {
+            switch (response.result) {
+                case 'success':
+                    const message = response.emailed + ' levél kiküldve';
+                    $('#budatoll-message').html('Levélküldés sikeres.<br>' + message).removeClass('budatoll-error').addClass('budatoll-success');
+                    $('#budatoll-message').show(1000).delay(2500).hide(1000);
+                    setTimeout(function () {
+                        window.location.reload(false);
+                    }, 3000);
+                    break;
+                case 'error':
+                    $('#budatoll-message').html('A levélküldés sikeretelen').removeClass('budatoll-success').addClass('budatoll-error');
+                    $('#budatoll-message').show(1000).delay(1500).hide(1000);
+                    break;
+            }
+        },
+        error: function (response) {
+            $('#budatoll-message').html('A levélküldés sikeretelen').addClass('budatoll-error');
+            $('#budatoll-message').show(1000).delay(1500).hide(1000);
+        }
+    });
+}
+
+function emailToRenters() {
+    $.ajax({
+        url: budatoll_ajax_object.ajax_url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            action: 'budatoll',
+            'ajax-action': 'email-renters'
         },
         success: function (response) {
             switch (response.result) {

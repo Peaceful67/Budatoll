@@ -69,3 +69,7 @@
     flex-wrap: wrap;
     justify-content: flex-start;
 }
+
+.fc-col-header-cell {
+    background-color: #d0d0d0; /* light gray */
+}

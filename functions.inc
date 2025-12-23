@@ -108,8 +108,7 @@ function bt_send_email($user_id, $subject, $message) {
     ];
     $message .= '<br><br>' . get_option(BT_CUSTOM_EMAIL_SIGN, 'Üdvözlettel:<br>Budatoll csapata');
     bt_logger(BUDATOLL_LOGGER_TYPE_EMAILS, $user_id, $subject . ' (' . $user_email . '), ' . substr($message, 0, 128));
-    $ret = wp_mail($user_email, $subject, $message, $headers);
-    return $ret;
+    return wp_mail($user_email, $subject, $message, $headers) ? $user_email : '';
 }
 
 function budatoll_menu_based_on_role($args) {
@@ -385,10 +384,10 @@ function bt_get_coaches() {
     return $ret;
 }
 
-function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete, akik érintettek mától az utolsó feltöltött alkalomig
+function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelet, akik érintettek mától az utolsó feltöltött alkalomig
     $players = bt_get_active_players();
     $num = false;
-    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE();';
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE() AND `' . BUDATOLL_EVENTS_MAX_PLAYERS . '`>1;;';
     $events = bt_get_results($sql);
     if (!$events) {  // Valami hiba van
         return false;
@@ -399,13 +398,15 @@ function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete
     $event_types = [];
     $public_events = get_public_event_types();
     $is_public = false;
+
     foreach ($events as $event) {
         $type_id = $event->{BUDATOLL_EVENTS_EVENT_TYPE_ID};
         $event_types[$type_id] = true;
         if (in_array($type_id, $public_events)) { // hav van publikus
-            $is_public = true;
+            // $is_public = true;  Egyelőre ezt nem vesszük figyelembe
         }
     }
+
     foreach ($players as $player) {
         $user_id = $player->ID ?? -1;
         $user_allowed = false;
@@ -413,6 +414,57 @@ function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelete
         if ($is_public) { // Ha van az időszakban publikus, akkor nem keresünk tovább
             $user_allowed = true;
         } elseif (!empty($events_arr)) {
+            foreach ($events_arr[0] as $event_type_id) {
+                if (isset($event_types[$event_type_id])) {
+                    $user_allowed = true;
+                }
+            }
+        }
+        if ($user_allowed) {
+            if (bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_WARN_PLAYERS)) {
+                if ($num) {
+                    $num++;
+                } else {
+                    $num = 1;
+                }
+            }
+        }
+    }
+    return $num;
+}
+
+function bt_warn_renters() {  // Azoknak az aktív játékosoknak küld levelete, akik érintettek mától az utolsó feltöltött alkalomig
+    // Ezt azok kapják akik, pályát tudnak bérelni. max_players>1
+    $players = bt_get_active_players();
+    $num = false;
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE() AND `' . BUDATOLL_EVENTS_MAX_PLAYERS . '`=1;';
+    $events = bt_get_results($sql);
+    if (!$events) {  // Valami hiba van
+        return false;
+    }
+    if (empty($events)) { // Nincs ilyen alakalom.
+        return 0;
+    }
+    $event_types = [];
+    $public_events = get_public_event_types();
+
+    $is_public = false; //  Van-e a jövőben publikusnak jelelölt alkalom, amire bárki jelentkezhet
+
+    foreach ($events as $event) {
+        $type_id = $event->{BUDATOLL_EVENTS_EVENT_TYPE_ID};
+        $event_types[$type_id] = true;
+        if (in_array($type_id, $public_events)) { // hav van publikus
+            // $is_public = true; // Ezt egyelőre nem nézzük
+        }
+    }
+
+    foreach ($players as $player) {
+        $user_id = $player->ID ?? -1;
+        $user_allowed = false;
+        $events_arr = get_user_meta($user_id, BUDATOLL_USER_META_EVENTS, false);
+        if ($is_public) { // Ha van az időszakban publikus, akkor nem keresünk tovább
+            $user_allowed = true;
+        } else {
             foreach ($events_arr[0] as $event_type_id) {
                 if (isset($event_types[$event_type_id])) {
                     $user_allowed = true;
