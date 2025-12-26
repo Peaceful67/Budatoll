@@ -126,7 +126,7 @@ function budatoll_scripts() {
                 wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '1.5.1', true);
                 break;
             case 'edzeseim-naptar':
-                wp_enqueue_script('budatoll-my-trainings-script', plugins_url('js/my_trainings_calendar.js', __FILE__), array('jquery'), '1.5.1', true);
+                wp_enqueue_script('budatoll-my-trainings-script', plugins_url('js/my_trainings_calendar.js', __FILE__), array('jquery'), '1.5.3', true);
                 break;
         }
     }

@@ -255,7 +255,7 @@ function showApplicants(trainings) {
 
     waiting_list = '';
     if (trainings.length === 0) {
-        trainings_text += 'Senki';
+        trainings_text = 'Nem jelentkezett senki';
     } else {
         trainings_text = 'Jelentkezett ' + trainings.length + ' játékos: ';
         trainings.forEach(function (training) {
