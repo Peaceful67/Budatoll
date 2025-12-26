@@ -387,7 +387,7 @@ function bt_get_coaches() {
 function bt_warn_players() {  // Azoknak az aktív játékosoknak küld levelet, akik érintettek mától az utolsó feltöltött alkalomig
     $players = bt_get_active_players();
     $num = false;
-    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE() AND `' . BUDATOLL_EVENTS_MAX_PLAYERS . '`>1;;';
+    $sql = 'SELECT * FROM `' . BUDATOLL_EVENTS_TABLE . '` WHERE `' . BUDATOLL_EVENTS_DAY . '`>= CURDATE() AND `' . BUDATOLL_EVENTS_MAX_PLAYERS . '`!=1;';
     $events = bt_get_results($sql);
     if (!$events) {  // Valami hiba van
         return false;
@@ -472,7 +472,7 @@ function bt_warn_renters() {  // Azoknak az aktív játékosoknak küld levelete
             }
         }
         if ($user_allowed) {
-            if (bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_WARN_PLAYERS)) {
+            if (bt_send_custom_email($user_id, BT_CUSTOM_EMAIL_WARN_RENTERS)) {
                 if ($num) {
                     $num++;
                 } else {
