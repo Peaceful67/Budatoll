@@ -120,7 +120,7 @@ function budatoll_scripts() {
                 wp_enqueue_script('budatoll-events-script', plugins_url('js/events_template.js', __FILE__), array('jquery'), '1.5.1', true);
                 break;
             case 'alkalom-naptar':
-                wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '1.5.2', true);
+                wp_enqueue_script('budatoll-events-script', plugins_url('js/events_calendar.js', __FILE__), array('jquery'), '1.5.3', true);
                 break;
             case 'edzesek-naptar':
                 wp_enqueue_script('budatoll-trainings-script', plugins_url('js/trainings_calendar.js', __FILE__), array('jquery'), '1.5.1', true);

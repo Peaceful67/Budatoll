@@ -91,7 +91,7 @@ const budatoll_events_calendar = new FullCalendar.Calendar(calendarEl_events, {
             text: 'Email pályabérlőknek',
             hint: 'Emaileket küld a pályabérlőknek, hogy jelentkezhetnek következő időszakra.',
             click: function () {
-                if (confirm('Biztosan levelet akarsz küldeni az összes érintett játékosnak?')) {
+                if (confirm('Biztosan levelet akarsz küldeni az összes érintett pályabérlőnek?')) {
                     emailToRenters();
                 }
             }

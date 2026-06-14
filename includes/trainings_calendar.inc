@@ -115,7 +115,7 @@ function budatoll_trainings_calendar() {
     $set_max_players = getPostVariable('set_max_players');
     if ($set_max_players) {
         $max_players = getPostVariable('max_players');
-        if ($max_players >= 1 AND $max_players <= 20) {
+        if ($max_players >= 1 AND $max_players <= 99) {
             if ($wpdb->update(BUDATOLL_EVENTS_TABLE, [BUDATOLL_EVENTS_MAX_PLAYERS => $max_players], [BUDATOLL_EVENTS_ID => $set_max_players]) > 0) {
                 bt_logger(BUDATOLL_LOGGER_TYPE_EVENTS, -1, 'A ' . $set_max_players . ' azonositójú edzés módositott max játékos száma: ' . $max_players);
                 bt_confirm_waitinglist_of_event($set_max_players);

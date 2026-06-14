@@ -176,7 +176,7 @@ function btEventClick(eventInfo) {
     trainings_text += '<div class="budatoll-row">Idősáv: ' + event.start.substring(0, 5) + ' - ' + event.end.substring(0, 5) + '</div>';
     trainings_text += '<div class="budatoll-popup-row">Max játékos: ';
     if (event.max_players > 0) {
-        trainings_text += '<input type="number" size="2" min="1" max="20" name="max_players" id="max_players" value="' + event.max_players + '">';
+        trainings_text += '<input type="number" size="2" min="1" max="99" name="max_players" id="max_players" value="' + event.max_players + '">';
         trainings_text += '<button class="button budatoll-button" name="set_max_players"  value="' + id + '" title="Módosítás"><span class="dashicons dashicons-saved"></span></button>';
     } else {
         trainings_text += 'Korlátlan';
